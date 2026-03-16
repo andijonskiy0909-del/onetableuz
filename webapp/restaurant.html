@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restoran</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
+    .back-btn { position: fixed; top: 12px; left: 12px; background: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 100; font-size: 18px; }
+    .hero img { width: 100%; height: 250px; object-fit: cover; }
+    .content { padding: 16px; }
+    .name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .meta { color: #64748b; font-size: 14px; margin-bottom: 16px; }
+    .rating { color: #f59e0b; font-weight: 600; }
+    .section { margin-bottom: 20px; }
+    .section h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .section p { font-size: 14px; color: #475569; line-height: 1.6; }
+    .info-row { display: flex; gap: 8px; align-items: center; font-size: 14px; color: #475569; margin-bottom: 6px; }
+    .reserve-btn { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: white; border-top: 1px solid #e2e8f0; }
+    .reserve-btn button { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .loading { text-align: center; padding: 60px 20px; color: #64748b; }
+    .form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; }
+    .form-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; padding: 20px; z-index: 201; }
+    .form-sheet h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { font-size: 13px; color: #64748b; margin-bottom: 4px; display: block; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; }
+    .form-submit { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .close-btn { float: right; background: none; border: none; font-size: 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="history.back()">←</button>
+
+  <div id="restaurantDetail">
+    <div class="loading">Yuklanmoqda...</div>
+  </div>
+
+  <div class="form-overlay" id="formOverlay" onclick="closeForm()"></div>
+  <div class="form-sheet" id="formSheet" style="display:none">
+    <button class="close-btn" onclick="closeForm()">✕</button>
+    <h3>📅 Bron qilish</h3>
+    <div class="form-group">
+      <label>Sana</label>
+      <input type="date" id="bookDate" min="">
+    </div>
+    <div class="form-group">
+      <label>Vaqt</label>
+      <input type="time" id="bookTime" value="19:00">
+    </div>
+    <div class="form-group">
+      <label>Mehmonlar soni</label>
+      <select id="bookGuests">
+        <option value="1">1 kishi</option>
+        <option value="2" selected>2 kishi</option>
+        <option value="3">3 kishi</option>
+        <option value="4">4 kishi</option>
+        <option value="5">5 kishi</option>
+        <option value="6">6 kishi</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Izoh (ixtiyoriy)</label>
+      <input type="text" id="bookComment" placeholder="Maxsus xohish...">
+    </div>
+    <button class="form-submit" onclick="submitReservation()">✅ Bronni tasdiqlash</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const API_URL = 'https://onetableuz-production.up.railway.app/api';
+    const params = new URLSearchParams(window.location.search);
+    const restaurantId = params.get('id');
+    let restaurant = null;
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('bookDate').min = today;
+    document.getElementById('bookDate').value = today;
+
+    async function loadRestaurant() {
+      try {
+        const res = await fetch(`${API_URL}/restaurants/${restaurantId}`);
+        restaurant = await res.json();
+        renderRestaurant(restaurant);
+      } catch {
+        document.getElementById('restaurantDetail').innerHTML = '<div class="loading">Xatolik yuz berdi</div>';
+      }
+    }
+
+    function renderRestaurant(r) {
+      document.getElementById('restaurantDetail').innerHTML = `
+        <div class="hero">
+          <img src="${r.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600'}" alt="${r.name}">
+        </div>
+        <div class="content">
+          <div class="name">${r.name}</div>
+          <div class="meta">
+            <span class="rating">⭐ ${r.rating || '4.5'}</span> • 
+            ${r.cuisine ? r.cuisine.join(', ') : ''} • ${r.price_category || ''}
+          </div>
+          <div class="section">
+            <h3>📍 Manzil</h3>
+            <div class="info-row">📍 ${r.address || 'Manzil ko\'rsatilmagan'}</div>
+            <div class="info-row">📞 ${r.phone || 'Telefon ko\'rsatilmagan'}</div>
+          </div>
+          <div class="section">
+            <h3>ℹ️ Haqida</h3>
+            <p>${r.description || 'Ma\'lumot yo\'q'}</p>
+          </div>
+        </div>
+        <div style="height: 80px"></div>
+      `;
+
+      document.querySelector('.reserve-btn') && (document.querySelector('.reserve-btn').style.display = 'block');
+    }
+
+    function openForm() {
+      document.getElementById('formOverlay').style.display = 'block';
+      document.getElementById('formSheet').style.display = 'block';
+    }
+
+    function closeForm() {
+      document.getElementById('formOverlay').style.display = 'none';
+      document.getElementById('formSheet').style.display = 'none';
+    }
+
+    async function submitReservation() {
+      const date = document.getElementById('bookDate').value;
+      const time = document.getElementById('bookTime').value;
+      const guests = document.getElementById('bookGuests').value;
+      const comment = document.getElementById('bookComment').value;
+
+      tg.showPopup({
+        title: '✅ Bron tasdiqlandi!',
+        message: `${restaurant.name}\n📅 ${date} soat ${time}\n👥 ${guests} kishi`,
+        buttons: [{ type: 'ok', text: 'Yaxshi!' }]
+      });
+
+      closeForm();
+      tg.sendData(JSON.stringify({
+        action: 'reservation_created',
+        restaurant_id: restaurantId,
+        restaurant_name: restaurant.name,
+        date, time, guests, comment
+      }));
+    }
+
+    loadRestaurant();
+  </script>
+
+  <div class="reserve-btn">
+    <button onclick="openForm()">📅 Bron qilish — Bepul</button>
+  </div>
+</body>
+</html>
