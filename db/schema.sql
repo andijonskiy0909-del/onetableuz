@@ -1,6 +1,6 @@
 CREATE TABLE users (
  id SERIAL PRIMARY KEY,
- telegram_id BIGINT UNIQUE,
+ telegram_id BIGINT UNIQUE NOT NULL,
  name TEXT,
  phone TEXT,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -8,20 +8,20 @@ CREATE TABLE users (
 
 CREATE TABLE restaurants (
  id SERIAL PRIMARY KEY,
- name TEXT,
+ name TEXT NOT NULL,
  description TEXT,
- capacity INTEGER,
+ capacity INTEGER NOT NULL,
  address TEXT,
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE reservations (
  id SERIAL PRIMARY KEY,
- user_id INTEGER REFERENCES users(id),
- restaurant_id INTEGER REFERENCES restaurants(id),
+ user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ restaurant_id INTEGER NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
  date DATE NOT NULL,
  time TIME NOT NULL,
- guests INTEGER NOT NULL,
+ guests INTEGER NOT NULL CHECK (guests > 0),
  status VARCHAR(20) DEFAULT 'pending',
  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
