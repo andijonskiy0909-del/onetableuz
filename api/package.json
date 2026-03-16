@@ -2,7 +2,7 @@
   "name": "onetable-api",
   "version": "1.0.0",
 "scripts": {
- "start": "node server.js"
+ "start": "node server.js",
 }
   "migrate": "node src/migrate.js",
   "seed": "node src/seed.js",
