@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneTable — Dashboard</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#1e293b; }
+.login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#1a1a2e; }
+.login-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; }
+.login-logo { text-align:center; font-size:40px; margin-bottom:8px; }
+.login-title { text-align:center; font-size:22px; font-weight:700; margin-bottom:4px; }
+.login-sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:28px; }
+.login-box input { width:100%; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; outline:none; margin-bottom:12px; }
+.login-box input:focus { border-color:#ef4444; }
+.login-btn { width:100%; background:#ef4444; color:white; border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
+.login-err { color:#ef4444; font-size:13px; text-align:center; margin-top:10px; display:none; }
+.app { display:none; }
+.sidebar { width:240px; background:#1a1a2e; color:white; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; }
+.sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.sidebar-logo h1 { font-size:20px; font-weight:700; }
+.sidebar-logo p { font-size:12px; color:#94a3b8; margin-top:2px; }
+.nav-links { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:4px; }
+.nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:#94a3b8; border:none; background:none; width:100%; text-align:left; transition:all .15s; }
+.nav-link:hover { background:rgba(255,255,255,0.08); color:white; }
+.nav-link.active { background:#ef4444; color:white; }
+.nav-icon { font-size:18px; width:24px; }
+.sidebar-bottom { padding:16px 12px; border-top:1px solid rgba(255,255,255,0.1); }
+.resto-info { font-size:13px; color:#94a3b8; padding:8px 12px; margin-bottom:4px; }
+.logout-btn { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:#94a3b8; border:none; background:none; width:100%; }
+.logout-btn:hover { color:#ef4444; }
+.main { margin-left:240px; padding:28px; min-height:100vh; }
+.page-header { margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-start; }
+.page-header h2 { font-size:22px; font-weight:700; }
+.page-header p { color:#64748b; font-size:14px; margin-top:2px; }
+.section { display:none; }
+.section.active { display:block; }
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.stat-label { font-size:13px; color:#64748b; margin-bottom:8px; }
+.stat-value { font-size:32px; font-weight:700; }
+.stat-sub { font-size:12px; color:#94a3b8; margin-top:4px; }
+.stat-blue .stat-value { color:#3b82f6; }
+.stat-green .stat-value { color:#10b981; }
+.stat-orange .stat-value { color:#f59e0b; }
+.stat-red .stat-value { color:#ef4444; }
+.card { background:white; border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:20px; }
+.card-header { padding:16px 20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; }
+.card-header h3 { font-size:16px; font-weight:600; }
+.badge-count { background:#f1f5f9; color:#64748b; font-size:12px; padding:3px 10px; border-radius:20px; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:12px 16px; font-size:12px; color:#64748b; font-weight:600; text-transform:uppercase; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+td { padding:13px 16px; border-bottom:1px solid #f1f5f9; font-size:14px; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#fafafa; }
+.badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-pending { background:#fef3c7; color:#d97706; }
+.badge-confirmed { background:#d1fae5; color:#059669; }
+.badge-cancelled { background:#fee2e2; color:#dc2626; }
+.btn-confirm { border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:#d1fae5; color:#059669; margin-right:6px; }
+.btn-confirm:hover { background:#059669; color:white; }
+.btn-reject { border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:#fee2e2; color:#dc2626; }
+.btn-reject:hover { background:#dc2626; color:white; }
+.today-badge { background:#eff6ff; color:#3b82f6; font-size:12px; padding:3px 10px; border-radius:8px; margin-left:8px; font-weight:600; }
+.filter-tabs { display:flex; gap:8px; margin-bottom:16px; }
+.ftab { padding:7px 16px; border-radius:8px; border:1.5px solid #e2e8f0; background:white; font-size:13px; cursor:pointer; font-weight:500; }
+.ftab.active { background:#ef4444; color:white; border-color:#ef4444; }
+.menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.menu-item { background:white; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; }
+.menu-name { font-weight:600; font-size:15px; }
+.menu-cat { font-size:12px; color:#94a3b8; margin-top:2px; }
+.menu-price { font-size:15px; color:#ef4444; font-weight:600; margin-top:6px; }
+.toggle-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; }
+.toggle-on { background:#d1fae5; color:#059669; }
+.toggle-off { background:#fee2e2; color:#dc2626; }
+.add-btn { background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; justify-content:center; align-items:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:white; border-radius:16px; padding:28px; width:100%; max-width:440px; }
+.modal h3 { font-size:18px; font-weight:700; margin-bottom:20px; }
+.fg { margin-bottom:14px; }
+.fg label { font-size:13px; color:#64748b; margin-bottom:4px; display:block; }
+.fg input, .fg select, .fg textarea { width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; }
+.fg input:focus, .fg select:focus { border-color:#ef4444; }
+.modal-btns { display:flex; gap:10px; margin-top:20px; }
+.modal-btns button { flex:1; padding:12px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; border:none; }
+.btn-save { background:#ef4444; color:white; }
+.btn-cls { background:#f1f5f9; color:#64748b; }
+.prof-form { max-width:500px; }
+.prof-form .fg input { margin-bottom:0; }
+.save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
+.toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:white; padding:12px 20px; border-radius:10px; font-size:14px; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
+.toast.show { opacity:1; }
+.empty-state { text-align:center; padding:60px 20px; color:#94a3b8; }
+.empty-state .ei { font-size:48px; margin-bottom:12px; }
+.spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:white; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🍽</div>
+    <div class="login-title">OneTable Dashboard</div>
+    <div class="login-sub">Restoran boshqaruv paneli</div>
+    <input type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="loginPassword" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Kirish</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="appPage">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>🍽 OneTable</h1>
+      <p>Boshqaruv paneli</p>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSec('dashboard',this)"><span class="nav-icon">📊</span>Umumiy</button>
+      <button class="nav-link" onclick="showSec('today',this)"><span class="nav-icon">📅</span>Bugungi bronlar</button>
+      <button class="nav-link" onclick="showSec('all',this)"><span class="nav-icon">📋</span>Barcha bronlar</button>
+      <button class="nav-link" onclick="showSec('menu',this)"><span class="nav-icon">🍜</span>Menyu</button>
+      <button class="nav-link" onclick="showSec('profile',this)"><span class="nav-icon">⚙️</span>Sozlamalar</button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="resto-info" id="sidebarName">—</div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Chiqish</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Dashboard -->
+    <div class="section active" id="sec-dashboard">
+      <div class="page-header">
+        <div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">—</div><div class="stat-sub">bugun</div></div>
+        <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">—</div><div class="stat-sub">tasdiqlash kerak</div></div>
+        <div class="stat-card stat-green"><div class="stat-label">Tasdiqlangan</div><div class="stat-value" id="st-confirmed">—</div><div class="stat-sub">jami</div></div>
+        <div class="stat-card stat-red"><div class="stat-label">Jami bronlar</div><div class="stat-value" id="st-total">—</div><div class="stat-sub">hammasi</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>⏳ Tasdiqlash kerak</h3>
+          <span class="badge-count" id="pendingCount">0</span>
+        </div>
+        <table>
+          <thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Amal</th></tr></thead>
+          <tbody id="pendingTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Bugun -->
+    <div class="section" id="sec-today">
+      <div class="page-header">
+        <div><h2>Bugungi bronlar <span class="today-badge" id="todayBadge">0</span></h2><p>Bugun kelishi kutilayotgan mehmonlar</p></div>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Mijoz</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead>
+          <tbody id="todayTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Barcha -->
+    <div class="section" id="sec-all">
+      <div class="page-header"><div><h2>Barcha bronlar</h2></div></div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterAll('all',this)">Hammasi</button>
+        <button class="ftab" onclick="filterAll('pending',this)">Kutilmoqda</button>
+        <button class="ftab" onclick="filterAll('confirmed',this)">Tasdiqlangan</button>
+        <button class="ftab" onclick="filterAll('cancelled',this)">Bekor qilingan</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead>
+          <tbody id="allTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Menyu -->
+    <div class="section" id="sec-menu">
+      <div class="page-header">
+        <div><h2>Menyu boshqaruvi</h2><p>Taomlar va narxlarni boshqaring</p></div>
+        <button class="add-btn" onclick="openMenuModal()">+ Taom qo'shish</button>
+      </div>
+      <div class="menu-grid" id="menuGrid">
+        <div class="empty-state"><div class="ei">🍜</div>Menyu bo'sh</div>
+      </div>
+    </div>
+
+    <!-- Sozlamalar -->
+    <div class="section" id="sec-profile">
+      <div class="page-header"><div><h2>Sozlamalar</h2></div></div>
+      <div class="card" style="padding:24px;">
+        <div class="prof-form">
+          <div class="fg"><label>Restoran nomi</label><input type="text" id="profName"></div>
+          <div class="fg"><label>Manzil</label><input type="text" id="profAddress"></div>
+          <div class="fg"><label>Telefon</label><input type="text" id="profPhone"></div>
+          <div class="fg"><label>Ish vaqti boshlanish</label><input type="time" id="profOpen" value="10:00"></div>
+          <div class="fg"><label>Ish vaqti tugash</label><input type="time" id="profClose" value="22:00"></div>
+          <button class="save-btn" onclick="saveProfile()">💾 Saqlash</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Taom modal -->
+<div class="modal-overlay" id="menuModal">
+  <div class="modal">
+    <h3>Taom qo'shish</h3>
+    <div class="fg"><label>Nomi *</label><input type="text" id="mName" placeholder="Masalan: Osh"></div>
+    <div class="fg"><label>Kategoriya</label>
+      <select id="mCat">
+        <option>Asosiy taomlar</option><option>Salatlar</option>
+        <option>Ichimliklar</option><option>Desertlar</option>
+        <option>Sho'rvalar</option><option>Lavash / Non</option>
+      </select>
+    </div>
+    <div class="fg"><label>Narx (so'm) *</label><input type="number" id="mPrice" placeholder="50000"></div>
+    <div class="fg"><label>Tavsif</label><textarea id="mDesc" rows="2" style="resize:none;" placeholder="Qisqacha tavsif..."></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-save" onclick="saveMenuItem()">Saqlash</button>
+      <button class="btn-cls" onclick="closeMenuModal()">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://onetableuz-production.up.railway.app/api';
+let token = localStorage.getItem('ownerToken');
+let allRes = [];
+let curFilter = 'all';
+let restoId = null;
+
+window.onload = () => {
+  document.getElementById('todayDate').textContent =
+    new Date().toLocaleDateString('uz-UZ', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if (token) showApp();
+};
+
+function toast(msg, ms=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ── Login ────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!email || !pass) { err.textContent='Email va parol kiriting'; err.style.display='block'; return; }
+  btn.innerHTML = '<span class="spinner"></span>Kirish...';
+  btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/owner/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pass})
+    });
+    const d = await r.json();
+    if (d.token) {
+      token = d.token;
+      localStorage.setItem('ownerToken', token);
+      restoId = d.owner.restaurant_id;
+      showApp();
+    } else {
+      err.textContent = d.error || 'Xatolik'; err.style.display='block';
+      btn.textContent='Kirish'; btn.disabled=false;
+    }
+  } catch(e) {
+    err.textContent='Server xatoligi'; err.style.display='block';
+    btn.textContent='Kirish'; btn.disabled=false;
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('ownerToken');
+  token = null;
+  document.getElementById('appPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appPage').style.display = 'flex';
+  // restoId tokendan olish
+  try { restoId = JSON.parse(atob(token.split('.')[1])).restaurant_id; } catch(e) {}
+  loadAll();
+}
+
+// ── Navigation ───────────────────────────────────────────────
+function showSec(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'menu') loadMenu();
+  if (name === 'profile') loadProfile();
+}
+
+// ── Data ─────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadStats(), loadReservations()]);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/owner/stats`, {headers:{Authorization:`Bearer ${token}`}});
+    const d = await r.json();
+    document.getElementById('st-today').textContent = d.today ?? 0;
+    document.getElementById('st-pending').textContent = d.pending ?? 0;
+    document.getElementById('st-confirmed').textContent = d.confirmed ?? 0;
+    document.getElementById('st-total').textContent = d.total ?? 0;
+    document.getElementById('pendingCount').textContent = d.pending ?? 0;
+    document.getElementById('todayBadge').textContent = (d.today ?? 0) + ' ta';
+  } catch(e) {}
+}
+
+async function loadReservations() {
+  try {
+    const r = await fetch(`${API}/owner/reservations`, {headers:{Authorization:`Bearer ${token}`}});
+    allRes = await r.json();
+    if (allRes[0]?.restaurant_name) document.getElementById('sidebarName').textContent = allRes[0].restaurant_name;
+    renderPending();
+    renderToday();
+    renderAll();
+  } catch(e) {}
+}
+
+// ── Render helpers ───────────────────────────────────────────
+const nameOf = r => (`${r.first_name||''} ${r.last_name||''}`).trim() || 'Noma\'lum';
+const timeOf = r => (r.time||'').substring(0,5);
+
+function statusBadge(s) {
+  const cls = {pending:'badge-pending',confirmed:'badge-confirmed',cancelled:'badge-cancelled'};
+  const txt = {pending:'⏳ Kutilmoqda',confirmed:'✅ Tasdiqlangan',cancelled:'❌ Bekor'};
+  return `<span class="badge ${cls[s]||'badge-pending'}">${txt[s]||s}</span>`;
+}
+
+function actionBtns(id, status) {
+  if (status === 'cancelled') return '<span style="color:#94a3b8">—</span>';
+  if (status === 'confirmed')
+    return `<button class="btn-reject" onclick="updateStatus(${id},'cancelled')">Bekor qilish</button>`;
+  return `<button class="btn-confirm" onclick="updateStatus(${id},'confirmed')">✅ Tasdiqlash</button>
+          <button class="btn-reject" onclick="updateStatus(${id},'cancelled')">❌ Rad</button>`;
+}
+
+function emptyRow(cols, msg, icon='📭') {
+  return `<tr><td colspan="${cols}"><div class="empty-state"><div class="ei">${icon}</div>${msg}</div></td></tr>`;
+}
+
+function renderPending() {
+  const list = allRes.filter(r => r.status === 'pending');
+  const tb = document.getElementById('pendingTbody');
+  if (!list.length) { tb.innerHTML = emptyRow(6,'Kutilayotgan bron yo\'q','✅'); return; }
+  tb.innerHTML = list.map(r=>`<tr>
+    <td><b>${nameOf(r)}</b></td>
+    <td>${r.date}</td><td>${timeOf(r)}</td>
+    <td>👥 ${r.guests} kishi</td>
+    <td>${r.comment||'—'}</td>
+    <td>${actionBtns(r.id,r.status)}</td>
+  </tr>`).join('');
+}
+
+function renderToday() {
+  const today = new Date().toISOString().split('T')[0];
+  const list = allRes.filter(r => String(r.date).startsWith(today)).sort((a,b)=>a.time>b.time?1:-1);
+  const tb = document.getElementById('todayTbody');
+  if (!list.length) { tb.innerHTML = emptyRow(6,'Bugun bron yo\'q'); return; }
+  tb.innerHTML = list.map(r=>`<tr>
+    <td><b>${nameOf(r)}</b></td><td>${timeOf(r)}</td>
+    <td>👥 ${r.guests} kishi</td>
+    <td>${r.comment||'—'}</td>
+    <td>${statusBadge(r.status)}</td>
+    <td>${actionBtns(r.id,r.status)}</td>
+  </tr>`).join('');
+}
+
+function filterAll(f, btn) {
+  curFilter = f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAll();
+}
+
+function renderAll() {
+  const list = curFilter === 'all' ? allRes : allRes.filter(r=>r.status===curFilter);
+  const tb = document.getElementById('allTbody');
+  if (!list.length) { tb.innerHTML = emptyRow(7,'Bron topilmadi'); return; }
+  tb.innerHTML = list.map(r=>`<tr>
+    <td><b>${nameOf(r)}</b></td>
+    <td>${r.date}</td><td>${timeOf(r)}</td>
+    <td>👥 ${r.guests}</td>
+    <td>${r.comment||'—'}</td>
+    <td>${statusBadge(r.status)}</td>
+    <td>${actionBtns(r.id,r.status)}</td>
+  </tr>`).join('');
+}
+
+// ── Status update ────────────────────────────────────────────
+async function updateStatus(id, status) {
+  try {
+    const r = await fetch(`${API}/owner/reservations/${id}`, {
+      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({status})
+    });
+    if (r.ok) {
+      toast(status==='confirmed' ? '✅ Tasdiqlandi! Foydalanuvchiga xabar ketdi.' : '❌ Bekor qilindi.');
+      loadAll();
+    } else toast('❌ Xatolik yuz berdi');
+  } catch(e) { toast('❌ Server xatoligi'); }
+}
+
+// ── Menu ─────────────────────────────────────────────────────
+async function loadMenu() {
+  try {
+    const r = await fetch(`${API}/owner/menu`, {headers:{Authorization:`Bearer ${token}`}});
+    const items = await r.json();
+    const g = document.getElementById('menuGrid');
+    if (!items.length) { g.innerHTML='<div class="empty-state"><div class="ei">🍜</div>Menyu bo\'sh. Taom qo\'shing!</div>'; return; }
+    g.innerHTML = items.map(item=>`
+      <div class="menu-item">
+        <div>
+          <div class="menu-name">${item.name}</div>
+          <div class="menu-cat">${item.category||''}</div>
+          <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
+        </div>
+        <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}"
+                onclick="toggleMenu(${item.id},${!item.is_available})">
+          ${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}
+        </button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
+function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
+
+async function saveMenuItem() {
+  const name = document.getElementById('mName').value.trim();
+  const category = document.getElementById('mCat').value;
+  const price = document.getElementById('mPrice').value;
+  const description = document.getElementById('mDesc').value;
+  if (!name || !price) { toast('⚠️ Nom va narx kerak'); return; }
+  try {
+    const r = await fetch(`${API}/owner/menu`, {
+      method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({name,category,price:parseInt(price),description,is_available:true})
+    });
+    if (r.ok) {
+      toast('✅ Taom qo\'shildi!'); closeMenuModal();
+      document.getElementById('mName').value='';
+      document.getElementById('mPrice').value='';
+      document.getElementById('mDesc').value='';
+      loadMenu();
+    } else toast('❌ Xatolik');
+  } catch(e) { toast('❌ Server xatoligi'); }
+}
+
+async function toggleMenu(id, available) {
+  try {
+    await fetch(`${API}/owner/menu/${id}`, {
+      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({is_available:available})
+    });
+    loadMenu();
+  } catch(e) {}
+}
+
+// ── Profile ──────────────────────────────────────────────────
+async function loadProfile() {
+  try {
+    const r = await fetch(`${API}/restaurants/${restoId}`);
+    const d = await r.json();
+    document.getElementById('profName').value = d.name||'';
+    document.getElementById('profAddress').value = d.address||'';
+    document.getElementById('profPhone').value = d.phone||'';
+  } catch(e) {}
+}
+
+async function saveProfile() {
+  try {
+    const r = await fetch(`${API}/owner/profile`, {
+      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({
+        name: document.getElementById('profName').value,
+        address: document.getElementById('profAddress').value,
+        phone: document.getElementById('profPhone').value
+      })
+    });
+    if (r.ok) toast('✅ Saqlandi!');
+    else toast('❌ Xatolik');
+  } catch(e) { toast('❌ Server xatoligi'); }
+}
+
+// Har 30 soniyada yangilash
+setInterval(() => { if (token) loadAll(); }, 30000);
+</script>
+</body>
+</html>
