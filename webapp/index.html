@@ -10,6 +10,9 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1a1a2e; }
     .header { background: #1a1a2e; color: white; padding: 16px; text-align: center; position: sticky; top: 0; z-index: 100; }
     .header h1 { font-size: 20px; font-weight: 700; }
+    .lang-switcher { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+    .lang-btn { padding: 3px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); background: transparent; color: white; font-size: 12px; cursor: pointer; }
+    .lang-btn.active { background: #ef4444; border-color: #ef4444; font-weight: 600; }
     .search { padding: 12px 16px; }
     .search input { width: 100%; padding: 10px 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; }
     .filters { display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto; }
@@ -30,17 +33,24 @@
     .nav-item span { font-size: 10px; color: #64748b; }
     .nav-item.active span { color: #ef4444; }
     .content { padding-bottom: 70px; }
-    /* Modal */
     .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-end; }
     .modal.open { display: flex; }
-    .modal-content { background: white; border-radius: 20px 20px 0 0; padding: 24px; width: 100%; }
+    .modal-content { background: white; border-radius: 20px 20px 0 0; padding: 24px; width: 100%; max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
     .form-group { margin-bottom: 12px; }
     .form-group label { font-size: 13px; color: #64748b; margin-bottom: 4px; display: block; }
     .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
+    .time-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+    .slot { padding: 8px 4px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; text-align: center; cursor: pointer; background: white; transition: all 0.15s; }
+    .slot:hover:not(.slot-busy) { border-color: #ef4444; color: #ef4444; }
+    .slot.selected { background: #ef4444; color: white; border-color: #ef4444; font-weight: 600; }
+    .slot.slot-busy { background: #f1f5f9; color: #cbd5e1; cursor: not-allowed; text-decoration: line-through; }
+    .slot-loading { grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 13px; padding: 12px; }
+    .slots-legend { display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: #64748b; }
+    .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 3px; }
     .btn-submit { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
     .btn-cancel { width: 100%; background: #f1f5f9; color: #64748b; border: none; padding: 12px; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 8px; }
-    /* Bronlarim */
     .page { display: none; padding: 16px; padding-bottom: 70px; }
     .page.active { display: block; }
     .reservation-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
@@ -49,247 +59,402 @@
     .res-status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 8px; }
     .status-pending { background: #fef3c7; color: #d97706; }
     .status-confirmed { background: #d1fae5; color: #059669; }
+    .status-cancelled { background: #fee2e2; color: #dc2626; }
+    .res-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    .btn-cancel-res { background: none; border: 1px solid #fca5a5; color: #ef4444; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 10px 20px; border-radius: 10px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
-  <div class="header"><h1>🍽 OneTable</h1></div>
+  <div class="header">
+    <h1>🍽 OneTable</h1>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('uz')">🇺🇿 UZ</button>
+      <button class="lang-btn" onclick="setLang('ru')">🇷🇺 RU</button>
+      <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
 
-  <!-- Bosh sahifa -->
   <div id="homePage" class="page active">
     <div class="content">
-      <div class="search">
-        <input type="text" id="searchInput" placeholder="Restoran qidiring..." oninput="filterRestaurants()">
-      </div>
+      <div class="search"><input type="text" id="searchInput" oninput="filterRestaurants()"></div>
       <div class="filters">
-        <button class="filter-btn active" onclick="setFilter('all', this)">Hammasi</button>
-        <button class="filter-btn" onclick="setFilter('Uzbek', this)">O'zbek</button>
-        <button class="filter-btn" onclick="setFilter('European', this)">Evropa</button>
-        <button class="filter-btn" onclick="setFilter('Asian', this)">Osiyo</button>
-        <button class="filter-btn" onclick="setFilter('Italian', this)">Italyan</button>
-        <button class="filter-btn" onclick="setFilter('$', this)">$</button>
-        <button class="filter-btn" onclick="setFilter('$$', this)">$$</button>
-        <button class="filter-btn" onclick="setFilter('$$$', this)">$$$</button>
+        <button class="filter-btn active" onclick="setFilter('all',this)" data-i18n="all">Hammasi</button>
+        <button class="filter-btn" onclick="setFilter('Uzbek',this)">O'zbek</button>
+        <button class="filter-btn" onclick="setFilter('European',this)" data-i18n="european">Evropa</button>
+        <button class="filter-btn" onclick="setFilter('Asian',this)" data-i18n="asian">Osiyo</button>
+        <button class="filter-btn" onclick="setFilter('Italian',this)">Italyan</button>
+        <button class="filter-btn" onclick="setFilter('$',this)">$</button>
+        <button class="filter-btn" onclick="setFilter('$$',this)">$$</button>
+        <button class="filter-btn" onclick="setFilter('$$$',this)">$$$</button>
       </div>
-      <div class="restaurants" id="restaurantList">
-        <div class="loading">Yuklanmoqda...</div>
-      </div>
+      <div class="restaurants" id="restaurantList"><div class="loading">Yuklanmoqda...</div></div>
     </div>
   </div>
 
-  <!-- Bronlarim -->
   <div id="bookingsPage" class="page">
     <h2 style="font-size:18px;font-weight:700;margin-bottom:16px;">📅 Bronlarim</h2>
     <div id="bookingsList"><div class="loading">Yuklanmoqda...</div></div>
   </div>
 
-  <!-- Profil -->
   <div id="profilePage" class="page">
     <h2 style="font-size:18px;font-weight:700;margin-bottom:16px;">👤 Profil</h2>
     <div id="profileInfo" style="background:white;border-radius:12px;padding:16px;"></div>
   </div>
 
-  <!-- Bottom Nav -->
   <div class="bottom-nav">
     <div class="nav-item active" id="nav-home" onclick="showPage('home')">
-      <span>🏠</span><span>Bosh sahifa</span>
+      <span>🏠</span><span id="nav-home-txt">Bosh sahifa</span>
     </div>
     <div class="nav-item" id="nav-bookings" onclick="showPage('bookings')">
-      <span>📅</span><span>Bronlarim</span>
+      <span>📅</span><span id="nav-bookings-txt">Bronlarim</span>
     </div>
     <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
-      <span>👤</span><span>Profil</span>
+      <span>👤</span><span id="nav-profile-txt">Profil</span>
     </div>
   </div>
 
-  <!-- Bron Modal -->
   <div class="modal" id="reserveModal">
     <div class="modal-content">
       <div class="modal-title" id="modalTitle">Bron qilish</div>
       <div class="form-group">
-        <label>Sana</label>
-        <input type="date" id="resDate">
+        <label id="lbl-date">Sana</label>
+        <input type="date" id="resDate" onchange="loadTimeSlots()">
       </div>
       <div class="form-group">
-        <label>Vaqt</label>
-        <input type="time" id="resTime">
+        <label id="lbl-guests">Mehmonlar soni</label>
+        <select id="resGuests"></select>
       </div>
       <div class="form-group">
-        <label>Mehmonlar soni</label>
-        <select id="resGuests">
-          <option value="1">1 kishi</option>
-          <option value="2" selected>2 kishi</option>
-          <option value="3">3 kishi</option>
-          <option value="4">4 kishi</option>
-          <option value="5">5 kishi</option>
-          <option value="6">6+ kishi</option>
-        </select>
+        <label id="lbl-time">Vaqt tanlang</label>
+        <div class="time-slots" id="timeSlots">
+          <div class="slot-loading" id="slots-hint">Avval sana tanlang</div>
+        </div>
+        <div class="slots-legend">
+          <span><span class="legend-dot" style="background:#ef4444;"></span><span id="leg-selected">Tanlangan</span></span>
+          <span><span class="legend-dot" style="background:#e2e8f0;"></span><span id="leg-busy">Band</span></span>
+        </div>
       </div>
       <div class="form-group">
-        <label>Izoh (ixtiyoriy)</label>
-        <input type="text" id="resComment" placeholder="Maxsus xohish...">
+        <label id="lbl-comment">Izoh (ixtiyoriy)</label>
+        <input type="text" id="resComment">
       </div>
-      <button class="btn-submit" onclick="submitReservation()">✅ Bron qilish</button>
-      <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
+      <button class="btn-submit" id="btnSubmit" onclick="submitReservation()" disabled>Vaqt tanlang</button>
+      <button class="btn-cancel" id="btnCancel" onclick="closeModal()">Bekor qilish</button>
     </div>
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+    const tg = window.Telegram?.WebApp || {ready(){},expand(){},showAlert:alert,initDataUnsafe:{}};
+    tg.ready(); tg.expand();
 
     const API_URL = 'https://onetableuz-production.up.railway.app/api';
-    let allRestaurants = [];
-    let currentFilter = 'all';
-    let selectedRestaurantId = null;
+    let allRestaurants = [], currentFilter = 'all';
+    let selectedRestaurantId = null, selectedTime = null;
     let authToken = localStorage.getItem('token');
+    let currentLang = localStorage.getItem('lang') || 'uz';
 
-    // Auto login
+    const i18n = {
+      uz: {
+        all:'Hammasi', european:'Evropa', asian:'Osiyo', italian:'Italyan',
+        loading:'Yuklanmoqda...', error:'Xatolik yuz berdi',
+        not_found:'Restoran topilmadi', no_bookings:'Bronlar yo\'q',
+        my_bookings:'📅 Bronlarim', profile:'👤 Profil', home:'Bosh sahifa', bookings:'Bronlarim',
+        date:'Sana', guests:'Mehmonlar soni', choose_time:'Vaqt tanlang',
+        choose_date_first:'Avval sana tanlang', selected:'Tanlangan', busy:'Band',
+        comment:'Izoh (ixtiyoriy)', comment_ph:'Tug\'ilgan kun, maxsus xohish...',
+        cancel:'Bekor qilish', reserve:'Bron qilish',
+        reserve_btn: t => `✅ ${t} — Bron qilish`,
+        sending:'Yuborilmoqda...', success:'✅ Bron muvaffaqiyatli qilindi!',
+        err_login:'❌ Botni qayta oching!', err_time:'⚠️ Vaqt tanlang!',
+        err_busy:'❌ Bu vaqt band. Boshqa vaqt tanlang.',
+        err_server:'❌ Server xatoligi!',
+        cancel_confirm:'Bronni bekor qilasizmi?',
+        cancelled:'🗑 Bron bekor qilindi', cancel_fail:'❌ Bekor qilib bo\'lmadi',
+        st_confirmed:'✅ Tasdiqlangan', st_pending:'⏳ Kutilmoqda', st_cancelled:'❌ Bekor qilingan',
+        cancel_btn:'Bekor qilish', search_ph:'Restoran qidiring...',
+        person: n => `${n} kishi`, view_bookings:'📅 Bronlarimni ko\'rish',
+        slots_loading:'⏳ Vaqtlar yuklanmoqda...',
+      },
+      ru: {
+        all:'Все', european:'Европа', asian:'Азия', italian:'Итальянская',
+        loading:'Загрузка...', error:'Произошла ошибка',
+        not_found:'Рестораны не найдены', no_bookings:'Нет бронирований',
+        my_bookings:'📅 Мои брони', profile:'👤 Профиль', home:'Главная', bookings:'Брони',
+        date:'Дата', guests:'Кол-во гостей', choose_time:'Выберите время',
+        choose_date_first:'Сначала выберите дату', selected:'Выбрано', busy:'Занято',
+        comment:'Комментарий (необязательно)', comment_ph:'День рождения, пожелания...',
+        cancel:'Отмена', reserve:'Забронировать',
+        reserve_btn: t => `✅ ${t} — Забронировать`,
+        sending:'Отправляется...', success:'✅ Бронирование успешно!',
+        err_login:'❌ Перезапустите бота!', err_time:'⚠️ Выберите время!',
+        err_busy:'❌ Время занято. Выберите другое.',
+        err_server:'❌ Ошибка сервера!',
+        cancel_confirm:'Отменить бронирование?',
+        cancelled:'🗑 Бронирование отменено', cancel_fail:'❌ Не удалось отменить',
+        st_confirmed:'✅ Подтверждено', st_pending:'⏳ Ожидание', st_cancelled:'❌ Отменено',
+        cancel_btn:'Отменить', search_ph:'Поиск ресторана...',
+        person: n => `${n} чел.`, view_bookings:'📅 Мои бронирования',
+        slots_loading:'⏳ Загрузка времени...',
+      },
+      en: {
+        all:'All', european:'European', asian:'Asian', italian:'Italian',
+        loading:'Loading...', error:'An error occurred',
+        not_found:'No restaurants found', no_bookings:'No bookings yet',
+        my_bookings:'📅 My Bookings', profile:'👤 Profile', home:'Home', bookings:'Bookings',
+        date:'Date', guests:'Number of guests', choose_time:'Choose time',
+        choose_date_first:'Choose a date first', selected:'Selected', busy:'Busy',
+        comment:'Comment (optional)', comment_ph:'Birthday, special requests...',
+        cancel:'Cancel', reserve:'Reserve',
+        reserve_btn: t => `✅ ${t} — Book Now`,
+        sending:'Sending...', success:'✅ Booking successful!',
+        err_login:'❌ Please reopen the bot!', err_time:'⚠️ Select a time!',
+        err_busy:'❌ Time taken. Choose another.',
+        err_server:'❌ Server error!',
+        cancel_confirm:'Cancel this booking?',
+        cancelled:'🗑 Booking cancelled', cancel_fail:'❌ Could not cancel',
+        st_confirmed:'✅ Confirmed', st_pending:'⏳ Pending', st_cancelled:'❌ Cancelled',
+        cancel_btn:'Cancel', search_ph:'Search restaurants...',
+        person: n => `${n} ${n===1?'person':'people'}`, view_bookings:'📅 View bookings',
+        slots_loading:'⏳ Loading times...',
+      }
+    };
+
+    const T = (k, a) => { const v = i18n[currentLang][k]; return typeof v==='function'?v(a):v||k; };
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+      applyT();
+      filterRestaurants();
+    }
+
+    function applyT() {
+      document.getElementById('searchInput').placeholder = T('search_ph');
+      document.querySelector('[data-i18n="all"]').textContent = T('all');
+      document.querySelector('[data-i18n="european"]').textContent = T('european');
+      document.querySelector('[data-i18n="asian"]').textContent = T('asian');
+      document.querySelector('#bookingsPage h2').textContent = T('my_bookings');
+      document.querySelector('#profilePage h2').textContent = T('profile');
+      document.getElementById('nav-home-txt').textContent = T('home');
+      document.getElementById('nav-bookings-txt').textContent = T('bookings');
+      document.getElementById('nav-profile-txt').textContent = T('profile');
+      document.getElementById('lbl-date').textContent = T('date');
+      document.getElementById('lbl-guests').textContent = T('guests');
+      document.getElementById('lbl-time').textContent = T('choose_time');
+      document.getElementById('lbl-comment').textContent = T('comment');
+      document.getElementById('resComment').placeholder = T('comment_ph');
+      document.getElementById('btnCancel').textContent = T('cancel');
+      document.getElementById('leg-selected').textContent = T('selected');
+      document.getElementById('leg-busy').textContent = T('busy');
+      buildGuests();
+    }
+
+    function buildGuests() {
+      const s = document.getElementById('resGuests'), v = s.value||'2';
+      s.innerHTML = [1,2,3,4,5,6].map(n=>`<option value="${n}"${n==v?' selected':''}>${T('person',n)}${n===6?'+':''}</option>`).join('');
+    }
+
+    function showToast(msg, ms=2500) {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'), ms);
+    }
+
     async function autoLogin() {
       try {
-        const user = tg.initDataUnsafe?.user;
-        if (!user) return;
-        const res = await fetch(`${API_URL}/auth/telegram`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            telegram_id: user.id,
-            username: user.username,
-            first_name: user.first_name,
-            last_name: user.last_name
-          })
-        });
-        const data = await res.json();
-        if (data.token) {
-          authToken = data.token;
-          localStorage.setItem('token', data.token);
-        }
-      } catch (err) { console.error(err); }
+        const user = tg.initDataUnsafe?.user; if(!user) return;
+        const r = await fetch(`${API_URL}/auth/telegram`,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({telegram_id:user.id,username:user.username,first_name:user.first_name,last_name:user.last_name})});
+        const d = await r.json();
+        if(d.token){authToken=d.token;localStorage.setItem('token',d.token);}
+      } catch(e){console.error(e);}
     }
 
     async function loadRestaurants() {
       try {
-        const res = await fetch(`${API_URL}/restaurants`);
-        allRestaurants = await res.json();
+        const r = await fetch(`${API_URL}/restaurants`);
+        allRestaurants = await r.json();
         renderRestaurants(allRestaurants);
-      } catch (err) {
-        document.getElementById('restaurantList').innerHTML = '<div class="loading">Xatolik yuz berdi.</div>';
-      }
+      } catch(e){ document.getElementById('restaurantList').innerHTML=`<div class="loading">${T('error')}</div>`; }
     }
 
     function renderRestaurants(list) {
-      const container = document.getElementById('restaurantList');
-      if (!list.length) { container.innerHTML = '<div class="loading">Restoran topilmadi</div>'; return; }
-      container.innerHTML = list.map(r => `
+      const c = document.getElementById('restaurantList');
+      if(!list.length){c.innerHTML=`<div class="loading">${T('not_found')}</div>`;return;}
+      c.innerHTML = list.map(r=>`
         <div class="card">
-          <img src="${r.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'}" alt="${r.name}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'">
+          <img src="${r.image_url||'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'}" alt="${r.name}"
+               onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'">
           <div class="card-body">
             <div class="card-name">${r.name}</div>
-            <div class="card-meta">${r.cuisine ? r.cuisine.join(', ') : ''} • ${r.price_category || ''} • ${r.address || ''}</div>
+            <div class="card-meta">${r.cuisine?r.cuisine.join(', '):''} • ${r.price_category||''} • ${r.address||''}</div>
             <div class="card-footer">
-              <span class="rating">⭐ ${r.rating || '4.5'}</span>
-              <button class="btn-reserve" onclick="openReserve(${r.id}, '${r.name}')">Bron qilish</button>
+              <span class="rating">⭐ ${r.rating||'4.5'}</span>
+              <button class="btn-reserve" onclick="openReserve(${r.id},'${r.name.replace(/'/g,"\\'")}')">
+                ${T('reserve')}
+              </button>
             </div>
           </div>
-        </div>
-      `).join('');
+        </div>`).join('');
     }
 
-    function setFilter(filter, btn) {
-      currentFilter = filter;
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      filterRestaurants();
+    function setFilter(f,btn){
+      currentFilter=f;
+      document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); filterRestaurants();
+    }
+    function filterRestaurants(){
+      const q=document.getElementById('searchInput').value.toLowerCase();
+      let f=allRestaurants;
+      if(currentFilter!=='all') f=f.filter(r=>(r.cuisine&&r.cuisine.includes(currentFilter))||r.price_category===currentFilter);
+      if(q) f=f.filter(r=>r.name.toLowerCase().includes(q));
+      renderRestaurants(f);
     }
 
-    function filterRestaurants() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      let filtered = allRestaurants;
-      if (currentFilter !== 'all') {
-        filtered = filtered.filter(r => (r.cuisine && r.cuisine.includes(currentFilter)) || r.price_category === currentFilter);
-      }
-      if (q) filtered = filtered.filter(r => r.name.toLowerCase().includes(q));
-      renderRestaurants(filtered);
-    }
-
-    function openReserve(id, name) {
-      selectedRestaurantId = id;
-      document.getElementById('modalTitle').textContent = `🍽 ${name} — Bron`;
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('resDate').value = today;
-      document.getElementById('resTime').value = '19:00';
+    function openReserve(id,name){
+      selectedRestaurantId=id; selectedTime=null;
+      document.getElementById('modalTitle').textContent=`🍽 ${name}`;
+      const today=new Date().toISOString().split('T')[0];
+      document.getElementById('resDate').value=today;
+      document.getElementById('resDate').min=today;
+      document.getElementById('resComment').value='';
+      const btn=document.getElementById('btnSubmit');
+      btn.disabled=true; btn.textContent=T('choose_time');
       document.getElementById('reserveModal').classList.add('open');
+      buildGuests(); loadTimeSlots();
+    }
+    function closeModal(){
+      document.getElementById('reserveModal').classList.remove('open'); selectedTime=null;
     }
 
-    function closeModal() {
-      document.getElementById('reserveModal').classList.remove('open');
+    async function loadTimeSlots(){
+      const date=document.getElementById('resDate').value; if(!date) return;
+      selectedTime=null;
+      const btn=document.getElementById('btnSubmit');
+      btn.disabled=true; btn.textContent=T('choose_time');
+      const c=document.getElementById('timeSlots');
+      c.innerHTML=`<div class="slot-loading">${T('slots_loading')}</div>`;
+      const slots=[];
+      for(let h=10;h<=21;h++){slots.push(`${String(h).padStart(2,'0')}:00`);slots.push(`${String(h).padStart(2,'0')}:30`);}
+      slots.push('22:00');
+      let busy=[];
+      try{
+        const r=await fetch(`${API_URL}/restaurants/${selectedRestaurantId}/availability?date=${date}`);
+        if(r.ok){const d=await r.json();busy=Array.isArray(d)?d:(d.busy_times||[]);}
+      }catch(e){}
+      const now=new Date(), isToday=new Date(date).toDateString()===now.toDateString();
+      c.innerHTML=slots.map(s=>{
+        const isBusy=busy.includes(s);
+        let isPast=false;
+        if(isToday){const[h,m]=s.split(':').map(Number);isPast=(h*60+m)<(now.getHours()*60+now.getMinutes()+60);}
+        const dis=isBusy||isPast;
+        return `<div class="slot${dis?' slot-busy':''}" onclick="${dis?'':` selectSlot('${s}',this)`}">${s}</div>`;
+      }).join('');
     }
 
-    async function submitReservation() {
-      if (!authToken) {
-        tg.showAlert('Iltimos, botni qayta oching!');
-        return;
-      }
-      const date = document.getElementById('resDate').value;
-      const time = document.getElementById('resTime').value;
-      const guests = document.getElementById('resGuests').value;
-      const comment = document.getElementById('resComment').value;
-      if (!date || !time) { tg.showAlert('Sana va vaqtni kiriting!'); return; }
-      try {
-        const res = await fetch(`${API_URL}/reservations`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-          body: JSON.stringify({ restaurant_id: selectedRestaurantId, date, time, guests, comment })
-        });
-        const data = await res.json();
-        if (data.id) {
-          closeModal();
-          tg.showAlert('✅ Bron muvaffaqiyatli qilindi!');
-          showPage('bookings');
-        } else {
-          tg.showAlert('Xatolik: ' + (data.error || 'Qayta urinib ko\'ring'));
+    function selectSlot(time,el){
+      document.querySelectorAll('.slot.selected').forEach(s=>s.classList.remove('selected'));
+      el.classList.add('selected'); selectedTime=time;
+      const btn=document.getElementById('btnSubmit');
+      btn.disabled=false; btn.textContent=T('reserve_btn',time);
+    }
+
+    async function submitReservation(){
+      if(!authToken){showToast(T('err_login'));return;}
+      if(!selectedTime){showToast(T('err_time'));return;}
+      const date=document.getElementById('resDate').value;
+      const guests=document.getElementById('resGuests').value;
+      const comment=document.getElementById('resComment').value;
+      const btn=document.getElementById('btnSubmit');
+      btn.disabled=true; btn.innerHTML=`<span class="spinner"></span>${T('sending')}`;
+      try{
+        const r=await fetch(`${API_URL}/reservations`,{method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},
+          body:JSON.stringify({restaurant_id:selectedRestaurantId,date,time:selectedTime,guests:parseInt(guests),comment})});
+        const d=await r.json();
+        if(d.id||r.ok){closeModal();showToast(T('success'));setTimeout(()=>showPage('bookings'),800);}
+        else{
+          btn.disabled=false; btn.textContent=T('reserve_btn',selectedTime);
+          if(d.error&&d.error.toLowerCase().includes('available')){showToast(T('err_busy'));loadTimeSlots();}
+          else showToast('❌ '+(d.error||T('err_server')));
         }
-      } catch (err) {
-        tg.showAlert('Server bilan bog\'lanishda xatolik!');
+      }catch(e){btn.disabled=false;btn.textContent=T('reserve_btn',selectedTime);showToast(T('err_server'));}
+    }
+
+    async function loadBookings(){
+      if(!authToken){document.getElementById('bookingsList').innerHTML=`<div class="loading">${T('err_login')}</div>`;return;}
+      document.getElementById('bookingsList').innerHTML=`<div class="loading">${T('loading')}</div>`;
+      try{
+        const r=await fetch(`${API_URL}/reservations/my`,{headers:{'Authorization':`Bearer ${authToken}`}});
+        const data=await r.json();
+        if(!data.length){
+          document.getElementById('bookingsList').innerHTML=`<div class="loading"><div style="font-size:40px;margin-bottom:12px;">📭</div><div>${T('no_bookings')}</div></div>`;
+          return;
+        }
+        const stCls={confirmed:'status-confirmed',pending:'status-pending',cancelled:'status-cancelled'};
+        document.getElementById('bookingsList').innerHTML=data.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(b=>{
+          const s=b.status||'pending';
+          const canCancel=new Date(b.date)>=new Date()&&s!=='cancelled';
+          return `<div class="reservation-card">
+            <div class="res-name">${b.restaurant_name||b.name||'Restaurant'}</div>
+            <div class="res-info">📅 ${fmtDate(b.date)} • ⏰ ${b.time} • 👥 ${T('person',b.guests)}</div>
+            ${b.address?`<div class="res-info">📍 ${b.address}</div>`:''}
+            ${b.comment?`<div class="res-info">💬 ${b.comment}</div>`:''}
+            <div class="res-footer">
+              <span class="res-status ${stCls[s]||'status-pending'}">${T('st_'+s)||T('st_pending')}</span>
+              ${canCancel?`<button class="btn-cancel-res" onclick="cancelRes(${b.id})">${T('cancel_btn')}</button>`:''}
+            </div>
+          </div>`;
+        }).join('');
+      }catch(e){document.getElementById('bookingsList').innerHTML=`<div class="loading">${T('error')}</div>`;}
+    }
+
+    async function cancelRes(id){
+      if(!confirm(T('cancel_confirm'))) return;
+      try{
+        const r=await fetch(`${API_URL}/reservations/${id}`,{method:'DELETE',headers:{'Authorization':`Bearer ${authToken}`}});
+        if(r.ok){showToast(T('cancelled'));loadBookings();}
+        else showToast(T('cancel_fail'));
+      }catch(e){showToast(T('error'));}
+    }
+
+    function fmtDate(s){
+      const d=new Date(s);
+      if(currentLang==='uz'){const m=['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`;}
+      return d.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-GB',{day:'numeric',month:'short',year:'numeric'});
+    }
+
+    function showPage(page){
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      if(page==='home'){document.getElementById('homePage').classList.add('active');document.getElementById('nav-home').classList.add('active');}
+      if(page==='bookings'){document.getElementById('bookingsPage').classList.add('active');document.getElementById('nav-bookings').classList.add('active');loadBookings();}
+      if(page==='profile'){
+        document.getElementById('profilePage').classList.add('active');document.getElementById('nav-profile').classList.add('active');
+        const user=tg.initDataUnsafe?.user;
+        document.getElementById('profileInfo').innerHTML=user?`
+          <div style="font-size:48px;text-align:center;margin-bottom:12px;">👤</div>
+          <div style="text-align:center;font-size:18px;font-weight:600;">${user.first_name} ${user.last_name||''}</div>
+          <div style="text-align:center;color:#64748b;margin-top:4px;margin-bottom:16px;">@${user.username||''}</div>
+          <button onclick="showPage('bookings')" style="width:100%;background:#f1f5f9;border:none;padding:12px;border-radius:10px;font-size:14px;cursor:pointer;">${T('view_bookings')}</button>
+        `:`<div class="loading">${T('error')}</div>`;
       }
     }
 
-    async function loadBookings() {
-      if (!authToken) { document.getElementById('bookingsList').innerHTML = '<div class="loading">Login qiling</div>'; return; }
-      try {
-        const res = await fetch(`${API_URL}/reservations/my`, { headers: { 'Authorization': `Bearer ${authToken}` } });
-        const data = await res.json();
-        if (!data.length) { document.getElementById('bookingsList').innerHTML = '<div class="loading">Bronlar yo\'q</div>'; return; }
-        document.getElementById('bookingsList').innerHTML = data.map(b => `
-          <div class="reservation-card">
-            <div class="res-name">${b.name}</div>
-            <div class="res-info">📅 ${b.date} • ⏰ ${b.time} • 👥 ${b.guests} kishi</div>
-            <div class="res-info">📍 ${b.address || ''}</div>
-            <span class="res-status ${b.status === 'confirmed' ? 'status-confirmed' : 'status-pending'}">${b.status === 'confirmed' ? '✅ Tasdiqlangan' : '⏳ Kutilmoqda'}</span>
-          </div>
-        `).join('');
-      } catch (err) {
-        document.getElementById('bookingsList').innerHTML = '<div class="loading">Xatolik yuz berdi</div>';
-      }
+    // Init
+    applyT();
+    const tgLang=tg.initDataUnsafe?.user?.language_code;
+    if(tgLang&&!localStorage.getItem('lang')){
+      if(tgLang.startsWith('ru')) setLang('ru');
+      else if(tgLang.startsWith('en')) setLang('en');
     }
-
-    function showPage(page) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      if (page === 'home') { document.getElementById('homePage').classList.add('active'); document.getElementById('nav-home').classList.add('active'); }
-      if (page === 'bookings') { document.getElementById('bookingsPage').classList.add('active'); document.getElementById('nav-bookings').classList.add('active'); loadBookings(); }
-      if (page === 'profile') {
-        document.getElementById('profilePage').classList.add('active');
-        document.getElementById('nav-profile').classList.add('active');
-        const user = tg.initDataUnsafe?.user;
-        document.getElementById('profileInfo').innerHTML = user ? `
-          <div style="font-size:40px;text-align:center;margin-bottom:12px;">👤</div>
-          <div style="text-align:center;font-size:18px;font-weight:600;">${user.first_name} ${user.last_name || ''}</div>
-          <div style="text-align:center;color:#64748b;margin-top:4px;">@${user.username || 'foydalanuvchi'}</div>
-        ` : '<div class="loading">Ma\'lumot yo\'q</div>';
-      }
-    }
-
     autoLogin();
     loadRestaurants();
   </script>
