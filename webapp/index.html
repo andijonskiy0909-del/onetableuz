@@ -30,46 +30,106 @@
     .nav-item span { font-size: 10px; color: #64748b; }
     .nav-item.active span { color: #ef4444; }
     .content { padding-bottom: 70px; }
+    /* Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-end; }
+    .modal.open { display: flex; }
+    .modal-content { background: white; border-radius: 20px 20px 0 0; padding: 24px; width: 100%; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { font-size: 13px; color: #64748b; margin-bottom: 4px; display: block; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
+    .btn-submit { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-cancel { width: 100%; background: #f1f5f9; color: #64748b; border: none; padding: 12px; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 8px; }
+    /* Bronlarim */
+    .page { display: none; padding: 16px; padding-bottom: 70px; }
+    .page.active { display: block; }
+    .reservation-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .res-name { font-weight: 600; font-size: 16px; }
+    .res-info { font-size: 13px; color: #64748b; margin-top: 4px; }
+    .res-status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+    .status-pending { background: #fef3c7; color: #d97706; }
+    .status-confirmed { background: #d1fae5; color: #059669; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>🍽 OneTable</h1>
+  <div class="header"><h1>🍽 OneTable</h1></div>
+
+  <!-- Bosh sahifa -->
+  <div id="homePage" class="page active">
+    <div class="content">
+      <div class="search">
+        <input type="text" id="searchInput" placeholder="Restoran qidiring..." oninput="filterRestaurants()">
+      </div>
+      <div class="filters">
+        <button class="filter-btn active" onclick="setFilter('all', this)">Hammasi</button>
+        <button class="filter-btn" onclick="setFilter('Uzbek', this)">O'zbek</button>
+        <button class="filter-btn" onclick="setFilter('European', this)">Evropa</button>
+        <button class="filter-btn" onclick="setFilter('Asian', this)">Osiyo</button>
+        <button class="filter-btn" onclick="setFilter('Italian', this)">Italyan</button>
+        <button class="filter-btn" onclick="setFilter('$', this)">$</button>
+        <button class="filter-btn" onclick="setFilter('$$', this)">$$</button>
+        <button class="filter-btn" onclick="setFilter('$$$', this)">$$$</button>
+      </div>
+      <div class="restaurants" id="restaurantList">
+        <div class="loading">Yuklanmoqda...</div>
+      </div>
+    </div>
   </div>
 
-  <div class="content">
-    <div class="search">
-      <input type="text" id="searchInput" placeholder="Restoran qidiring..." oninput="filterRestaurants()">
-    </div>
-
-    <div class="filters">
-      <button class="filter-btn active" onclick="setFilter('all', this)">Hammasi</button>
-      <button class="filter-btn" onclick="setFilter('Uzbek', this)">O'zbek</button>
-      <button class="filter-btn" onclick="setFilter('European', this)">Evropa</button>
-      <button class="filter-btn" onclick="setFilter('Asian', this)">Osiyo</button>
-      <button class="filter-btn" onclick="setFilter('Italian', this)">Italyan</button>
-      <button class="filter-btn" onclick="setFilter('$', this)">$</button>
-      <button class="filter-btn" onclick="setFilter('$$', this)">$$</button>
-      <button class="filter-btn" onclick="setFilter('$$$', this)">$$$</button>
-    </div>
-
-    <div class="restaurants" id="restaurantList">
-      <div class="loading">Yuklanmoqda...</div>
-    </div>
+  <!-- Bronlarim -->
+  <div id="bookingsPage" class="page">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:16px;">📅 Bronlarim</h2>
+    <div id="bookingsList"><div class="loading">Yuklanmoqda...</div></div>
   </div>
 
+  <!-- Profil -->
+  <div id="profilePage" class="page">
+    <h2 style="font-size:18px;font-weight:700;margin-bottom:16px;">👤 Profil</h2>
+    <div id="profileInfo" style="background:white;border-radius:12px;padding:16px;"></div>
+  </div>
+
+  <!-- Bottom Nav -->
   <div class="bottom-nav">
-    <div class="nav-item active">
-      <span>🏠</span>
-      <span>Bosh sahifa</span>
+    <div class="nav-item active" id="nav-home" onclick="showPage('home')">
+      <span>🏠</span><span>Bosh sahifa</span>
     </div>
-    <div class="nav-item">
-      <span>📅</span>
-      <span>Bronlarim</span>
+    <div class="nav-item" id="nav-bookings" onclick="showPage('bookings')">
+      <span>📅</span><span>Bronlarim</span>
     </div>
-    <div class="nav-item">
-      <span>👤</span>
-      <span>Profil</span>
+    <div class="nav-item" id="nav-profile" onclick="showPage('profile')">
+      <span>👤</span><span>Profil</span>
+    </div>
+  </div>
+
+  <!-- Bron Modal -->
+  <div class="modal" id="reserveModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">Bron qilish</div>
+      <div class="form-group">
+        <label>Sana</label>
+        <input type="date" id="resDate">
+      </div>
+      <div class="form-group">
+        <label>Vaqt</label>
+        <input type="time" id="resTime">
+      </div>
+      <div class="form-group">
+        <label>Mehmonlar soni</label>
+        <select id="resGuests">
+          <option value="1">1 kishi</option>
+          <option value="2" selected>2 kishi</option>
+          <option value="3">3 kishi</option>
+          <option value="4">4 kishi</option>
+          <option value="5">5 kishi</option>
+          <option value="6">6+ kishi</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Izoh (ixtiyoriy)</label>
+        <input type="text" id="resComment" placeholder="Maxsus xohish...">
+      </div>
+      <button class="btn-submit" onclick="submitReservation()">✅ Bron qilish</button>
+      <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
     </div>
   </div>
 
@@ -81,6 +141,31 @@
     const API_URL = 'https://onetableuz-production.up.railway.app/api';
     let allRestaurants = [];
     let currentFilter = 'all';
+    let selectedRestaurantId = null;
+    let authToken = localStorage.getItem('token');
+
+    // Auto login
+    async function autoLogin() {
+      try {
+        const user = tg.initDataUnsafe?.user;
+        if (!user) return;
+        const res = await fetch(`${API_URL}/auth/telegram`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            telegram_id: user.id,
+            username: user.username,
+            first_name: user.first_name,
+            last_name: user.last_name
+          })
+        });
+        const data = await res.json();
+        if (data.token) {
+          authToken = data.token;
+          localStorage.setItem('token', data.token);
+        }
+      } catch (err) { console.error(err); }
+    }
 
     async function loadRestaurants() {
       try {
@@ -88,25 +173,22 @@
         allRestaurants = await res.json();
         renderRestaurants(allRestaurants);
       } catch (err) {
-        document.getElementById('restaurantList').innerHTML = '<div class="loading">Xatolik yuz berdi. Qayta urinib ko\'ring.</div>';
+        document.getElementById('restaurantList').innerHTML = '<div class="loading">Xatolik yuz berdi.</div>';
       }
     }
 
     function renderRestaurants(list) {
       const container = document.getElementById('restaurantList');
-      if (!list.length) {
-        container.innerHTML = '<div class="loading">Restoran topilmadi</div>';
-        return;
-      }
+      if (!list.length) { container.innerHTML = '<div class="loading">Restoran topilmadi</div>'; return; }
       container.innerHTML = list.map(r => `
-        <div class="card" onclick="openRestaurant('${r.id}')">
+        <div class="card">
           <img src="${r.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'}" alt="${r.name}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'">
           <div class="card-body">
             <div class="card-name">${r.name}</div>
             <div class="card-meta">${r.cuisine ? r.cuisine.join(', ') : ''} • ${r.price_category || ''} • ${r.address || ''}</div>
             <div class="card-footer">
               <span class="rating">⭐ ${r.rating || '4.5'}</span>
-              <button class="btn-reserve" onclick="event.stopPropagation(); reserve('${r.id}', '${r.name}')">Bron qilish</button>
+              <button class="btn-reserve" onclick="openReserve(${r.id}, '${r.name}')">Bron qilish</button>
             </div>
           </div>
         </div>
@@ -124,39 +206,91 @@
       const q = document.getElementById('searchInput').value.toLowerCase();
       let filtered = allRestaurants;
       if (currentFilter !== 'all') {
-        filtered = filtered.filter(r => 
-          (r.cuisine && r.cuisine.includes(currentFilter)) || 
-          r.price_category === currentFilter
-        );
+        filtered = filtered.filter(r => (r.cuisine && r.cuisine.includes(currentFilter)) || r.price_category === currentFilter);
       }
-      if (q) {
-        filtered = filtered.filter(r => 
-          r.name.toLowerCase().includes(q) || 
-          (r.description && r.description.toLowerCase().includes(q))
-        );
-      }
+      if (q) filtered = filtered.filter(r => r.name.toLowerCase().includes(q));
       renderRestaurants(filtered);
     }
 
-    function reserve(id, name) {
-      tg.showPopup({
-        title: name,
-        message: 'Bron qilish uchun quyidagilarni tanlang:',
-        buttons: [
-          { id: 'book', type: 'default', text: '📅 Bron qilish' },
-          { id: 'cancel', type: 'cancel', text: 'Bekor qilish' }
-        ]
-      }, (btnId) => {
-        if (btnId === 'book') {
-          tg.sendData(JSON.stringify({ action: 'reserve', restaurant_id: id, restaurant_name: name }));
+    function openReserve(id, name) {
+      selectedRestaurantId = id;
+      document.getElementById('modalTitle').textContent = `🍽 ${name} — Bron`;
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('resDate').value = today;
+      document.getElementById('resTime').value = '19:00';
+      document.getElementById('reserveModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('reserveModal').classList.remove('open');
+    }
+
+    async function submitReservation() {
+      if (!authToken) {
+        tg.showAlert('Iltimos, botni qayta oching!');
+        return;
+      }
+      const date = document.getElementById('resDate').value;
+      const time = document.getElementById('resTime').value;
+      const guests = document.getElementById('resGuests').value;
+      const comment = document.getElementById('resComment').value;
+      if (!date || !time) { tg.showAlert('Sana va vaqtni kiriting!'); return; }
+      try {
+        const res = await fetch(`${API_URL}/reservations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+          body: JSON.stringify({ restaurant_id: selectedRestaurantId, date, time, guests, comment })
+        });
+        const data = await res.json();
+        if (data.id) {
+          closeModal();
+          tg.showAlert('✅ Bron muvaffaqiyatli qilindi!');
+          showPage('bookings');
+        } else {
+          tg.showAlert('Xatolik: ' + (data.error || 'Qayta urinib ko\'ring'));
         }
-      });
+      } catch (err) {
+        tg.showAlert('Server bilan bog\'lanishda xatolik!');
+      }
     }
 
-    function openRestaurant(id) {
-      window.location.href = `restaurant.html?id=${id}`;
+    async function loadBookings() {
+      if (!authToken) { document.getElementById('bookingsList').innerHTML = '<div class="loading">Login qiling</div>'; return; }
+      try {
+        const res = await fetch(`${API_URL}/reservations/my`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+        const data = await res.json();
+        if (!data.length) { document.getElementById('bookingsList').innerHTML = '<div class="loading">Bronlar yo\'q</div>'; return; }
+        document.getElementById('bookingsList').innerHTML = data.map(b => `
+          <div class="reservation-card">
+            <div class="res-name">${b.name}</div>
+            <div class="res-info">📅 ${b.date} • ⏰ ${b.time} • 👥 ${b.guests} kishi</div>
+            <div class="res-info">📍 ${b.address || ''}</div>
+            <span class="res-status ${b.status === 'confirmed' ? 'status-confirmed' : 'status-pending'}">${b.status === 'confirmed' ? '✅ Tasdiqlangan' : '⏳ Kutilmoqda'}</span>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('bookingsList').innerHTML = '<div class="loading">Xatolik yuz berdi</div>';
+      }
     }
 
+    function showPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (page === 'home') { document.getElementById('homePage').classList.add('active'); document.getElementById('nav-home').classList.add('active'); }
+      if (page === 'bookings') { document.getElementById('bookingsPage').classList.add('active'); document.getElementById('nav-bookings').classList.add('active'); loadBookings(); }
+      if (page === 'profile') {
+        document.getElementById('profilePage').classList.add('active');
+        document.getElementById('nav-profile').classList.add('active');
+        const user = tg.initDataUnsafe?.user;
+        document.getElementById('profileInfo').innerHTML = user ? `
+          <div style="font-size:40px;text-align:center;margin-bottom:12px;">👤</div>
+          <div style="text-align:center;font-size:18px;font-weight:600;">${user.first_name} ${user.last_name || ''}</div>
+          <div style="text-align:center;color:#64748b;margin-top:4px;">@${user.username || 'foydalanuvchi'}</div>
+        ` : '<div class="loading">Ma\'lumot yo\'q</div>';
+      }
+    }
+
+    autoLogin();
     loadRestaurants();
   </script>
 </body>
