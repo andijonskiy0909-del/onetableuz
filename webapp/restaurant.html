@@ -3,158 +3,374 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restoran</title>
+  <title>OneTable — Restoran</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; }
-    .back-btn { position: fixed; top: 12px; left: 12px; background: white; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 100; font-size: 18px; }
-    .hero img { width: 100%; height: 250px; object-fit: cover; }
-    .content { padding: 16px; }
-    .name { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-    .meta { color: #64748b; font-size: 14px; margin-bottom: 16px; }
-    .rating { color: #f59e0b; font-weight: 600; }
-    .section { margin-bottom: 20px; }
-    .section h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-    .section p { font-size: 14px; color: #475569; line-height: 1.6; }
-    .info-row { display: flex; gap: 8px; align-items: center; font-size: 14px; color: #475569; margin-bottom: 6px; }
-    .reserve-btn { position: fixed; bottom: 0; left: 0; right: 0; padding: 16px; background: white; border-top: 1px solid #e2e8f0; }
-    .reserve-btn button { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
-    .loading { text-align: center; padding: 60px 20px; color: #64748b; }
-    .form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; }
-    .form-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; padding: 20px; z-index: 201; }
-    .form-sheet h3 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1a1a2e; }
+
+    .hero { position: relative; height: 260px; overflow: hidden; }
+    .hero img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%); }
+    .hero-back { position: absolute; top: 14px; left: 14px; background: rgba(255,255,255,0.22); backdrop-filter: blur(8px); border: none; width: 38px; height: 38px; border-radius: 50%; color: white; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .hero-badge { position: absolute; top: 14px; right: 14px; background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); color: #fbbf24; font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 20px; }
+    .hero-info { position: absolute; bottom: 16px; left: 16px; right: 16px; color: white; }
+    .hero-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    .hero-meta { font-size: 13px; opacity: 0.9; }
+
+    .content { padding-bottom: 90px; }
+    .section { padding: 16px 16px 0; }
+    .section-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+
+    .info-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .info-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #475569; }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+    .info-row a { color: #ef4444; text-decoration: none; font-weight: 500; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .tag { background: #f1f5f9; color: #475569; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+
+    .menu-cat { margin-bottom: 14px; }
+    .menu-cat-title { font-size: 13px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .menu-item { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .menu-item-left { flex: 1; min-width: 0; }
+    .menu-item-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .menu-item-desc { font-size: 12px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .menu-item-price { font-size: 14px; font-weight: 700; color: #ef4444; white-space: nowrap; flex-shrink: 0; }
+
+    .review-card { background: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .review-name { font-size: 14px; font-weight: 600; }
+    .review-stars { color: #fbbf24; font-size: 13px; }
+    .review-text { font-size: 13px; color: #475569; line-height: 1.5; }
+    .review-date { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .no-reviews { text-align: center; padding: 24px; color: #94a3b8; font-size: 14px; background: white; border-radius: 12px; }
+
+    .loading-block { text-align: center; padding: 30px 16px; color: #94a3b8; font-size: 14px; }
+
+    .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+    .btn-reserve { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; }
+    .modal-overlay.open { display: block; }
+    .modal-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 22px 22px 0 0; z-index: 301; max-height: 92vh; overflow-y: auto; padding: 20px 20px max(20px, env(safe-area-inset-bottom)); display: none; }
+    .modal-handle { width: 36px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 0 auto 16px; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
     .form-group { margin-bottom: 12px; }
-    .form-group label { font-size: 13px; color: #64748b; margin-bottom: 4px; display: block; }
-    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; }
-    .form-submit { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-    .close-btn { float: right; background: none; border: none; font-size: 20px; cursor: pointer; }
+    .form-group label { font-size: 13px; color: #64748b; margin-bottom: 5px; display: block; font-weight: 500; }
+    .form-group input, .form-group select { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; outline: none; background: white; }
+    .form-group input:focus, .form-group select:focus { border-color: #ef4444; }
+
+    .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-top: 6px; }
+    .slot { padding: 9px 4px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-size: 13px; text-align: center; cursor: pointer; background: white; font-weight: 500; }
+    .slot:hover:not(.busy) { border-color: #ef4444; color: #ef4444; }
+    .slot.selected { background: #ef4444; color: white; border-color: #ef4444; }
+    .slot.busy { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; text-decoration: line-through; }
+    .slot-loading { grid-column: 1/-1; text-align: center; color: #94a3b8; font-size: 13px; padding: 14px; }
+    .slots-legend { display: flex; gap: 14px; margin-top: 8px; font-size: 12px; color: #94a3b8; }
+    .leg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+    .btn-submit { width: 100%; background: #ef4444; color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .btn-submit:disabled { background: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+    .btn-close { width: 100%; background: #f1f5f9; color: #64748b; border: none; padding: 12px; border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 8px; }
+
+    .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 10px 20px; border-radius: 12px; font-size: 14px; z-index: 999; opacity: 0; transition: opacity 0.25s; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; }
+    .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: rot 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+    @keyframes rot { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-  <button class="back-btn" onclick="history.back()">←</button>
 
-  <div id="restaurantDetail">
-    <div class="loading">Yuklanmoqda...</div>
+<div id="mainContent">
+  <div class="loading-block" style="padding:100px 20px;">⏳ Yuklanmoqda...</div>
+</div>
+
+<div class="bottom-bar" id="bottomBar" style="display:none">
+  <button class="btn-reserve" onclick="openModal()">📅 Bron qilish — Bepul</button>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+<div class="modal-sheet" id="modalSheet">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="modalTitle">📅 Bron qilish</div>
+
+  <div class="form-group">
+    <label>📅 Sana</label>
+    <input type="date" id="resDate" onchange="loadSlots()">
+  </div>
+  <div class="form-group">
+    <label>👥 Mehmonlar soni</label>
+    <select id="resGuests">
+      <option value="1">1 kishi</option>
+      <option value="2" selected>2 kishi</option>
+      <option value="3">3 kishi</option>
+      <option value="4">4 kishi</option>
+      <option value="5">5 kishi</option>
+      <option value="6">6+ kishi</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>⏰ Vaqt tanlang</label>
+    <div class="time-grid" id="timeGrid">
+      <div class="slot-loading">Avval sana tanlang</div>
+    </div>
+    <div class="slots-legend">
+      <span><span class="leg-dot" style="background:#ef4444"></span>Tanlangan</span>
+      <span><span class="leg-dot" style="background:#e2e8f0"></span>Band</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>💬 Izoh (ixtiyoriy)</label>
+    <input type="text" id="resComment" placeholder="Tug'ilgan kun, maxsus xohish...">
   </div>
 
-  <div class="form-overlay" id="formOverlay" onclick="closeForm()"></div>
-  <div class="form-sheet" id="formSheet" style="display:none">
-    <button class="close-btn" onclick="closeForm()">✕</button>
-    <h3>📅 Bron qilish</h3>
-    <div class="form-group">
-      <label>Sana</label>
-      <input type="date" id="bookDate" min="">
-    </div>
-    <div class="form-group">
-      <label>Vaqt</label>
-      <input type="time" id="bookTime" value="19:00">
-    </div>
-    <div class="form-group">
-      <label>Mehmonlar soni</label>
-      <select id="bookGuests">
-        <option value="1">1 kishi</option>
-        <option value="2" selected>2 kishi</option>
-        <option value="3">3 kishi</option>
-        <option value="4">4 kishi</option>
-        <option value="5">5 kishi</option>
-        <option value="6">6 kishi</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Izoh (ixtiyoriy)</label>
-      <input type="text" id="bookComment" placeholder="Maxsus xohish...">
-    </div>
-    <button class="form-submit" onclick="submitReservation()">✅ Bronni tasdiqlash</button>
-  </div>
+  <button class="btn-submit" id="btnSubmit" onclick="submitReservation()" disabled>Vaqt tanlang</button>
+  <button class="btn-close" onclick="closeModal()">Bekor qilish</button>
+</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
+<div class="toast" id="toast"></div>
 
-    const API_URL = 'https://onetableuz-production.up.railway.app/api';
-    const params = new URLSearchParams(window.location.search);
-    const restaurantId = params.get('id');
-    let restaurant = null;
+<script>
+  const tg = window.Telegram?.WebApp || { ready(){}, expand(){}, initDataUnsafe:{} };
+  tg.ready(); tg.expand();
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('bookDate').min = today;
-    document.getElementById('bookDate').value = today;
+  const API = 'https://onetableuz-production.up.railway.app/api';
+  const params = new URLSearchParams(window.location.search);
+  const restoId = params.get('id');
+  let authToken = localStorage.getItem('token');
+  let selectedTime = null;
+  let restoData = null;
 
-    async function loadRestaurant() {
-      try {
-        const res = await fetch(`${API_URL}/restaurants/${restaurantId}`);
-        restaurant = await res.json();
-        renderRestaurant(restaurant);
-      } catch {
-        document.getElementById('restaurantDetail').innerHTML = '<div class="loading">Xatolik yuz berdi</div>';
-      }
-    }
+  function toast(msg, ms = 2800) {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), ms);
+  }
 
-    function renderRestaurant(r) {
-      document.getElementById('restaurantDetail').innerHTML = `
-        <div class="hero">
-          <img src="${r.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600'}" alt="${r.name}">
-        </div>
-        <div class="content">
-          <div class="name">${r.name}</div>
-          <div class="meta">
-            <span class="rating">⭐ ${r.rating || '4.5'}</span> • 
-            ${r.cuisine ? r.cuisine.join(', ') : ''} • ${r.price_category || ''}
-          </div>
-          <div class="section">
-            <h3>📍 Manzil</h3>
-            <div class="info-row">📍 ${r.address || 'Manzil ko\'rsatilmagan'}</div>
-            <div class="info-row">📞 ${r.phone || 'Telefon ko\'rsatilmagan'}</div>
-          </div>
-          <div class="section">
-            <h3>ℹ️ Haqida</h3>
-            <p>${r.description || 'Ma\'lumot yo\'q'}</p>
-          </div>
-        </div>
-        <div style="height: 80px"></div>
-      `;
-
-      document.querySelector('.reserve-btn') && (document.querySelector('.reserve-btn').style.display = 'block');
-    }
-
-    function openForm() {
-      document.getElementById('formOverlay').style.display = 'block';
-      document.getElementById('formSheet').style.display = 'block';
-    }
-
-    function closeForm() {
-      document.getElementById('formOverlay').style.display = 'none';
-      document.getElementById('formSheet').style.display = 'none';
-    }
-
-    async function submitReservation() {
-      const date = document.getElementById('bookDate').value;
-      const time = document.getElementById('bookTime').value;
-      const guests = document.getElementById('bookGuests').value;
-      const comment = document.getElementById('bookComment').value;
-
-      tg.showPopup({
-        title: '✅ Bron tasdiqlandi!',
-        message: `${restaurant.name}\n📅 ${date} soat ${time}\n👥 ${guests} kishi`,
-        buttons: [{ type: 'ok', text: 'Yaxshi!' }]
+  async function autoLogin() {
+    if (authToken) return;
+    try {
+      const user = tg.initDataUnsafe?.user;
+      if (!user) return;
+      const r = await fetch(`${API}/auth/telegram`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_id: user.id, username: user.username, first_name: user.first_name, last_name: user.last_name })
       });
+      const d = await r.json();
+      if (d.token) { authToken = d.token; localStorage.setItem('token', d.token); }
+    } catch(e) {}
+  }
 
-      closeForm();
-      tg.sendData(JSON.stringify({
-        action: 'reservation_created',
-        restaurant_id: restaurantId,
-        restaurant_name: restaurant.name,
-        date, time, guests, comment
-      }));
+  async function loadAll() {
+    if (!restoId) {
+      document.getElementById('mainContent').innerHTML = '<div class="loading-block">❌ Restoran topilmadi</div>';
+      return;
+    }
+    try {
+      const [r1, r2, r3] = await Promise.all([
+        fetch(`${API}/restaurants/${restoId}`),
+        fetch(`${API}/restaurants/${restoId}/menu`),
+        fetch(`${API}/restaurants/${restoId}/reviews`)
+      ]);
+      restoData = await r1.json();
+      const menu = await r2.json();
+      const reviews = await r3.json();
+      render(restoData, menu, reviews);
+    } catch(e) {
+      document.getElementById('mainContent').innerHTML = '<div class="loading-block">❌ Xatolik. Qayta urinib ko\'ring.</div>';
+    }
+  }
+
+  function render(r, menu, reviews) {
+    const img = r.image_url || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&q=80';
+    const cuisineStr = Array.isArray(r.cuisine) ? r.cuisine.join(', ') : (r.cuisine || '');
+
+    let html = `
+      <div class="hero">
+        <img src="${img}" alt="${r.name}" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700'">
+        <div class="hero-overlay"></div>
+        <button class="hero-back" onclick="history.back()">←</button>
+        <div class="hero-badge">⭐ ${r.rating || '4.5'}</div>
+        <div class="hero-info">
+          <div class="hero-name">${r.name}</div>
+          <div class="hero-meta">${cuisineStr}${r.price_category ? ' • ' + r.price_category : ''}</div>
+        </div>
+      </div>
+      <div class="content">
+        <div class="section" style="margin-top:14px;">
+          <div class="section-title">📌 Ma'lumotlar</div>
+          <div class="info-card">
+            ${r.address ? `<div class="info-row"><span class="info-icon">📍</span><span>${r.address}</span></div>` : ''}
+            ${r.phone ? `<div class="info-row"><span class="info-icon">📞</span><a href="tel:${r.phone}">${r.phone}</a></div>` : ''}
+            <div class="info-row"><span class="info-icon">🕐</span><span>${r.working_hours || '10:00 — 22:00'}</span></div>
+            ${r.description ? `<div class="info-row"><span class="info-icon">ℹ️</span><span style="line-height:1.5">${r.description}</span></div>` : ''}
+          </div>
+        </div>`;
+
+    // Xususiyatlar
+    const extras = [];
+    if (r.has_parking) extras.push('🚗 Parking');
+    if (r.has_wifi) extras.push('📶 Wi-Fi');
+    if (r.has_kids_area) extras.push('🧒 Bolalar maydon');
+    if (r.capacity) extras.push(`🪑 ${r.capacity} o'rindiq`);
+    if (extras.length) {
+      html += `<div class="section" style="margin-top:10px;"><div class="tags">${extras.map(e=>`<span class="tag">${e}</span>`).join('')}</div></div>`;
     }
 
-    loadRestaurant();
-  </script>
+    // Menyu
+    html += `<div class="section" style="margin-top:16px;"><div class="section-title">🍜 Menyu</div>`;
+    if (!menu || !menu.length) {
+      html += `<div class="loading-block" style="background:white;border-radius:12px;">Menyu hali qo'shilmagan</div>`;
+    } else {
+      const cats = {};
+      menu.forEach(item => {
+        const cat = item.category || 'Boshqa';
+        if (!cats[cat]) cats[cat] = [];
+        cats[cat].push(item);
+      });
+      Object.entries(cats).forEach(([cat, items]) => {
+        html += `<div class="menu-cat"><div class="menu-cat-title">${cat}</div>`;
+        items.forEach(item => {
+          html += `<div class="menu-item">
+            <div class="menu-item-left">
+              <div class="menu-item-name">${item.name}</div>
+              ${item.description ? `<div class="menu-item-desc">${item.description}</div>` : ''}
+            </div>
+            <div class="menu-item-price">${Number(item.price).toLocaleString()} so'm</div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+    }
+    html += `</div>`;
 
-  <div class="reserve-btn">
-    <button onclick="openForm()">📅 Bron qilish — Bepul</button>
-  </div>
+    // Sharhlar
+    html += `<div class="section" style="margin-top:16px;"><div class="section-title">💬 Sharhlar</div>`;
+    if (!reviews || !reviews.length) {
+      html += `<div class="no-reviews">Hali sharh yo'q. Birinchi bo'ling!</div>`;
+    } else {
+      reviews.slice(0, 10).forEach(rv => {
+        const stars = '⭐'.repeat(Math.min(rv.rating || 5, 5));
+        const name = `${rv.first_name || ''}${rv.last_name ? ' ' + rv.last_name : ''}`.trim() || 'Foydalanuvchi';
+        const date = rv.created_at ? new Date(rv.created_at).toLocaleDateString('uz-UZ', { day:'numeric', month:'long', year:'numeric' }) : '';
+        html += `<div class="review-card">
+          <div class="review-header">
+            <div class="review-name">${name}</div>
+            <div class="review-stars">${stars}</div>
+          </div>
+          ${rv.comment ? `<div class="review-text">${rv.comment}</div>` : ''}
+          ${date ? `<div class="review-date">${date}</div>` : ''}
+        </div>`;
+      });
+    }
+    html += `</div></div>`;
+
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('bottomBar').style.display = 'block';
+    document.getElementById('modalTitle').textContent = `📅 ${r.name} — Bron`;
+  }
+
+  function openModal() {
+    selectedTime = null;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('resDate').value = today;
+    document.getElementById('resDate').min = today;
+    document.getElementById('resComment').value = '';
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true; btn.textContent = 'Vaqt tanlang';
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('modalSheet').style.display = 'block';
+    loadSlots();
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+    document.getElementById('modalSheet').style.display = 'none';
+    selectedTime = null;
+  }
+
+  async function loadSlots() {
+    const date = document.getElementById('resDate').value;
+    if (!date) return;
+    selectedTime = null;
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true; btn.textContent = 'Vaqt tanlang';
+    const grid = document.getElementById('timeGrid');
+    grid.innerHTML = '<div class="slot-loading">⏳ Yuklanmoqda...</div>';
+
+    const slots = [];
+    for (let h = 10; h <= 21; h++) {
+      slots.push(`${String(h).padStart(2,'0')}:00`);
+      slots.push(`${String(h).padStart(2,'0')}:30`);
+    }
+    slots.push('22:00');
+
+    let busy = [];
+    try {
+      const r = await fetch(`${API}/restaurants/${restoId}/availability?date=${date}`);
+      if (r.ok) { const d = await r.json(); busy = Array.isArray(d) ? d : (d.busy_times || []); }
+    } catch(e) {}
+
+    const now = new Date();
+    const isToday = new Date(date).toDateString() === now.toDateString();
+    grid.innerHTML = slots.map(s => {
+      const isBusy = busy.includes(s);
+      let isPast = false;
+      if (isToday) {
+        const [h, m] = s.split(':').map(Number);
+        isPast = (h * 60 + m) < (now.getHours() * 60 + now.getMinutes() + 60);
+      }
+      const dis = isBusy || isPast;
+      return `<div class="slot${dis ? ' busy' : ''}" ${dis ? '' : `onclick="selectSlot('${s}',this)"`}>${s}</div>`;
+    }).join('');
+  }
+
+  function selectSlot(time, el) {
+    document.querySelectorAll('.slot.selected').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedTime = time;
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = false;
+    btn.textContent = `✅ ${time} — Bron qilish`;
+  }
+
+  async function submitReservation() {
+    if (!authToken) { toast('❌ Botni qayta oching!'); return; }
+    if (!selectedTime) { toast('⚠️ Vaqt tanlang!'); return; }
+    const date = document.getElementById('resDate').value;
+    const guests = document.getElementById('resGuests').value;
+    const comment = document.getElementById('resComment').value;
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>Yuborilmoqda...';
+    try {
+      const r = await fetch(`${API}/reservations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+        body: JSON.stringify({ restaurant_id: parseInt(restoId), date, time: selectedTime, guests: parseInt(guests), comment })
+      });
+      const d = await r.json();
+      if (d.id || r.ok) {
+        closeModal();
+        toast('🎉 Bron muvaffaqiyatli qilindi!');
+      } else {
+        btn.disabled = false;
+        btn.textContent = `✅ ${selectedTime} — Bron qilish`;
+        if (d.error && d.error.includes('mavjud emas')) { toast('❌ Bu vaqt band!'); loadSlots(); }
+        else toast('❌ ' + (d.error || 'Xatolik'));
+      }
+    } catch(e) {
+      btn.disabled = false;
+      btn.textContent = `✅ ${selectedTime} — Bron qilish`;
+      toast('❌ Server xatoligi');
+    }
+  }
+
+  autoLogin();
+  loadAll();
+</script>
 </body>
 </html>
