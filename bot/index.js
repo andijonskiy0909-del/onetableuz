@@ -10,7 +10,7 @@ bot.onText(/\/start/, (msg) => {
   const firstName = msg.from.first_name || 'Foydalanuvchi';
 
   bot.sendMessage(chatId, 
-    `Salom, ${firstName}! 👋\n\nOneTable — Toshkentdagi restoranlarni bron qilish platformasi.\n\n🍽 Restoranlarni ko'ring\n📅 Bron qiling\n⭐ Baholang`, 
+    `Salom, ${firstName}! 👋\n\nOneTable — Har bir kechani unutilmas qiling. ✨\n\n🍽 Restoranlarni ko'ring\n📅 Bron qiling\n⭐ Baholang`, 
     {
       reply_markup: {
         inline_keyboard: [
