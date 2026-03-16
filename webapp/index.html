@@ -46,4 +46,118 @@
       <button class="filter-btn active" onclick="setFilter('all', this)">Hammasi</button>
       <button class="filter-btn" onclick="setFilter('Uzbek', this)">O'zbek</button>
       <button class="filter-btn" onclick="setFilter('European', this)">Evropa</button>
-      <button class="filter-btn" onclick="
+      <button class="filter-btn" onclick="setFilter('Asian', this)">Osiyo</button>
+      <button class="filter-btn" onclick="setFilter('Italian', this)">Italyan</button>
+      <button class="filter-btn" onclick="setFilter('$', this)">$</button>
+      <button class="filter-btn" onclick="setFilter('$$', this)">$$</button>
+      <button class="filter-btn" onclick="setFilter('$$$', this)">$$$</button>
+    </div>
+
+    <div class="restaurants" id="restaurantList">
+      <div class="loading">Yuklanmoqda...</div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active">
+      <span>🏠</span>
+      <span>Bosh sahifa</span>
+    </div>
+    <div class="nav-item">
+      <span>📅</span>
+      <span>Bronlarim</span>
+    </div>
+    <div class="nav-item">
+      <span>👤</span>
+      <span>Profil</span>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const API_URL = 'https://onetableuz-production.up.railway.app/api';
+    let allRestaurants = [];
+    let currentFilter = 'all';
+
+    async function loadRestaurants() {
+      try {
+        const res = await fetch(`${API_URL}/restaurants`);
+        allRestaurants = await res.json();
+        renderRestaurants(allRestaurants);
+      } catch (err) {
+        document.getElementById('restaurantList').innerHTML = '<div class="loading">Xatolik yuz berdi. Qayta urinib ko\'ring.</div>';
+      }
+    }
+
+    function renderRestaurants(list) {
+      const container = document.getElementById('restaurantList');
+      if (!list.length) {
+        container.innerHTML = '<div class="loading">Restoran topilmadi</div>';
+        return;
+      }
+      container.innerHTML = list.map(r => `
+        <div class="card" onclick="openRestaurant('${r.id}')">
+          <img src="${r.image_url || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'}" alt="${r.name}" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'">
+          <div class="card-body">
+            <div class="card-name">${r.name}</div>
+            <div class="card-meta">${r.cuisine ? r.cuisine.join(', ') : ''} • ${r.price_category || ''} • ${r.address || ''}</div>
+            <div class="card-footer">
+              <span class="rating">⭐ ${r.rating || '4.5'}</span>
+              <button class="btn-reserve" onclick="event.stopPropagation(); reserve('${r.id}', '${r.name}')">Bron qilish</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filterRestaurants();
+    }
+
+    function filterRestaurants() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      let filtered = allRestaurants;
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(r => 
+          (r.cuisine && r.cuisine.includes(currentFilter)) || 
+          r.price_category === currentFilter
+        );
+      }
+      if (q) {
+        filtered = filtered.filter(r => 
+          r.name.toLowerCase().includes(q) || 
+          (r.description && r.description.toLowerCase().includes(q))
+        );
+      }
+      renderRestaurants(filtered);
+    }
+
+    function reserve(id, name) {
+      tg.showPopup({
+        title: name,
+        message: 'Bron qilish uchun quyidagilarni tanlang:',
+        buttons: [
+          { id: 'book', type: 'default', text: '📅 Bron qilish' },
+          { id: 'cancel', type: 'cancel', text: 'Bekor qilish' }
+        ]
+      }, (btnId) => {
+        if (btnId === 'book') {
+          tg.sendData(JSON.stringify({ action: 'reserve', restaurant_id: id, restaurant_name: name }));
+        }
+      });
+    }
+
+    function openRestaurant(id) {
+      window.location.href = `restaurant.html?id=${id}`;
+    }
+
+    loadRestaurants();
+  </script>
+</body>
+</html>
