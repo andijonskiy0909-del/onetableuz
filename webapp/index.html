@@ -19,13 +19,15 @@
     .filter-btn { padding: 6px 14px; border: 1px solid #e2e8f0; border-radius: 20px; background: white; font-size: 13px; cursor: pointer; white-space: nowrap; }
     .filter-btn.active { background: #ef4444; color: white; border-color: #ef4444; }
     .restaurants { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
-    .card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; }
     .card img { width: 100%; height: 160px; object-fit: cover; }
     .card-body { padding: 12px; }
     .card-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
     .card-meta { font-size: 13px; color: #64748b; margin-bottom: 8px; }
-    .card-footer { display: flex; justify-content: space-between; align-items: center; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
     .rating { font-size: 13px; color: #f59e0b; font-weight: 600; }
+    .card-btns { display: flex; gap: 6px; }
+    .btn-view { background: #f1f5f9; color: #1a1a2e; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
     .btn-reserve { background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 600; }
     .loading { text-align: center; padding: 40px; color: #64748b; }
     .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; display: flex; padding: 8px 0; }
@@ -160,15 +162,15 @@
 
     const i18n = {
       uz: {
-        all:'Hammasi', european:'Evropa', asian:'Osiyo', italian:'Italyan',
+        all:'Hammasi', european:'Evropa', asian:'Osiyo',
         loading:'Yuklanmoqda...', error:'Xatolik yuz berdi',
         not_found:'Restoran topilmadi', no_bookings:'Bronlar yo\'q',
         my_bookings:'📅 Bronlarim', profile:'👤 Profil', home:'Bosh sahifa', bookings:'Bronlarim',
         date:'Sana', guests:'Mehmonlar soni', choose_time:'Vaqt tanlang',
-        choose_date_first:'Avval sana tanlang', selected:'Tanlangan', busy:'Band',
+        selected:'Tanlangan', busy:'Band',
         comment:'Izoh (ixtiyoriy)', comment_ph:'Tug\'ilgan kun, maxsus xohish...',
-        cancel:'Bekor qilish', reserve:'Bron qilish',
-        reserve_btn: t => `✅ ${t} — Bron qilish`,
+        cancel:'Bekor qilish', reserve:'Bron', view:'Ko\'rish',
+        reserve_btn: t => `✅ ${t} — Bron`,
         sending:'Yuborilmoqda...', success:'✅ Bron muvaffaqiyatli qilindi!',
         err_login:'❌ Botni qayta oching!', err_time:'⚠️ Vaqt tanlang!',
         err_busy:'❌ Bu vaqt band. Boshqa vaqt tanlang.',
@@ -181,15 +183,15 @@
         slots_loading:'⏳ Vaqtlar yuklanmoqda...',
       },
       ru: {
-        all:'Все', european:'Европа', asian:'Азия', italian:'Итальянская',
+        all:'Все', european:'Европа', asian:'Азия',
         loading:'Загрузка...', error:'Произошла ошибка',
         not_found:'Рестораны не найдены', no_bookings:'Нет бронирований',
         my_bookings:'📅 Мои брони', profile:'👤 Профиль', home:'Главная', bookings:'Брони',
         date:'Дата', guests:'Кол-во гостей', choose_time:'Выберите время',
-        choose_date_first:'Сначала выберите дату', selected:'Выбрано', busy:'Занято',
+        selected:'Выбрано', busy:'Занято',
         comment:'Комментарий (необязательно)', comment_ph:'День рождения, пожелания...',
-        cancel:'Отмена', reserve:'Забронировать',
-        reserve_btn: t => `✅ ${t} — Забронировать`,
+        cancel:'Отмена', reserve:'Бронь', view:'Смотреть',
+        reserve_btn: t => `✅ ${t} — Бронь`,
         sending:'Отправляется...', success:'✅ Бронирование успешно!',
         err_login:'❌ Перезапустите бота!', err_time:'⚠️ Выберите время!',
         err_busy:'❌ Время занято. Выберите другое.',
@@ -202,15 +204,15 @@
         slots_loading:'⏳ Загрузка времени...',
       },
       en: {
-        all:'All', european:'European', asian:'Asian', italian:'Italian',
+        all:'All', european:'European', asian:'Asian',
         loading:'Loading...', error:'An error occurred',
         not_found:'No restaurants found', no_bookings:'No bookings yet',
         my_bookings:'📅 My Bookings', profile:'👤 Profile', home:'Home', bookings:'Bookings',
-        date:'Date', guests:'Number of guests', choose_time:'Choose time',
-        choose_date_first:'Choose a date first', selected:'Selected', busy:'Busy',
+        date:'Date', guests:'Guests', choose_time:'Choose time',
+        selected:'Selected', busy:'Busy',
         comment:'Comment (optional)', comment_ph:'Birthday, special requests...',
-        cancel:'Cancel', reserve:'Reserve',
-        reserve_btn: t => `✅ ${t} — Book Now`,
+        cancel:'Cancel', reserve:'Book', view:'View',
+        reserve_btn: t => `✅ ${t} — Book`,
         sending:'Sending...', success:'✅ Booking successful!',
         err_login:'❌ Please reopen the bot!', err_time:'⚠️ Select a time!',
         err_busy:'❌ Time taken. Choose another.',
@@ -274,7 +276,7 @@
           body:JSON.stringify({telegram_id:user.id,username:user.username,first_name:user.first_name,last_name:user.last_name})});
         const d = await r.json();
         if(d.token){authToken=d.token;localStorage.setItem('token',d.token);}
-      } catch(e){console.error(e);}
+      } catch(e){}
     }
 
     async function loadRestaurants() {
@@ -289,7 +291,7 @@
       const c = document.getElementById('restaurantList');
       if(!list.length){c.innerHTML=`<div class="loading">${T('not_found')}</div>`;return;}
       c.innerHTML = list.map(r=>`
-        <div class="card">
+        <div class="card" onclick="location.href='restaurant.html?id=${r.id}'">
           <img src="${r.image_url||'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'}" alt="${r.name}"
                onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'">
           <div class="card-body">
@@ -297,9 +299,14 @@
             <div class="card-meta">${r.cuisine?r.cuisine.join(', '):''} • ${r.price_category||''} • ${r.address||''}</div>
             <div class="card-footer">
               <span class="rating">⭐ ${r.rating||'4.5'}</span>
-              <button class="btn-reserve" onclick="openReserve(${r.id},'${r.name.replace(/'/g,"\\'")}')">
-                ${T('reserve')}
-              </button>
+              <div class="card-btns">
+                <button class="btn-view" onclick="event.stopPropagation();location.href='restaurant.html?id=${r.id}'">
+                  👁 ${T('view')}
+                </button>
+                <button class="btn-reserve" onclick="event.stopPropagation();openReserve(${r.id},'${r.name.replace(/'/g,"\\'")}')">
+                  📅 ${T('reserve')}
+                </button>
+              </div>
             </div>
           </div>
         </div>`).join('');
@@ -448,7 +455,6 @@
       }
     }
 
-    // Init
     applyT();
     const tgLang=tg.initDataUnsafe?.user?.language_code;
     if(tgLang&&!localStorage.getItem('lang')){
