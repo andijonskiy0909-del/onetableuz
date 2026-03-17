@@ -51,6 +51,3 @@ app.listen(PORT, () => {
 })
 ```
 
-GitHub da `api/src/index.js` ni shu kod bilan almashtiring → Commit → deploy kutib:
-```
-https://onetableuz-production.up.railway.app/fix-owner
