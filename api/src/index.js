@@ -1,20 +1,26 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const app = express();
+const express = require("express")
+const cors = require("cors")
+require("dotenv").config()
 
-app.use(cors({
-  origin: '*'
-}));
-app.use(express.json());
+const app = express()
+
+app.use(cors())
+app.use(express.json())
 
 // Routes
-app.use('/api/restaurants', require('./routes/restaurants'));
-app.use('/api/reservations', require('./routes/reservations'));
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
+const restaurantRoutes = require("./routes/restaurants")
+const reservationRoutes = require("./routes/reservations")
+const authRoutes = require("./routes/auth")
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.use("/api/restaurants", restaurantRoutes)
+app.use("/api/reservations", reservationRoutes)
+app.use("/api/auth", authRoutes)
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.get("/", (req, res) => {
+  res.send("OneTable API ishlayapti ✅")
+})
+
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Server ${PORT} portda ishlayapti`)
+})
