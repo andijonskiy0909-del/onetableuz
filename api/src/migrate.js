@@ -112,7 +112,7 @@ async function migrate() {
 
   console.log('✅ Barcha jadvallar tayyor!');
   console.log('✅ Owner: admin@onetable.uz | parol: secret123');
-  process.exit(0);
+
 }
 
 migrate().catch(console.error);
