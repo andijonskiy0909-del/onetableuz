@@ -115,8 +115,4 @@ async function migrate() {
 migrate().catch(console.error);
 ```
 
-GitHub da `api/src/migrate.js` ni shu kod bilan almashtiring → Commit!
 
-Keyin Railway → Start Command:
-```
-node src/migrate.js; node src/index.js
