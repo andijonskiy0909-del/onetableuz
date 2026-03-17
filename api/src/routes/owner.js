@@ -8,12 +8,51 @@ const ownerAuth = (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
     req.owner = jwt.verify(token, process.env.JWT_SECRET);
-    if (req.owner.role !== 'owner') throw new Error();
+    if (req.owner.role !== 'owner' && req.owner.role !== 'admin') throw new Error();
     next();
   } catch {
     res.status(401).json({ error: 'Invalid token' });
   }
 };
+
+// ── Ro'yxatdan o'tish ────────────────────────────────────────
+router.post('/register', async (req, res) => {
+  try {
+    const { email, password, full_name, phone } = req.body;
+
+    if (!email || !password || !full_name) {
+      return res.status(400).json({ error: 'Email, parol va ism kiritish shart' });
+    }
+
+    // Email band emasmi?
+    const existing = await pool.query(
+      'SELECT id FROM restaurant_owners WHERE email = $1', [email]
+    );
+    if (existing.rows.length) {
+      return res.status(400).json({ error: 'Bu email allaqachon ro\'yxatdan o\'tgan' });
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    const result = await pool.query(
+      `INSERT INTO restaurant_owners (email, password_hash, full_name, phone, role)
+       VALUES ($1, $2, $3, $4, 'owner') RETURNING *`,
+      [email, hash, full_name, phone]
+    );
+
+    const owner = result.rows[0];
+    const token = jwt.sign(
+      { id: owner.id, role: owner.role, restaurant_id: owner.restaurant_id },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.json({ token, owner });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // ── Login ────────────────────────────────────────────────────
 router.post('/login', async (req, res) => {
@@ -29,7 +68,7 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: "Parol noto'g'ri" });
 
     const token = jwt.sign(
-      { id: owner.id, role: 'owner', restaurant_id: owner.restaurant_id },
+      { id: owner.id, role: owner.role, restaurant_id: owner.restaurant_id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
@@ -42,6 +81,7 @@ router.post('/login', async (req, res) => {
 // ── Restoran ma'lumotlarini olish ────────────────────────────
 router.get('/restaurant', ownerAuth, async (req, res) => {
   try {
+    if (!req.owner.restaurant_id) return res.json(null);
     const result = await pool.query(
       'SELECT * FROM restaurants WHERE id = $1',
       [req.owner.restaurant_id]
@@ -62,7 +102,7 @@ router.post('/restaurants', ownerAuth, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO restaurants 
+      `INSERT INTO restaurants
         (name, description, address, phone, cuisine, price_category, capacity, image_url, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved')
        RETURNING *`,
@@ -71,8 +111,9 @@ router.post('/restaurants', ownerAuth, async (req, res) => {
 
     const restaurant = result.rows[0];
 
+    // Owner ni yangi restoranga bog'lash
     await pool.query(
-      `UPDATE restaurant_owners SET restaurant_id = $1 WHERE id = $2`,
+      'UPDATE restaurant_owners SET restaurant_id = $1 WHERE id = $2',
       [restaurant.id, req.owner.id]
     );
 
@@ -83,14 +124,14 @@ router.post('/restaurants', ownerAuth, async (req, res) => {
   }
 });
 
-// ── Restoran ma'lumotlarini yangilash ────────────────────────
+// ── Restoran yangilash ────────────────────────────────────────
 router.put('/restaurant', ownerAuth, async (req, res) => {
   try {
     const { name, description, address, phone, cuisine, price_category, capacity, image_url } = req.body;
 
     const result = await pool.query(
-      `UPDATE restaurants 
-       SET name=$1, description=$2, address=$3, phone=$4, 
+      `UPDATE restaurants
+       SET name=$1, description=$2, address=$3, phone=$4,
            cuisine=$5, price_category=$6, capacity=$7, image_url=$8
        WHERE id=$9 RETURNING *`,
       [name, description, address, phone, cuisine, price_category, capacity, image_url, req.owner.restaurant_id]
@@ -294,6 +335,72 @@ router.delete('/availability/block', ownerAuth, async (req, res) => {
       `UPDATE availability SET is_blocked = false
        WHERE restaurant_id = $1 AND date = $2 AND time = $3`,
       [req.owner.restaurant_id, date, time]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── Premium boshqaruvi ────────────────────────────────────────
+router.get('/premium', ownerAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM premium_subscriptions
+       WHERE restaurant_id = $1
+       ORDER BY created_at DESC LIMIT 1`,
+      [req.owner.restaurant_id]
+    );
+    const resto = await pool.query(
+      'SELECT is_premium FROM restaurants WHERE id = $1',
+      [req.owner.restaurant_id]
+    );
+    res.json({
+      subscription: result.rows[0] || null,
+      is_premium: resto.rows[0]?.is_premium || false
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.post('/premium/activate', ownerAuth, async (req, res) => {
+  try {
+    const { plan } = req.body; // monthly | yearly
+    const amount = plan === 'yearly' ? 1200000 : 150000;
+    const months = plan === 'yearly' ? 12 : 1;
+
+    const expires_at = new Date();
+    expires_at.setMonth(expires_at.getMonth() + months);
+
+    await pool.query(
+      `INSERT INTO premium_subscriptions
+        (restaurant_id, plan, amount, status, expires_at)
+       VALUES ($1, $2, $3, 'active', $4)`,
+      [req.owner.restaurant_id, plan, amount, expires_at]
+    );
+
+    await pool.query(
+      'UPDATE restaurants SET is_premium = true WHERE id = $1',
+      [req.owner.restaurant_id]
+    );
+
+    res.json({ success: true, expires_at });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.delete('/premium', ownerAuth, async (req, res) => {
+  try {
+    await pool.query(
+      `UPDATE premium_subscriptions SET status = 'cancelled'
+       WHERE restaurant_id = $1`,
+      [req.owner.restaurant_id]
+    );
+    await pool.query(
+      'UPDATE restaurants SET is_premium = false WHERE id = $1',
+      [req.owner.restaurant_id]
     );
     res.json({ success: true });
   } catch (err) {
