@@ -7,43 +7,32 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #333; }
-    
-    /* Login */
     .login-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
+      min-height: 100vh; display: flex; align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     .login-box {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      width: 360px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      background: white; padding: 40px; border-radius: 16px;
+      width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
     .login-box h1 { text-align: center; margin-bottom: 8px; color: #333; }
     .login-box p { text-align: center; color: #888; margin-bottom: 24px; }
     .form-group { margin-bottom: 16px; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
     .form-group input {
-      width: 100%; padding: 12px 16px;
-      border: 2px solid #e0e0e0; border-radius: 8px;
-      font-size: 15px; transition: border-color 0.2s;
+      width: 100%; padding: 12px 16px; border: 2px solid #e0e0e0;
+      border-radius: 8px; font-size: 15px; transition: border-color 0.2s;
     }
     .form-group input:focus { outline: none; border-color: #667eea; }
     .btn-login {
       width: 100%; padding: 13px;
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white; border: none; border-radius: 8px;
-      font-size: 16px; font-weight: 600; cursor: pointer;
-      transition: opacity 0.2s;
+      font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
     }
     .btn-login:hover { opacity: 0.9; }
     .error-msg { color: #e74c3c; text-align: center; margin-top: 12px; font-size: 14px; }
-
-    /* Dashboard */
     .dashboard { display: none; }
     .sidebar {
       position: fixed; left: 0; top: 0; bottom: 0;
@@ -64,10 +53,7 @@
     }
     .nav-item:hover, .nav-item.active { background: rgba(102,126,234,0.3); }
     .nav-item.active { border-left: 3px solid #667eea; }
-    .main-content {
-      margin-left: 240px; padding: 24px;
-      min-height: 100vh;
-    }
+    .main-content { margin-left: 240px; padding: 24px; min-height: 100vh; }
     .topbar {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 24px;
@@ -78,8 +64,7 @@
       padding: 6px 14px; border: 2px solid #667eea;
       border-radius: 20px; cursor: pointer;
       font-size: 13px; font-weight: 600;
-      background: white; color: #667eea;
-      transition: all 0.2s;
+      background: white; color: #667eea; transition: all 0.2s;
     }
     .lang-btn.active { background: #667eea; color: white; }
     .logout-btn {
@@ -87,8 +72,6 @@
       color: white; border: none; border-radius: 8px;
       cursor: pointer; font-size: 14px;
     }
-
-    /* Stats */
     .stats-grid {
       display: grid; grid-template-columns: repeat(4, 1fr);
       gap: 16px; margin-bottom: 24px;
@@ -100,37 +83,25 @@
     .stat-card .label { font-size: 13px; color: #888; margin-bottom: 8px; }
     .stat-card .value { font-size: 28px; font-weight: 700; color: #333; }
     .stat-card .sub { font-size: 12px; color: #27ae60; margin-top: 4px; }
-
-    /* Cards */
     .card {
       background: white; border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
       margin-bottom: 24px; overflow: hidden;
     }
     .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 16px 20px; border-bottom: 1px solid #f0f0f0;
       display: flex; justify-content: space-between; align-items: center;
     }
     .card-header h3 { font-size: 16px; }
     .card-body { padding: 20px; }
-
-    /* Table */
     table { width: 100%; border-collapse: collapse; }
     th { background: #f8f9fa; padding: 12px 16px; text-align: left; font-size: 13px; color: #888; }
     td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
     tr:last-child td { border-bottom: none; }
-
-    /* Status badges */
-    .badge {
-      padding: 4px 10px; border-radius: 20px;
-      font-size: 12px; font-weight: 600;
-    }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .badge-pending { background: #fff3cd; color: #856404; }
     .badge-confirmed { background: #d1edff; color: #0c5460; }
     .badge-cancelled { background: #f8d7da; color: #721c24; }
-
-    /* Buttons */
     .btn-confirm {
       padding: 6px 12px; background: #27ae60;
       color: white; border: none; border-radius: 6px;
@@ -141,39 +112,23 @@
       color: white; border: none; border-radius: 6px;
       cursor: pointer; font-size: 13px;
     }
-
-    /* Filter bar */
-    .filter-bar {
-      display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
-    }
+    .filter-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
     .filter-bar input, .filter-bar select {
       padding: 8px 12px; border: 2px solid #e0e0e0;
       border-radius: 8px; font-size: 14px;
     }
-
-    /* Peak hours */
-    .peak-bar {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 8px;
-    }
+    .peak-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
     .peak-bar .time { width: 50px; font-size: 14px; font-weight: 600; }
     .peak-bar .bar-wrap { flex: 1; background: #f0f0f0; border-radius: 4px; height: 20px; }
     .peak-bar .bar-fill {
       height: 100%; border-radius: 4px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      transition: width 0.5s;
+      background: linear-gradient(135deg, #667eea, #764ba2); transition: width 0.5s;
     }
     .peak-bar .count { width: 30px; font-size: 13px; color: #888; }
-
-    /* Menu */
     .menu-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;
     }
-    .menu-item-card {
-      border: 2px solid #f0f0f0; border-radius: 10px;
-      padding: 16px; position: relative;
-    }
+    .menu-item-card { border: 2px solid #f0f0f0; border-radius: 10px; padding: 16px; position: relative; }
     .menu-item-card h4 { font-size: 15px; margin-bottom: 4px; }
     .menu-item-card .price { color: #667eea; font-weight: 700; font-size: 16px; }
     .menu-item-card .category { font-size: 12px; color: #888; margin-bottom: 8px; }
@@ -183,17 +138,14 @@
     }
     .available-true { background: #27ae60; }
     .available-false { background: #e74c3c; }
-
-    /* Add menu form */
     .add-form {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 12px; margin-bottom: 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
     }
-    .add-form input, .add-form select {
+    .add-form input, .add-form select, .add-form textarea {
       padding: 10px 12px; border: 2px solid #e0e0e0;
       border-radius: 8px; font-size: 14px;
     }
-    .add-form input:focus, .add-form select:focus {
+    .add-form input:focus, .add-form select:focus, .add-form textarea:focus {
       outline: none; border-color: #667eea;
     }
     .btn-add {
@@ -201,41 +153,31 @@
       color: white; border: none; border-radius: 8px;
       cursor: pointer; font-size: 14px; font-weight: 600;
     }
-
-    /* Availability */
-    .time-grid {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
-    }
+    .time-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
     .time-slot {
-      padding: 10px; text-align: center;
-      border-radius: 8px; font-size: 13px;
-      cursor: pointer; border: 2px solid transparent;
-      transition: all 0.2s;
+      padding: 10px; text-align: center; border-radius: 8px; font-size: 13px;
+      cursor: pointer; border: 2px solid transparent; transition: all 0.2s;
     }
     .time-slot.free { background: #d1edff; color: #0c5460; }
     .time-slot.blocked { background: #f8d7da; color: #721c24; }
     .time-slot.booked { background: #e0e0e0; color: #666; cursor: not-allowed; }
-
-    /* Realtime indicator */
     .realtime-dot {
       width: 8px; height: 8px; background: #27ae60;
       border-radius: 50%; display: inline-block;
       margin-right: 6px; animation: pulse 2s infinite;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     .page { display: none; }
     .page.active { display: block; }
-
+    .success-msg { color: #27ae60; font-size: 14px; margin-top: 12px; }
+    .error-msg-inline { color: #e74c3c; font-size: 14px; margin-top: 12px; }
     @media (max-width: 768px) {
       .sidebar { width: 60px; }
       .sidebar-logo, .nav-item span { display: none; }
       .main-content { margin-left: 60px; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .time-grid { grid-template-columns: repeat(4, 1fr); }
+      .add-form { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -285,6 +227,9 @@
     <div class="nav-item" onclick="showPage('availability')">
       🕐 <span id="navAvailability">Vaqtlar</span>
     </div>
+    <div class="nav-item" onclick="showPage('restaurant')">
+      🏪 <span id="navRestaurant">Restoran</span>
+    </div>
   </div>
 
   <div class="main-content">
@@ -321,7 +266,6 @@
           <div class="value" id="statNoshow">—</div>
         </div>
       </div>
-
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
         <div class="card">
           <div class="card-header">
@@ -396,121 +340,111 @@
       </div>
     </div>
 
+    <!-- RESTAURANT PAGE -->
+    <div class="page" id="page-restaurant">
+      <div class="card">
+        <div class="card-header">
+          <h3 id="restaurantTitle">🏪 Restoran ma'lumotlari</h3>
+        </div>
+        <div class="card-body">
+          <div class="add-form">
+            <input type="text" id="restoName" placeholder="Restoran nomi *">
+            <input type="text" id="restoAddress" placeholder="Manzil *">
+            <input type="text" id="restoPhone" placeholder="Telefon">
+            <input type="text" id="restoImage" placeholder="Rasm URL">
+            <select id="restoPriceCategory">
+              <option value="$">$ (Arzon)</option>
+              <option value="$$" selected>$$ (O'rta)</option>
+              <option value="$$$">$$$ (Qimmat)</option>
+            </select>
+            <input type="number" id="restoCapacity" placeholder="Sig'im (stol soni)" value="50">
+            <input type="text" id="restoCuisine" placeholder="Oshxona turi (Uzbek, Italian...)">
+            <textarea id="restoDesc" placeholder="Tavsif" style="padding:10px;border:2px solid #e0e0e0;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <button class="btn-add" onclick="saveRestaurant()" id="btnSaveRestaurant">💾 Saqlash</button>
+          <div id="restaurantMsg" style="margin-top:12px; font-size:14px;"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
-  const API = '';  // Railway da bir xil domendan ishlaydi
+  const API = '';
   let token = localStorage.getItem('ot_token');
   let currentLang = localStorage.getItem('ot_lang') || 'uz';
   let realtimeInterval = null;
 
-  // ── Translations ─────────────────────────────────────────
   const T = {
     uz: {
       subtitle: 'Restoran egasi kabineti',
-      labelEmail: 'Email',
-      labelPassword: 'Parol',
-      btnLogin: 'Kirish',
-      btnLogout: 'Chiqish',
-      navAnalytics: 'Analitika',
-      navReservations: 'Bronlar',
-      navMenu: 'Menyu',
-      navAvailability: 'Vaqtlar',
-      statToday: 'Bugungi bronlar',
-      statWeekly: 'Haftalik bronlar',
-      statRevenue: 'Oylik daromad',
-      statNoshow: 'No-show foizi',
-      peakTitle: 'Pik vaqtlar',
-      dailyTitle: "So'nggi 7 kun",
-      resTitle: 'Bronlar',
-      menuTitle: 'Menyu boshqaruvi',
+      labelEmail: 'Email', labelPassword: 'Parol',
+      btnLogin: 'Kirish', btnLogout: 'Chiqish',
+      navAnalytics: 'Analitika', navReservations: 'Bronlar',
+      navMenu: 'Menyu', navAvailability: 'Vaqtlar', navRestaurant: 'Restoran',
+      statToday: 'Bugungi bronlar', statWeekly: 'Haftalik bronlar',
+      statRevenue: 'Oylik daromad', statNoshow: 'No-show foizi',
+      peakTitle: 'Pik vaqtlar', dailyTitle: "So'nggi 7 kun",
+      resTitle: 'Bronlar', menuTitle: 'Menyu boshqaruvi',
       availTitle: "Bo'sh vaqtlarni boshqarish",
       availHint: "Ko'k = bo'sh | Qizil = bloklangan | Kulrang = band",
-      optAll: 'Hammasi',
-      optPending: 'Kutilmoqda',
-      optConfirmed: 'Tasdiqlangan',
-      optCancelled: 'Bekor qilingan',
+      restaurantTitle: "🏪 Restoran ma'lumotlari",
+      optAll: 'Hammasi', optPending: 'Kutilmoqda',
+      optConfirmed: 'Tasdiqlangan', optCancelled: 'Bekor qilingan',
       btnAddMenu: "+ Taom qo'shish",
-      confirm: 'Tasdiqlash',
-      cancel: 'Bekor qilish',
-      guest: 'mehmon',
-      noData: "Ma'lumot yo'q",
+      confirm: 'Tasdiqlash', cancel: 'Bekor qilish',
+      guest: 'mehmon', noData: "Ma'lumot yo'q",
       loginError: "Email yoki parol noto'g'ri",
-      analyticsTitle: '📊 Analitika',
-      reservationsTitle: '📅 Bronlar',
-      menuPageTitle: '🍽 Menyu',
-      availabilityTitle: '🕐 Vaqtlar',
+      analyticsTitle: '📊 Analitika', reservationsTitle: '📅 Bronlar',
+      menuPageTitle: '🍽 Menyu', availabilityTitle: '🕐 Vaqtlar',
+      restaurantPageTitle: '🏪 Restoran',
     },
     ru: {
       subtitle: 'Кабинет владельца ресторана',
-      labelEmail: 'Email',
-      labelPassword: 'Пароль',
-      btnLogin: 'Войти',
-      btnLogout: 'Выйти',
-      navAnalytics: 'Аналитика',
-      navReservations: 'Брони',
-      navMenu: 'Меню',
-      navAvailability: 'Время',
-      statToday: 'Брони сегодня',
-      statWeekly: 'Брони за неделю',
-      statRevenue: 'Доход за месяц',
-      statNoshow: 'No-show %',
-      peakTitle: 'Пиковые часы',
-      dailyTitle: 'Последние 7 дней',
-      resTitle: 'Брони',
-      menuTitle: 'Управление меню',
+      labelEmail: 'Email', labelPassword: 'Пароль',
+      btnLogin: 'Войти', btnLogout: 'Выйти',
+      navAnalytics: 'Аналитика', navReservations: 'Брони',
+      navMenu: 'Меню', navAvailability: 'Время', navRestaurant: 'Ресторан',
+      statToday: 'Брони сегодня', statWeekly: 'Брони за неделю',
+      statRevenue: 'Доход за месяц', statNoshow: 'No-show %',
+      peakTitle: 'Пиковые часы', dailyTitle: 'Последние 7 дней',
+      resTitle: 'Брони', menuTitle: 'Управление меню',
       availTitle: 'Управление временем',
       availHint: 'Синий = свободно | Красный = заблокировано | Серый = занято',
-      optAll: 'Все',
-      optPending: 'Ожидает',
-      optConfirmed: 'Подтверждено',
-      optCancelled: 'Отменено',
+      restaurantTitle: '🏪 Данные ресторана',
+      optAll: 'Все', optPending: 'Ожидает',
+      optConfirmed: 'Подтверждено', optCancelled: 'Отменено',
       btnAddMenu: '+ Добавить блюдо',
-      confirm: 'Подтвердить',
-      cancel: 'Отменить',
-      guest: 'гостей',
-      noData: 'Нет данных',
+      confirm: 'Подтвердить', cancel: 'Отменить',
+      guest: 'гостей', noData: 'Нет данных',
       loginError: 'Неверный email или пароль',
-      analyticsTitle: '📊 Аналитика',
-      reservationsTitle: '📅 Брони',
-      menuPageTitle: '🍽 Меню',
-      availabilityTitle: '🕐 Время',
+      analyticsTitle: '📊 Аналитика', reservationsTitle: '📅 Брони',
+      menuPageTitle: '🍽 Меню', availabilityTitle: '🕐 Время',
+      restaurantPageTitle: '🏪 Ресторан',
     },
     en: {
       subtitle: 'Restaurant Owner Cabinet',
-      labelEmail: 'Email',
-      labelPassword: 'Password',
-      btnLogin: 'Login',
-      btnLogout: 'Logout',
-      navAnalytics: 'Analytics',
-      navReservations: 'Reservations',
-      navMenu: 'Menu',
-      navAvailability: 'Availability',
-      statToday: "Today's bookings",
-      statWeekly: 'Weekly bookings',
-      statRevenue: 'Monthly revenue',
-      statNoshow: 'No-show rate',
-      peakTitle: 'Peak hours',
-      dailyTitle: 'Last 7 days',
-      resTitle: 'Reservations',
-      menuTitle: 'Menu management',
+      labelEmail: 'Email', labelPassword: 'Password',
+      btnLogin: 'Login', btnLogout: 'Logout',
+      navAnalytics: 'Analytics', navReservations: 'Reservations',
+      navMenu: 'Menu', navAvailability: 'Availability', navRestaurant: 'Restaurant',
+      statToday: "Today's bookings", statWeekly: 'Weekly bookings',
+      statRevenue: 'Monthly revenue', statNoshow: 'No-show rate',
+      peakTitle: 'Peak hours', dailyTitle: 'Last 7 days',
+      resTitle: 'Reservations', menuTitle: 'Menu management',
       availTitle: 'Manage availability',
       availHint: 'Blue = free | Red = blocked | Gray = booked',
-      optAll: 'All',
-      optPending: 'Pending',
-      optConfirmed: 'Confirmed',
-      optCancelled: 'Cancelled',
+      restaurantTitle: '🏪 Restaurant info',
+      optAll: 'All', optPending: 'Pending',
+      optConfirmed: 'Confirmed', optCancelled: 'Cancelled',
       btnAddMenu: '+ Add dish',
-      confirm: 'Confirm',
-      cancel: 'Cancel',
-      guest: 'guests',
-      noData: 'No data',
+      confirm: 'Confirm', cancel: 'Cancel',
+      guest: 'guests', noData: 'No data',
       loginError: 'Invalid email or password',
-      analyticsTitle: '📊 Analytics',
-      reservationsTitle: '📅 Reservations',
-      menuPageTitle: '🍽 Menu',
-      availabilityTitle: '🕐 Availability',
+      analyticsTitle: '📊 Analytics', reservationsTitle: '📅 Reservations',
+      menuPageTitle: '🍽 Menu', availabilityTitle: '🕐 Availability',
+      restaurantPageTitle: '🏪 Restaurant',
     }
   };
 
@@ -528,10 +462,10 @@
   function applyTranslations() {
     const ids = [
       'loginSubtitle','labelEmail','labelPassword','btnLogin','btnLogout',
-      'navAnalytics','navReservations','navMenu','navAvailability',
+      'navAnalytics','navReservations','navMenu','navAvailability','navRestaurant',
       'statTodayLabel','statWeeklyLabel','statRevenueLabel','statNoshowLabel',
       'peakTitle','dailyTitle','resTitle','menuTitle','availTitle','availHint',
-      'optAll','optPending','optConfirmed','optCancelled','btnAddMenu'
+      'restaurantTitle','optAll','optPending','optConfirmed','optCancelled','btnAddMenu'
     ];
     const keyMap = {
       loginSubtitle: 'subtitle', statTodayLabel: 'statToday',
@@ -544,12 +478,10 @@
     });
   }
 
-  // ── Auth ──────────────────────────────────────────────────
   async function login() {
     const email = document.getElementById('emailInput').value;
     const password = document.getElementById('passwordInput').value;
     document.getElementById('loginError').textContent = '';
-
     try {
       const res = await fetch(`${API}/api/owner/login`, {
         method: 'POST',
@@ -558,7 +490,6 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
       token = data.token;
       localStorage.setItem('ot_token', token);
       showDashboard();
@@ -579,91 +510,70 @@
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('dashboardPage').style.display = 'block';
     loadAnalytics();
+    loadRestaurant();
     startRealtime();
   }
 
-  // ── Real-time yangilanish ─────────────────────────────────
   function startRealtime() {
     clearInterval(realtimeInterval);
     realtimeInterval = setInterval(() => {
       const activePage = document.querySelector('.page.active');
       if (activePage?.id === 'page-analytics') loadAnalytics();
       if (activePage?.id === 'page-reservations') loadReservations();
-    }, 15000); // har 15 soniyada
+    }, 15000);
   }
 
-  // ── Pages ─────────────────────────────────────────────────
   function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`page-${page}`).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     event.currentTarget.classList.add('active');
-
     const titles = {
       analytics: t('analyticsTitle'), reservations: t('reservationsTitle'),
-      menu: t('menuPageTitle'), availability: t('availabilityTitle')
+      menu: t('menuPageTitle'), availability: t('availabilityTitle'),
+      restaurant: t('restaurantPageTitle')
     };
     document.getElementById('pageTitle').textContent = titles[page];
-
     if (page === 'analytics') loadAnalytics();
     if (page === 'reservations') loadReservations();
     if (page === 'menu') loadMenu();
     if (page === 'availability') loadAvailability();
+    if (page === 'restaurant') loadRestaurant();
   }
 
-  // ── Analytics ─────────────────────────────────────────────
   async function loadAnalytics() {
     try {
       const res = await fetch(`${API}/api/owner/analytics`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-
       document.getElementById('statToday').textContent = data.today;
       document.getElementById('statWeekly').textContent = data.weekly;
-      document.getElementById('statRevenue').textContent =
-        data.revenue.toLocaleString() + " so'm";
+      document.getElementById('statRevenue').textContent = data.revenue.toLocaleString() + " so'm";
       document.getElementById('statNoshow').textContent = data.noshowRate + '%';
-      document.getElementById('statTodaySub').textContent =
-        new Date().toLocaleTimeString();
-
-      // Pik vaqtlar
+      document.getElementById('statTodaySub').textContent = new Date().toLocaleTimeString();
       const maxCount = Math.max(...data.peakHours.map(h => h.count), 1);
       document.getElementById('peakHoursChart').innerHTML =
         data.peakHours.length ? data.peakHours.map(h => `
           <div class="peak-bar">
             <div class="time">${h.time?.slice(0,5)}</div>
-            <div class="bar-wrap">
-              <div class="bar-fill" style="width:${h.count/maxCount*100}%"></div>
-            </div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:${h.count/maxCount*100}%"></div></div>
             <div class="count">${h.count}</div>
-          </div>
-        `).join('') : `<p style="color:#888">${t('noData')}</p>`;
-
-      // Kunlik statistika
+          </div>`).join('') : `<p style="color:#888">${t('noData')}</p>`;
       document.getElementById('dailyStatsChart').innerHTML =
-        data.dailyStats.length ? `
-          <table style="width:100%">
-            ${data.dailyStats.map(d => `
-              <tr>
-                <td style="padding:6px 0; font-size:13px">${d.date}</td>
-                <td style="padding:6px 0">
-                  <div style="background:#f0f0f0; border-radius:4px; height:16px; overflow:hidden">
-                    <div style="width:${d.count/Math.max(...data.dailyStats.map(x=>x.count),1)*100}%;
-                      height:100%; background:linear-gradient(135deg,#667eea,#764ba2)"></div>
-                  </div>
-                </td>
-                <td style="padding:6px 0 6px 8px; font-size:13px; color:#888">${d.count}</td>
-              </tr>
-            `).join('')}
-          </table>
-        ` : `<p style="color:#888">${t('noData')}</p>`;
-    } catch (e) {
-      console.error('Analytics error:', e);
-    }
+        data.dailyStats.length ? `<table style="width:100%">${data.dailyStats.map(d => `
+          <tr>
+            <td style="padding:6px 0; font-size:13px">${d.date}</td>
+            <td style="padding:6px 0">
+              <div style="background:#f0f0f0;border-radius:4px;height:16px;overflow:hidden">
+                <div style="width:${d.count/Math.max(...data.dailyStats.map(x=>x.count),1)*100}%;height:100%;background:linear-gradient(135deg,#667eea,#764ba2)"></div>
+              </div>
+            </td>
+            <td style="padding:6px 0 6px 8px;font-size:13px;color:#888">${d.count}</td>
+          </tr>`).join('')}</table>` : `<p style="color:#888">${t('noData')}</p>`;
+    } catch (e) { console.error('Analytics error:', e); }
   }
 
-  // ── Reservations ──────────────────────────────────────────
   async function loadReservations() {
     try {
       const date = document.getElementById('filterDate').value;
@@ -671,82 +581,56 @@
       let url = `${API}/api/owner/reservations?`;
       if (date) url += `date=${date}&`;
       if (status) url += `status=${status}`;
-
-      const res = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
-
       if (!data.length) {
         document.getElementById('reservationsTable').innerHTML =
-          `<p style="text-align:center; color:#888; padding:20px">${t('noData')}</p>`;
+          `<p style="text-align:center;color:#888;padding:20px">${t('noData')}</p>`;
         return;
       }
-
       document.getElementById('reservationsTable').innerHTML = `
         <table>
-          <thead>
+          <thead><tr>
+            <th>#</th><th>Mijoz</th><th>${t('guest')}</th>
+            <th>📅</th><th>⏰</th><th>Status</th><th></th>
+          </tr></thead>
+          <tbody>${data.map(r => `
             <tr>
-              <th>#</th><th>${t('labelEmail')}</th>
-              <th>${t('guest')}</th><th>📅</th><th>⏰</th>
-              <th>Status</th><th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${data.map(r => `
-              <tr>
-                <td>#${r.id}</td>
-                <td><b>${r.first_name} ${r.last_name || ''}</b><br>
-                  <small style="color:#888">${r.phone || ''}</small></td>
-                <td>${r.guests} ${t('guest')}</td>
-                <td>${r.date}</td>
-                <td>${r.time?.slice(0,5)}</td>
-                <td><span class="badge badge-${r.status}">
-                  ${r.status === 'pending' ? t('optPending') :
-                    r.status === 'confirmed' ? t('optConfirmed') : t('optCancelled')}
-                </span></td>
-                <td>
-                  ${r.status === 'pending' ? `
-                    <button class="btn-confirm" onclick="updateReservation(${r.id},'confirmed')">
-                      ✅ ${t('confirm')}
-                    </button>
-                    <button class="btn-cancel" onclick="updateReservation(${r.id},'cancelled')">
-                      ❌ ${t('cancel')}
-                    </button>
-                  ` : ''}
-                </td>
-              </tr>
-            `).join('')}
+              <td>#${r.id}</td>
+              <td><b>${r.first_name} ${r.last_name || ''}</b><br>
+                <small style="color:#888">${r.phone || ''}</small></td>
+              <td>${r.guests} ${t('guest')}</td>
+              <td>${r.date}</td>
+              <td>${r.time?.slice(0,5)}</td>
+              <td><span class="badge badge-${r.status}">
+                ${r.status === 'pending' ? t('optPending') :
+                  r.status === 'confirmed' ? t('optConfirmed') : t('optCancelled')}
+              </span></td>
+              <td>${r.status === 'pending' ? `
+                <button class="btn-confirm" onclick="updateReservation(${r.id},'confirmed')">✅ ${t('confirm')}</button>
+                <button class="btn-cancel" onclick="updateReservation(${r.id},'cancelled')">❌ ${t('cancel')}</button>
+              ` : ''}</td>
+            </tr>`).join('')}
           </tbody>
-        </table>
-      `;
-    } catch (e) {
-      console.error('Reservations error:', e);
-    }
+        </table>`;
+    } catch (e) { console.error('Reservations error:', e); }
   }
 
   async function updateReservation(id, status) {
     try {
       await fetch(`${API}/api/owner/reservations/${id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
       loadReservations();
     } catch (e) { console.error(e); }
   }
 
-  // ── Menu ──────────────────────────────────────────────────
   async function loadMenu() {
     try {
-      const res = await fetch(`${API}/api/owner/menu`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await fetch(`${API}/api/owner/menu`, { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
-
       document.getElementById('menuGrid').innerHTML = data.length
         ? data.map(item => `
           <div class="menu-item-card">
@@ -754,19 +638,17 @@
             <div class="category">${item.category || '—'}</div>
             <h4>${item.name}</h4>
             <div class="price">${item.price?.toLocaleString()} so'm</div>
-            <p style="font-size:12px; color:#888; margin-top:4px">${item.description || ''}</p>
-            <div style="margin-top:10px; display:flex; gap:6px;">
+            <p style="font-size:12px;color:#888;margin-top:4px">${item.description || ''}</p>
+            <div style="margin-top:10px;display:flex;gap:6px;">
               <button onclick="toggleAvailable(${item.id}, ${!item.is_available})"
-                style="padding:4px 8px; border:none; border-radius:4px; cursor:pointer;
-                background:${item.is_available ? '#f8d7da' : '#d1edff'}; font-size:12px">
+                style="padding:4px 8px;border:none;border-radius:4px;cursor:pointer;
+                background:${item.is_available ? '#f8d7da' : '#d1edff'};font-size:12px">
                 ${item.is_available ? '🔴 Yopish' : '🟢 Ochish'}
               </button>
               <button onclick="deleteMenuItem(${item.id})"
-                style="padding:4px 8px; border:none; border-radius:4px; cursor:pointer;
-                background:#f8d7da; font-size:12px">🗑</button>
+                style="padding:4px 8px;border:none;border-radius:4px;cursor:pointer;background:#f8d7da;font-size:12px">🗑</button>
             </div>
-          </div>
-        `).join('')
+          </div>`).join('')
         : `<p style="color:#888">${t('noData')}</p>`;
     } catch (e) { console.error(e); }
   }
@@ -777,14 +659,10 @@
     const price = document.getElementById('menuPrice').value;
     const description = document.getElementById('menuDesc').value;
     if (!name || !price) return alert('Nom va narx kiriting!');
-
     try {
       await fetch(`${API}/api/owner/menu`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, category, price: parseInt(price), description })
       });
       document.getElementById('menuName').value = '';
@@ -799,10 +677,7 @@
     try {
       await fetch(`${API}/api/owner/menu/${id}`, {
         method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ available })
       });
       loadMenu();
@@ -810,47 +685,33 @@
   }
 
   async function deleteMenuItem(id) {
-    if (!confirm('Taomni o\'chirish?')) return;
+    if (!confirm("Taomni o'chirish?")) return;
     try {
       await fetch(`${API}/api/owner/menu/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` }
       });
       loadMenu();
     } catch (e) { console.error(e); }
   }
 
-  // ── Availability ──────────────────────────────────────────
   async function loadAvailability() {
     const date = document.getElementById('availDate').value;
     if (!date) return;
-
-    // Bronlangan vaqtlarni olish
-    const resRes = await fetch(
-      `${API}/api/owner/reservations?date=${date}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
-    );
+    const resRes = await fetch(`${API}/api/owner/reservations?date=${date}`,
+      { headers: { 'Authorization': `Bearer ${token}` } });
     const reservations = await resRes.json();
-    const bookedTimes = reservations
-      .filter(r => r.status !== 'cancelled')
-      .map(r => r.time?.slice(0,5));
-
-    // Vaqt slotlari (10:00 - 22:00, har 30 daqiqa)
+    const bookedTimes = reservations.filter(r => r.status !== 'cancelled').map(r => r.time?.slice(0,5));
     const slots = [];
     for (let h = 10; h <= 22; h++) {
       slots.push(`${String(h).padStart(2,'0')}:00`);
       if (h < 22) slots.push(`${String(h).padStart(2,'0')}:30`);
     }
-
     document.getElementById('timeGrid').innerHTML = slots.map(time => {
       const isBooked = bookedTimes.includes(time);
       const cls = isBooked ? 'booked' : 'free';
-      return `
-        <div class="time-slot ${cls}" onclick="${isBooked ? '' : `toggleBlock('${date}','${time}')`}">
-          ${time}
-          ${isBooked ? '<br><small>band</small>' : ''}
-        </div>
-      `;
+      return `<div class="time-slot ${cls}" onclick="${isBooked ? '' : `toggleBlock('${date}','${time}')`}">
+        ${time}${isBooked ? '<br><small>band</small>' : ''}
+      </div>`;
     }).join('');
   }
 
@@ -858,26 +719,87 @@
     try {
       await fetch(`${API}/api/owner/availability/block`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ date, time, reason: 'Bloklangan' })
       });
       loadAvailability();
     } catch (e) { console.error(e); }
   }
 
-  // ── Init ──────────────────────────────────────────────────
+  // ── Restoran ──────────────────────────────────────────────
+  async function loadRestaurant() {
+    try {
+      const res = await fetch(`${API}/api/owner/restaurant`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data) {
+        document.getElementById('restoName').value = data.name || '';
+        document.getElementById('restoAddress').value = data.address || '';
+        document.getElementById('restoPhone').value = data.phone || '';
+        document.getElementById('restoImage').value = data.image_url || '';
+        document.getElementById('restoPriceCategory').value = data.price_category || '$$';
+        document.getElementById('restoCapacity').value = data.capacity || 50;
+        document.getElementById('restoCuisine').value = data.cuisine?.join(', ') || '';
+        document.getElementById('restoDesc').value = data.description || '';
+        document.getElementById('btnSaveRestaurant').textContent = '💾 Yangilash';
+        document.getElementById('sideRestaurantName').textContent = data.name;
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  async function saveRestaurant() {
+    const name = document.getElementById('restoName').value;
+    const address = document.getElementById('restoAddress').value;
+    if (!name || !address) {
+      document.getElementById('restaurantMsg').innerHTML = '<span style="color:#e74c3c">❌ Nom va manzil kiritish shart!</span>';
+      return;
+    }
+    const body = {
+      name, address,
+      phone: document.getElementById('restoPhone').value,
+      image_url: document.getElementById('restoImage').value,
+      price_category: document.getElementById('restoPriceCategory').value,
+      capacity: parseInt(document.getElementById('restoCapacity').value),
+      cuisine: document.getElementById('restoCuisine').value.split(',').map(s => s.trim()).filter(Boolean),
+      description: document.getElementById('restoDesc').value
+    };
+    try {
+      const checkRes = await fetch(`${API}/api/owner/restaurant`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const existing = await checkRes.json();
+      let res;
+      if (existing) {
+        res = await fetch(`${API}/api/owner/restaurant`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      } else {
+        res = await fetch(`${API}/api/owner/restaurants`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+      }
+      if (res.ok) {
+        document.getElementById('restaurantMsg').innerHTML = '<span style="color:#27ae60">✅ Muvaffaqiyatli saqlandi!</span>';
+        document.getElementById('sideRestaurantName').textContent = name;
+      } else {
+        document.getElementById('restaurantMsg').innerHTML = '<span style="color:#e74c3c">❌ Xato yuz berdi!</span>';
+      }
+    } catch(e) {
+      document.getElementById('restaurantMsg').innerHTML = `<span style="color:#e74c3c">❌ ${e.message}</span>`;
+    }
+  }
+
   document.getElementById('passwordInput').addEventListener('keypress', e => {
     if (e.key === 'Enter') login();
   });
 
   setLang(currentLang);
-
-  if (token) {
-    showDashboard();
-  }
+  if (token) { showDashboard(); }
 </script>
 </body>
 </html>
