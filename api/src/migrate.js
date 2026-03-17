@@ -85,7 +85,6 @@ async function migrate() {
     );
   `);
 
-  // Test restoran yaratish
   const resto = await pool.query(`
     INSERT INTO restaurants (name, address, cuisine, price_category)
     VALUES ('Plov Center', 'Yunusobod, Toshkent', ARRAY['Uzbek'], '$$')
@@ -96,23 +95,28 @@ async function migrate() {
   const restoId = resto.rows[0]?.id ||
     (await pool.query('SELECT id FROM restaurants LIMIT 1')).rows[0]?.id || 1;
 
-  // Eski owner ni o'chirib yangi qo'shish
   await pool.query(`
     DELETE FROM restaurant_owners WHERE email = 'admin@onetable.uz';
   `);
 
+  // Yangi hash yaratib qo'shamiz
+  const bcrypt = require('bcryptjs');
+  const hash = await bcrypt.hash('secret123', 10);
+
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id)
-    VALUES (
-      'admin@onetable.uz',
-      '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
-      $1
-    );
-  `, [restoId]);
+    VALUES ($1, $2, $3);
+  `, ['admin@onetable.uz', hash, restoId]);
 
   console.log('✅ Barcha jadvallar tayyor!');
   console.log('✅ Owner: admin@onetable.uz | parol: secret123');
-
 }
 
 migrate().catch(console.error);
+```
+
+GitHub da `api/src/migrate.js` ni shu kod bilan almashtiring → Commit!
+
+Keyin Railway → Start Command:
+```
+node src/migrate.js; node src/index.js
