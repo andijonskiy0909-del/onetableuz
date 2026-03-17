@@ -85,7 +85,7 @@ async function migrate() {
     );
   `);
 
-  // Test restoran yaratish (agar yo'q bo'lsa)
+  // Test restoran yaratish
   const resto = await pool.query(`
     INSERT INTO restaurants (name, address, cuisine, price_category)
     VALUES ('Plov Center', 'Yunusobod, Toshkent', ARRAY['Uzbek'], '$$')
@@ -93,23 +93,25 @@ async function migrate() {
     RETURNING id;
   `);
 
-  // Restaurant ID olish
-  const restoId = resto.rows[0]?.id || 
+  const restoId = resto.rows[0]?.id ||
     (await pool.query('SELECT id FROM restaurants LIMIT 1')).rows[0]?.id || 1;
 
-  // Test owner qo'shish
+  // Eski owner ni o'chirib yangi qo'shish
+  await pool.query(`
+    DELETE FROM restaurant_owners WHERE email = 'admin@onetable.uz';
+  `);
+
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id)
     VALUES (
       'admin@onetable.uz',
-      '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uRpkJ8VNC',
+      '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
       $1
-    )
-    ON CONFLICT (email) DO NOTHING;
+    );
   `, [restoId]);
 
   console.log('✅ Barcha jadvallar tayyor!');
-  console.log('✅ Owner: admin@onetable.uz | parol: password');
+  console.log('✅ Owner: admin@onetable.uz | parol: secret123');
   process.exit(0);
 }
 
