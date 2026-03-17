@@ -6,7 +6,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// Routes
 const restaurantRoutes = require("./routes/restaurants")
 const reservationRoutes = require("./routes/reservations")
 const authRoutes = require("./routes/auth")
