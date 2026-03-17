@@ -13,6 +13,7 @@ async function migrate() {
       price_category VARCHAR(10),
       rating DECIMAL(3,2) DEFAULT 4.5,
       image_url TEXT,
+      capacity INTEGER DEFAULT 50,
       status VARCHAR(50) DEFAULT 'approved',
       is_premium BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT NOW()
@@ -24,6 +25,14 @@ async function migrate() {
       first_name VARCHAR(255),
       last_name VARCHAR(255),
       phone VARCHAR(50),
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS restaurant_owners (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR(255) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL,
+      restaurant_id INTEGER REFERENCES restaurants(id),
       created_at TIMESTAMP DEFAULT NOW()
     );
 
@@ -39,14 +48,6 @@ async function migrate() {
       created_at TIMESTAMP DEFAULT NOW()
     );
 
-    CREATE TABLE IF NOT EXISTS restaurant_owners (
-      id SERIAL PRIMARY KEY,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      password_hash VARCHAR(255) NOT NULL,
-      restaurant_id INTEGER REFERENCES restaurants(id),
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-
     CREATE TABLE IF NOT EXISTS menu_items (
       id SERIAL PRIMARY KEY,
       restaurant_id INTEGER REFERENCES restaurants(id),
@@ -57,9 +58,41 @@ async function migrate() {
       is_available BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS availability (
+      id SERIAL PRIMARY KEY,
+      restaurant_id INTEGER REFERENCES restaurants(id),
+      date DATE NOT NULL,
+      time TIME NOT NULL,
+      is_blocked BOOLEAN DEFAULT false,
+      reason TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      UNIQUE(restaurant_id, date, time)
+    );
+
+    CREATE TABLE IF NOT EXISTS payments (
+      id SERIAL PRIMARY KEY,
+      reservation_id INTEGER REFERENCES reservations(id),
+      restaurant_id INTEGER REFERENCES restaurants(id),
+      user_id INTEGER REFERENCES users(id),
+      amount INTEGER NOT NULL,
+      status VARCHAR(50) DEFAULT 'pending',
+      provider VARCHAR(50),
+      transaction_id VARCHAR(255),
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS reviews (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      restaurant_id INTEGER REFERENCES restaurants(id),
+      rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+      comment TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
   `);
 
-  // Test owner qoshish
+  -- Test owner
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id)
     VALUES (
@@ -70,23 +103,9 @@ async function migrate() {
     ON CONFLICT (email) DO NOTHING;
   `);
 
-  console.log('✅ Jadvallar tayyor!');
+  console.log('✅ Barcha jadvallar tayyor!');
   console.log('✅ Owner: admin@onetable.uz | parol: password');
   process.exit(0);
 }
 
 migrate().catch(console.error);
-```
-
-**GitHub da:**
-1. `api/src/migrate.js` → Edit → hammasini o'chiring → bu kodni paste → Commit
-
-**Railway da:**
-1. API servis → **Settings** → **Deploy** → Start Command ni o'zgartiring:
-```
-node src/migrate.js
-```
-2. **Deploy** bosing — 10 soniyada tugadi
-3. Keyin Start Command ni qaytaring:
-```
-node src/index.js
