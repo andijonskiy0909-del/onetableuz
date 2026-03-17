@@ -92,7 +92,7 @@ async function migrate() {
     );
   `);
 
-  -- Test owner
+ // Test owner
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id)
     VALUES (
@@ -102,7 +102,6 @@ async function migrate() {
     )
     ON CONFLICT (email) DO NOTHING;
   `);
-
   console.log('✅ Barcha jadvallar tayyor!');
   console.log('✅ Owner: admin@onetable.uz | parol: password');
   process.exit(0);
