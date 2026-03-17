@@ -39,6 +39,68 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ── Restoran ma'lumotlarini olish ────────────────────────────
+router.get('/restaurant', ownerAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM restaurants WHERE id = $1',
+      [req.owner.restaurant_id]
+    );
+    res.json(result.rows[0] || null);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── Restoran qo'shish ────────────────────────────────────────
+router.post('/restaurants', ownerAuth, async (req, res) => {
+  try {
+    const { name, description, address, phone, cuisine, price_category, capacity, image_url } = req.body;
+
+    if (!name || !address) {
+      return res.status(400).json({ error: 'Nom va manzil kiritish shart' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO restaurants 
+        (name, description, address, phone, cuisine, price_category, capacity, image_url, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved')
+       RETURNING *`,
+      [name, description, address, phone, cuisine, price_category, capacity || 50, image_url]
+    );
+
+    const restaurant = result.rows[0];
+
+    await pool.query(
+      `UPDATE restaurant_owners SET restaurant_id = $1 WHERE id = $2`,
+      [restaurant.id, req.owner.id]
+    );
+
+    res.json(restaurant);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── Restoran ma'lumotlarini yangilash ────────────────────────
+router.put('/restaurant', ownerAuth, async (req, res) => {
+  try {
+    const { name, description, address, phone, cuisine, price_category, capacity, image_url } = req.body;
+
+    const result = await pool.query(
+      `UPDATE restaurants 
+       SET name=$1, description=$2, address=$3, phone=$4, 
+           cuisine=$5, price_category=$6, capacity=$7, image_url=$8
+       WHERE id=$9 RETURNING *`,
+      [name, description, address, phone, cuisine, price_category, capacity, image_url, req.owner.restaurant_id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── Bronlar ro'yxati ─────────────────────────────────────────
 router.get('/reservations', ownerAuth, async (req, res) => {
   try {
@@ -159,9 +221,7 @@ router.get('/analytics', ownerAuth, async (req, res) => {
 router.get('/menu', ownerAuth, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM menu_items
-       WHERE restaurant_id = $1
-       ORDER BY category, name`,
+      `SELECT * FROM menu_items WHERE restaurant_id = $1 ORDER BY category, name`,
       [req.owner.restaurant_id]
     );
     res.json(result.rows);
