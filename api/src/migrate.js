@@ -18,7 +18,6 @@ async function migrate() {
       is_premium BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       telegram_id BIGINT UNIQUE,
@@ -27,7 +26,6 @@ async function migrate() {
       phone VARCHAR(50),
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS restaurant_owners (
       id SERIAL PRIMARY KEY,
       email VARCHAR(255) UNIQUE NOT NULL,
@@ -35,7 +33,6 @@ async function migrate() {
       restaurant_id INTEGER REFERENCES restaurants(id),
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS reservations (
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
@@ -47,7 +44,6 @@ async function migrate() {
       status VARCHAR(50) DEFAULT 'pending',
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS menu_items (
       id SERIAL PRIMARY KEY,
       restaurant_id INTEGER REFERENCES restaurants(id),
@@ -58,7 +54,6 @@ async function migrate() {
       is_available BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS availability (
       id SERIAL PRIMARY KEY,
       restaurant_id INTEGER REFERENCES restaurants(id),
@@ -69,7 +64,6 @@ async function migrate() {
       created_at TIMESTAMP DEFAULT NOW(),
       UNIQUE(restaurant_id, date, time)
     );
-
     CREATE TABLE IF NOT EXISTS payments (
       id SERIAL PRIMARY KEY,
       reservation_id INTEGER REFERENCES reservations(id),
@@ -81,7 +75,6 @@ async function migrate() {
       transaction_id VARCHAR(255),
       created_at TIMESTAMP DEFAULT NOW()
     );
-
     CREATE TABLE IF NOT EXISTS reviews (
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
@@ -92,16 +85,29 @@ async function migrate() {
     );
   `);
 
- // Test owner
+  // Test restoran yaratish (agar yo'q bo'lsa)
+  const resto = await pool.query(`
+    INSERT INTO restaurants (name, address, cuisine, price_category)
+    VALUES ('Plov Center', 'Yunusobod, Toshkent', ARRAY['Uzbek'], '$$')
+    ON CONFLICT DO NOTHING
+    RETURNING id;
+  `);
+
+  // Restaurant ID olish
+  const restoId = resto.rows[0]?.id || 
+    (await pool.query('SELECT id FROM restaurants LIMIT 1')).rows[0]?.id || 1;
+
+  // Test owner qo'shish
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id)
     VALUES (
       'admin@onetable.uz',
       '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uRpkJ8VNC',
-      1
+      $1
     )
     ON CONFLICT (email) DO NOTHING;
-  `);
+  `, [restoId]);
+
   console.log('✅ Barcha jadvallar tayyor!');
   console.log('✅ Owner: admin@onetable.uz | parol: password');
   process.exit(0);
