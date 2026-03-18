@@ -18,13 +18,12 @@ const ownerAuth = (req, res, next) => {
 // ── Ro'yxatdan o'tish ────────────────────────────────────────
 router.post('/register', async (req, res) => {
   try {
-    const { email, password, full_name, phone } = req.body;
+    const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email va parol kiritish shart' });
     }
 
-    // Email band emasmi?
     const existing = await pool.query(
       'SELECT id FROM restaurant_owners WHERE email = $1', [email]
     );
@@ -34,7 +33,6 @@ router.post('/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    // Faqat mavjud columnlar bilan insert
     const result = await pool.query(
       `INSERT INTO restaurant_owners (email, password_hash)
        VALUES ($1, $2) RETURNING *`,
@@ -273,11 +271,11 @@ router.get('/menu', ownerAuth, async (req, res) => {
 
 router.post('/menu', ownerAuth, async (req, res) => {
   try {
-    const { name, category, price, description } = req.body;
+    const { name, category, price, description, image_url } = req.body;
     const result = await pool.query(
-      `INSERT INTO menu_items (restaurant_id, name, category, price, description, is_available)
-       VALUES ($1, $2, $3, $4, $5, true) RETURNING *`,
-      [req.owner.restaurant_id, name, category, price, description]
+      `INSERT INTO menu_items (restaurant_id, name, category, price, description, image_url, is_available)
+       VALUES ($1, $2, $3, $4, $5, $6, true) RETURNING *`,
+      [req.owner.restaurant_id, name, category, price, description, image_url || null]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -287,11 +285,11 @@ router.post('/menu', ownerAuth, async (req, res) => {
 
 router.put('/menu/:id', ownerAuth, async (req, res) => {
   try {
-    const { name, description, price, available } = req.body;
+    const { name, description, price, available, image_url } = req.body;
     const result = await pool.query(
-      `UPDATE menu_items SET name=$1, description=$2, price=$3, is_available=$4
-       WHERE id=$5 AND restaurant_id=$6 RETURNING *`,
-      [name, description, price, available, req.params.id, req.owner.restaurant_id]
+      `UPDATE menu_items SET name=$1, description=$2, price=$3, is_available=$4, image_url=$5
+       WHERE id=$6 AND restaurant_id=$7 RETURNING *`,
+      [name, description, price, available, image_url || null, req.params.id, req.owner.restaurant_id]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -367,7 +365,7 @@ router.get('/premium', ownerAuth, async (req, res) => {
 router.post('/premium/activate', ownerAuth, async (req, res) => {
   try {
     const { plan } = req.body;
-    const amount = plan === 'yearly' ? 1200000 : 150000;
+    const amount = plan === 'yearly' ? 990 : 99;
     const months = plan === 'yearly' ? 12 : 1;
 
     const expires_at = new Date();
