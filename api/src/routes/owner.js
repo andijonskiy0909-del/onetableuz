@@ -140,6 +140,27 @@ router.put('/restaurant', ownerAuth, async (req, res) => {
   }
 });
 
+// ── Restoran lokatsiyasini yangilash ─────────────────────────
+router.put('/restaurant/location', ownerAuth, async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: 'latitude va longitude kerak' });
+    }
+    if (!req.owner.restaurant_id) {
+      return res.status(400).json({ error: "Avval restoran qo'shing" });
+    }
+    const result = await pool.query(
+      `UPDATE restaurants SET latitude = $1, longitude = $2 WHERE id = $3 RETURNING id, name, latitude, longitude`,
+      [latitude, longitude, req.owner.restaurant_id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── Bronlar ro'yxati ─────────────────────────────────────────
 router.get('/reservations', ownerAuth, async (req, res) => {
   try {
