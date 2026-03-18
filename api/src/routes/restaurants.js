@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const pool = require('../db');
 
-// Barcha restoranlar
+// ── Barcha restoranlar ───────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
     const { q, cuisine, price } = req.query;
@@ -28,52 +28,56 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Bitta restoran
+// ── Bitta restoran ───────────────────────────────────────────
 router.get('/:id', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM restaurants WHERE id = $1', [req.params.id]);
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    const result = await pool.query(
+      'SELECT * FROM restaurants WHERE id = $1',
+      [req.params.id]
+    );
+    if (!result.rows.length)
+      return res.status(404).json({ error: 'Not found' });
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ✅ YANGI: Bo'sh vaqt slotlari
-// GET /api/restaurants/:id/availability?date=2025-01-15
+// ── Bo'sh vaqt slotlari ──────────────────────────────────────
 router.get('/:id/availability', async (req, res) => {
   try {
     const { id } = req.params;
     const { date } = req.query;
+    if (!date) return res.status(400).json({ error: 'date parametri kerak' });
 
-    if (!date) {
-      return res.status(400).json({ error: 'date parametri kerak' });
-    }
-
-    // Shu restoran, shu kunda band bo'lgan bronlarni ol
-    const result = await pool.query(
+    // Band bronlar
+    const reservations = await pool.query(
       `SELECT time FROM reservations
-       WHERE restaurant_id = $1
-         AND date = $2
-         AND status != 'cancelled'`,
+       WHERE restaurant_id = $1 AND date = $2 AND status != 'cancelled'`,
       [id, date]
     );
 
-    // Band vaqtlarni "HH:MM" formatida qaytaramiz
-    const busy_times = result.rows.map(r => {
-      const t = r.time || '';
-      return t.substring(0, 5);
-    });
+    // Bloklangan vaqtlar
+    const blocked = await pool.query(
+      `SELECT time FROM availability
+       WHERE restaurant_id = $1 AND date = $2 AND is_blocked = true`,
+      [id, date]
+    );
 
-    res.json({ busy_times });
+    const busy_times = [
+      ...reservations.rows.map(r => r.time?.substring(0, 5)),
+      ...blocked.rows.map(r => r.time?.substring(0, 5))
+    ].filter(Boolean);
+
+    // Webapp array kutayapti
+    res.json(busy_times);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// ✅ YANGI: Restoran menyusi
-// GET /api/restaurants/:id/menu
+// ── Menyu ────────────────────────────────────────────────────
 router.get('/:id/menu', async (req, res) => {
   try {
     const result = await pool.query(
@@ -88,8 +92,7 @@ router.get('/:id/menu', async (req, res) => {
   }
 });
 
-// ✅ YANGI: Restoran sharhlari
-// GET /api/restaurants/:id/reviews
+// ── Sharhlar ─────────────────────────────────────────────────
 router.get('/:id/reviews', async (req, res) => {
   try {
     const result = await pool.query(
@@ -97,13 +100,40 @@ router.get('/:id/reviews', async (req, res) => {
        FROM reviews r
        JOIN users u ON r.user_id = u.id
        WHERE r.restaurant_id = $1
-       ORDER BY r.created_at DESC
-       LIMIT 20`,
+       ORDER BY r.created_at DESC LIMIT 20`,
       [req.params.id]
     );
     res.json(result.rows);
   } catch (err) {
     res.json([]);
+  }
+});
+
+// ── Sharh qo'shish ───────────────────────────────────────────
+router.post('/:id/reviews', async (req, res) => {
+  try {
+    const { user_id, rating, comment } = req.body;
+    if (!user_id || !rating)
+      return res.status(400).json({ error: 'user_id va rating kiritish shart' });
+
+    const result = await pool.query(
+      `INSERT INTO reviews (user_id, restaurant_id, rating, comment)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [user_id, req.params.id, rating, comment]
+    );
+
+    // Ratingni yangilash
+    await pool.query(
+      `UPDATE restaurants SET rating = (
+         SELECT ROUND(AVG(rating)::numeric, 2)
+         FROM reviews WHERE restaurant_id = $1
+       ) WHERE id = $1`,
+      [req.params.id]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
