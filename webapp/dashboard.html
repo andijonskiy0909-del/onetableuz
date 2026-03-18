@@ -277,10 +277,10 @@ tr:hover td { background:#fafafa; }
         </div>
         <div class="premium-btns">
           <button class="premium-btn premium-btn-monthly" onclick="activatePremium('monthly')">
-            Oylik — 150,000 so'm
+            Oylik — $99
           </button>
           <button class="premium-btn premium-btn-yearly" onclick="activatePremium('yearly')">
-            Yillik — 1,200,000 so'm (2 oy bepul!)
+            Yillik — $990 (2 oy bepul!)
           </button>
         </div>
       </div>
@@ -303,6 +303,7 @@ tr:hover td { background:#fafafa; }
     </div>
     <div class="fg"><label>Narx (so'm) *</label><input type="number" id="mPrice" placeholder="50000"></div>
     <div class="fg"><label>Tavsif</label><textarea id="mDesc" rows="2" style="resize:none;" placeholder="Qisqacha tavsif..."></textarea></div>
+    <div class="fg"><label>Rasm URL</label><input type="text" id="mImage" placeholder="https://..."><div id="mImagePreview" style="margin-top:8px;display:none;"><img id="mPreviewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;" /></div></div>
     <div class="modal-btns">
       <button class="btn-save" onclick="saveMenuItem()">Saqlash</button>
       <button class="btn-cls" onclick="closeMenuModal()">Bekor</button>
@@ -347,48 +348,27 @@ async function doLogin() {
   const err = document.getElementById('loginErr');
   err.style.display = 'none';
   if (!email || !pass) { err.textContent='Email va parol kiriting'; err.style.display='block'; return; }
-  btn.innerHTML = '<span class="spinner"></span>Ulanilmoqda...'; btn.disabled = true;
-
-  const tryLogin = async (attempt) => {
-    if (attempt > 1) btn.innerHTML = `<span class="spinner"></span>Urinish ${attempt}/3...`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    try {
-      const r = await fetch(`${API}/owner/login`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({email, password: pass}),
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-      const d = await r.json();
-      if (d.token) {
-        token = d.token;
-        localStorage.setItem('ownerToken', token);
-        ownerData = d.owner;
-        restoId = d.owner?.restaurant_id || null;
-        showApp();
-      } else {
-        err.textContent = d.error || d.message || 'Email yoki parol noto\'g\'ri';
-        err.style.display='block';
-        btn.textContent='Kirish'; btn.disabled=false;
-      }
-    } catch(e) {
-      clearTimeout(timeout);
-      if (attempt < 3) {
-        btn.innerHTML = `<span class="spinner"></span>${3 - attempt} soniya kutilmoqda...`;
-        await new Promise(res => setTimeout(res, 3000));
-        return tryLogin(attempt + 1);
-      }
-      let msg = 'Server bilan aloqa yo\'q.';
-      if (e.name === 'AbortError') msg = 'Server javob bermadi (timeout). Keyinroq urinib ko\'ring.';
-      else if (e.message?.includes('Failed to fetch')) msg = 'Internet yoki server muammosi. Sahifani yangilang.';
-      err.innerHTML = `${msg}<br><small style="color:#94a3b8">Xato: ${e.message || e.name}</small>`;
-      err.style.display='block';
+  btn.innerHTML = '<span class="spinner"></span>Kirish...'; btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/owner/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password: pass})
+    });
+    const d = await r.json();
+    if (d.token) {
+      token = d.token;
+      localStorage.setItem('ownerToken', token);
+      ownerData = d.owner;
+      restoId = d.owner.restaurant_id;
+      showApp();
+    } else {
+      err.textContent = d.error || 'Xatolik'; err.style.display='block';
       btn.textContent='Kirish'; btn.disabled=false;
     }
-  };
-
-  await tryLogin(1);
+  } catch(e) {
+    err.textContent='Server xatoligi'; err.style.display='block';
+    btn.textContent='Kirish'; btn.disabled=false;
+  }
 }
 
 async function doRegister() {
@@ -401,57 +381,31 @@ async function doRegister() {
   err.style.display = 'none';
   if (!full_name || !email || !password) { err.textContent='Majburiy maydonlarni to\'ldiring'; err.style.display='block'; return; }
   if (password.length < 6) { err.textContent='Parol kamida 6 ta belgi bo\'lishi kerak'; err.style.display='block'; return; }
-  btn.innerHTML = '<span class="spinner"></span>Ulanilmoqda...'; btn.disabled = true;
-
-  // Server uyg'onishini kutish uchun retry
-  const tryRegister = async (attempt) => {
-    if (attempt > 1) {
-      btn.innerHTML = `<span class="spinner"></span>Urinish ${attempt}/3...`;
-    }
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    try {
-      const r = await fetch(`${API}/owner/register`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({full_name, phone, email, password}),
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-      const d = await r.json();
-      if (d.token) {
-        token = d.token;
-        localStorage.setItem('ownerToken', token);
-        ownerData = d.owner;
-        restoId = d.owner?.restaurant_id || null;
-        showApp();
-        toast('✅ Xush kelibsiz! Endi restoran ma\'lumotlarini kiriting.');
-        setTimeout(() => {
-          document.querySelector('[onclick="showSec(\'restaurant\',this)"]')?.click();
-        }, 500);
-      } else {
-        const msg = d.error || d.message || 'Noma\'lum xatolik';
-        err.textContent = msg; err.style.display='block';
-        btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
-      }
-    } catch(e) {
-      clearTimeout(timeout);
-      if (attempt < 3) {
-        // Server uyg'onishi uchun 3 soniya kutib qayta urinish
-        btn.innerHTML = `<span class="spinner"></span>${3 - attempt} soniya kutilmoqda...`;
-        await new Promise(res => setTimeout(res, 3000));
-        return tryRegister(attempt + 1);
-      }
-      let msg = 'Server bilan aloqa yo\'q.';
-      if (e.name === 'AbortError') msg = 'Server javob bermadi (timeout). Keyinroq urinib ko\'ring.';
-      else if (e.message?.includes('Failed to fetch')) msg = 'Internet yoki server muammosi. Sahifani yangilang.';
-      err.innerHTML = `${msg} <br><small style="color:#94a3b8">Xato: ${e.message || e.name}</small>`;
-      err.style.display='block';
+  btn.innerHTML = '<span class="spinner"></span>Ro\'yxatdan o\'tilmoqda...'; btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/owner/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({full_name, phone, email, password})
+    });
+    const d = await r.json();
+    if (d.token) {
+      token = d.token;
+      localStorage.setItem('ownerToken', token);
+      ownerData = d.owner;
+      restoId = d.owner.restaurant_id;
+      showApp();
+      toast('✅ Xush kelibsiz! Endi restoran ma\'lumotlarini kiriting.');
+      setTimeout(() => {
+        document.querySelector('[onclick="showSec(\'restaurant\',this)"]').click();
+      }, 500);
+    } else {
+      err.textContent = d.error || 'Xatolik'; err.style.display='block';
       btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
     }
-  };
-
-  await tryRegister(1);
+  } catch(e) {
+    err.textContent='Server xatoligi'; err.style.display='block';
+    btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
+  }
 }
 
 function doLogout() {
@@ -618,22 +572,33 @@ async function loadMenu() {
     const g = document.getElementById('menuGrid');
     if (!items.length) { g.innerHTML='<div class="empty-state"><div class="ei">🍜</div>Menyu bo\'sh. Taom qo\'shing!</div>'; return; }
     g.innerHTML = items.map(item=>`
-      <div class="menu-item">
-        <div>
-          <div class="menu-name">${item.name}</div>
-          <div class="menu-cat">${item.category||''}</div>
-          <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
-          ${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}
+      <div class="menu-item" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;">
+        ${item.image_url ? `<img src="${item.image_url}" style="width:100%;height:160px;object-fit:cover;" onerror="this.style.display='none'" />` : ''}
+        <div style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div class="menu-name">${item.name}</div>
+            <div class="menu-cat">${item.category||''}</div>
+            <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
+            ${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}
+          </div>
+          <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}"
+                  onclick="toggleMenu(${item.id},${!item.is_available})">
+            ${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}
+          </button>
         </div>
-        <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}"
-                onclick="toggleMenu(${item.id},${!item.is_available})">
-          ${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}
-        </button>
       </div>`).join('');
   } catch(e) {}
 }
 
 function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('mImage').addEventListener('input', function() {
+    const preview = document.getElementById('mImagePreview');
+    const img = document.getElementById('mPreviewImg');
+    if (this.value.trim()) { img.src = this.value.trim(); preview.style.display = 'block'; }
+    else { preview.style.display = 'none'; }
+  });
+});
 function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
 
 async function saveMenuItem() {
@@ -641,17 +606,20 @@ async function saveMenuItem() {
   const category = document.getElementById('mCat').value;
   const price = document.getElementById('mPrice').value;
   const description = document.getElementById('mDesc').value;
+  const image_url = document.getElementById('mImage').value.trim();
   if (!name || !price) { toast('⚠️ Nom va narx kerak'); return; }
   try {
     const r = await fetch(`${API}/owner/menu`, {
       method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({name,category,price:parseInt(price),description})
+      body: JSON.stringify({name,category,price:parseInt(price),description,image_url})
     });
     if (r.ok) {
       toast('✅ Taom qo\'shildi!'); closeMenuModal();
       document.getElementById('mName').value='';
       document.getElementById('mPrice').value='';
       document.getElementById('mDesc').value='';
+      document.getElementById('mImage').value='';
+      document.getElementById('mImagePreview').style.display='none';
       loadMenu();
     } else toast('❌ Xatolik');
   } catch(e) { toast('❌ Server xatoligi'); }
