@@ -7,15 +7,17 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#1e293b; }
-.login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#1a1a2e; }
-.login-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; }
-.login-logo { text-align:center; font-size:40px; margin-bottom:8px; }
-.login-title { text-align:center; font-size:22px; font-weight:700; margin-bottom:4px; }
-.login-sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:28px; }
-.login-box input { width:100%; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; outline:none; margin-bottom:12px; }
-.login-box input:focus { border-color:#ef4444; }
-.login-btn { width:100%; background:#ef4444; color:white; border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
-.login-err { color:#ef4444; font-size:13px; text-align:center; margin-top:10px; display:none; }
+.auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#1a1a2e; }
+.auth-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; }
+.auth-logo { text-align:center; font-size:40px; margin-bottom:8px; }
+.auth-title { text-align:center; font-size:22px; font-weight:700; margin-bottom:4px; }
+.auth-sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:28px; }
+.auth-box input { width:100%; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; outline:none; margin-bottom:12px; }
+.auth-box input:focus { border-color:#ef4444; }
+.auth-btn { width:100%; background:#ef4444; color:white; border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
+.auth-err { color:#ef4444; font-size:13px; text-align:center; margin-top:10px; display:none; }
+.auth-switch { text-align:center; margin-top:16px; font-size:14px; color:#64748b; }
+.auth-switch a { color:#ef4444; cursor:pointer; font-weight:600; text-decoration:none; }
 .app { display:none; }
 .sidebar { width:240px; background:#1a1a2e; color:white; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; }
 .sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
@@ -77,17 +79,17 @@ tr:hover td { background:#fafafa; }
 .add-btn { background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; justify-content:center; align-items:center; }
 .modal-overlay.open { display:flex; }
-.modal { background:white; border-radius:16px; padding:28px; width:100%; max-width:440px; }
+.modal { background:white; border-radius:16px; padding:28px; width:100%; max-width:440px; max-height:90vh; overflow-y:auto; }
 .modal h3 { font-size:18px; font-weight:700; margin-bottom:20px; }
 .fg { margin-bottom:14px; }
 .fg label { font-size:13px; color:#64748b; margin-bottom:4px; display:block; }
 .fg input, .fg select, .fg textarea { width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; }
-.fg input:focus, .fg select:focus { border-color:#ef4444; }
+.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:#ef4444; }
 .modal-btns { display:flex; gap:10px; margin-top:20px; }
 .modal-btns button { flex:1; padding:12px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; border:none; }
 .btn-save { background:#ef4444; color:white; }
 .btn-cls { background:#f1f5f9; color:#64748b; }
-.prof-form { max-width:500px; }
+.prof-form { max-width:560px; }
 .prof-form .fg input { margin-bottom:0; }
 .save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
 .toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:white; padding:12px 20px; border-radius:10px; font-size:14px; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
@@ -96,24 +98,51 @@ tr:hover td { background:#fafafa; }
 .empty-state .ei { font-size:48px; margin-bottom:12px; }
 .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:white; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
 @keyframes spin { to { transform:rotate(360deg); } }
+.no-resto { background:#fff3cd; border:1px solid #ffc107; border-radius:12px; padding:20px; margin-bottom:20px; }
+.no-resto h3 { color:#856404; margin-bottom:8px; }
+.no-resto p { color:#664d03; font-size:14px; }
+.premium-card { background:linear-gradient(135deg,#667eea,#764ba2); border-radius:14px; padding:24px; color:white; margin-bottom:20px; }
+.premium-card h3 { font-size:18px; margin-bottom:8px; }
+.premium-card p { font-size:14px; opacity:0.9; margin-bottom:16px; }
+.premium-btns { display:flex; gap:10px; }
+.premium-btn { padding:10px 20px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; }
+.premium-btn-monthly { background:white; color:#667eea; }
+.premium-btn-yearly { background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); }
 </style>
 </head>
 <body>
 
-<!-- Login -->
-<div class="login-page" id="loginPage">
-  <div class="login-box">
-    <div class="login-logo">🍽</div>
-    <div class="login-title">OneTable Dashboard</div>
-    <div class="login-sub">Restoran boshqaruv paneli</div>
+<!-- LOGIN -->
+<div class="auth-page" id="loginPage">
+  <div class="auth-box">
+    <div class="auth-logo">🍽</div>
+    <div class="auth-title">OneTable Dashboard</div>
+    <div class="auth-sub">Restoran boshqaruv paneli</div>
     <input type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')doLogin()">
     <input type="password" id="loginPassword" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">Kirish</button>
-    <div class="login-err" id="loginErr"></div>
+    <button class="auth-btn" id="loginBtn" onclick="doLogin()">Kirish</button>
+    <div class="auth-err" id="loginErr"></div>
+    <div class="auth-switch">Akkauntingiz yo'qmi? <a onclick="showRegister()">Ro'yxatdan o'ting</a></div>
   </div>
 </div>
 
-<!-- App -->
+<!-- REGISTER -->
+<div class="auth-page" id="registerPage" style="display:none">
+  <div class="auth-box">
+    <div class="auth-logo">🍽</div>
+    <div class="auth-title">Ro'yxatdan o'tish</div>
+    <div class="auth-sub">Restoran egasi sifatida qo'shiling</div>
+    <input type="text" id="regName" placeholder="Ismingiz *">
+    <input type="text" id="regPhone" placeholder="Telefon raqam">
+    <input type="email" id="regEmail" placeholder="Email *">
+    <input type="password" id="regPassword" placeholder="Parol (min 6 ta) *">
+    <button class="auth-btn" id="regBtn" onclick="doRegister()">Ro'yxatdan o'tish</button>
+    <div class="auth-err" id="regErr"></div>
+    <div class="auth-switch">Akkauntingiz bormi? <a onclick="showLogin()">Kiring</a></div>
+  </div>
+</div>
+
+<!-- APP -->
 <div class="app" id="appPage">
   <div class="sidebar">
     <div class="sidebar-logo">
@@ -125,7 +154,8 @@ tr:hover td { background:#fafafa; }
       <button class="nav-link" onclick="showSec('today',this)"><span class="nav-icon">📅</span>Bugungi bronlar</button>
       <button class="nav-link" onclick="showSec('all',this)"><span class="nav-icon">📋</span>Barcha bronlar</button>
       <button class="nav-link" onclick="showSec('menu',this)"><span class="nav-icon">🍜</span>Menyu</button>
-      <button class="nav-link" onclick="showSec('profile',this)"><span class="nav-icon">⚙️</span>Sozlamalar</button>
+      <button class="nav-link" onclick="showSec('restaurant',this)"><span class="nav-icon">🏪</span>Restoran</button>
+      <button class="nav-link" onclick="showSec('premium',this)"><span class="nav-icon">💎</span>Premium</button>
     </div>
     <div class="sidebar-bottom">
       <div class="resto-info" id="sidebarName">—</div>
@@ -140,11 +170,15 @@ tr:hover td { background:#fafafa; }
       <div class="page-header">
         <div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div>
       </div>
+      <div id="noRestoWarning" class="no-resto" style="display:none">
+        <h3>⚠️ Restoran qo'shilmagan!</h3>
+        <p>Iltimos, <b>Restoran</b> bo'limiga o'tib, restoran ma'lumotlaringizni kiriting.</p>
+      </div>
       <div class="stats-grid">
-        <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">—</div><div class="stat-sub">bugun</div></div>
-        <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">—</div><div class="stat-sub">tasdiqlash kerak</div></div>
-        <div class="stat-card stat-green"><div class="stat-label">Tasdiqlangan</div><div class="stat-value" id="st-confirmed">—</div><div class="stat-sub">jami</div></div>
-        <div class="stat-card stat-red"><div class="stat-label">Jami bronlar</div><div class="stat-value" id="st-total">—</div><div class="stat-sub">hammasi</div></div>
+        <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">0</div><div class="stat-sub">bugun</div></div>
+        <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">0</div><div class="stat-sub">tasdiqlash kerak</div></div>
+        <div class="stat-card stat-green"><div class="stat-label">Tasdiqlangan</div><div class="stat-value" id="st-confirmed">0</div><div class="stat-sub">jami</div></div>
+        <div class="stat-card stat-red"><div class="stat-label">Jami bronlar</div><div class="stat-value" id="st-total">0</div><div class="stat-sub">hammasi</div></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -199,17 +233,55 @@ tr:hover td { background:#fafafa; }
       </div>
     </div>
 
-    <!-- Sozlamalar -->
-    <div class="section" id="sec-profile">
-      <div class="page-header"><div><h2>Sozlamalar</h2></div></div>
+    <!-- Restoran -->
+    <div class="section" id="sec-restaurant">
+      <div class="page-header"><div><h2>🏪 Restoran ma'lumotlari</h2></div></div>
       <div class="card" style="padding:24px;">
         <div class="prof-form">
-          <div class="fg"><label>Restoran nomi</label><input type="text" id="profName"></div>
-          <div class="fg"><label>Manzil</label><input type="text" id="profAddress"></div>
-          <div class="fg"><label>Telefon</label><input type="text" id="profPhone"></div>
-          <div class="fg"><label>Ish vaqti boshlanish</label><input type="time" id="profOpen" value="10:00"></div>
-          <div class="fg"><label>Ish vaqti tugash</label><input type="time" id="profClose" value="22:00"></div>
-          <button class="save-btn" onclick="saveProfile()">💾 Saqlash</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="fg"><label>Restoran nomi *</label><input type="text" id="restoName" placeholder="Masalan: Plov Center"></div>
+            <div class="fg"><label>Manzil *</label><input type="text" id="restoAddress" placeholder="Ko'cha, tuman, shahar"></div>
+            <div class="fg"><label>Telefon</label><input type="text" id="restoPhone" placeholder="+998 90 123 45 67"></div>
+            <div class="fg"><label>Narx kategoriyasi</label>
+              <select id="restoPriceCategory">
+                <option value="$">$ — Arzon</option>
+                <option value="$$" selected>$$ — O'rta</option>
+                <option value="$$$">$$$ — Qimmat</option>
+              </select>
+            </div>
+            <div class="fg"><label>Sig'im (stol/o'rindiq soni)</label><input type="number" id="restoCapacity" placeholder="50" value="50"></div>
+            <div class="fg"><label>Oshxona turi</label><input type="text" id="restoCuisine" placeholder="Uzbek, Italian, Asian..."></div>
+            <div class="fg"><label>Rasm URL</label><input type="text" id="restoImage" placeholder="https://..."></div>
+            <div class="fg"><label>Ish vaqti</label><input type="text" id="restoHours" placeholder="10:00 — 22:00"></div>
+          </div>
+          <div class="fg"><label>Tavsif</label><textarea id="restoDesc" rows="3" style="resize:vertical;" placeholder="Restoran haqida qisqacha..."></textarea></div>
+          <button class="save-btn" id="restoSaveBtn" onclick="saveRestaurant()">💾 Saqlash</button>
+          <div id="restoMsg" style="margin-top:10px;font-size:14px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium -->
+    <div class="section" id="sec-premium">
+      <div class="page-header"><div><h2>💎 Premium</h2><p>Restoraningizni ko'proq mijozlarga ko'rsating</p></div></div>
+      <div id="premiumStatus"></div>
+      <div class="premium-card">
+        <h3>💎 Premium obuna</h3>
+        <p>Premium restoranlar ro'yxatda eng yuqorida ko'rinadi, premium badge oladi va ko'proq mijoz jalb qiladi.</p>
+        <div style="margin-bottom:16px;">
+          <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:8px;">
+            ✅ Ro'yxatda eng yuqorida ko'rinish<br>
+            ✅ 💎 Premium badge<br>
+            ✅ Ko'proq mijoz jalb qilish
+          </div>
+        </div>
+        <div class="premium-btns">
+          <button class="premium-btn premium-btn-monthly" onclick="activatePremium('monthly')">
+            Oylik — 150,000 so'm
+          </button>
+          <button class="premium-btn premium-btn-yearly" onclick="activatePremium('yearly')">
+            Yillik — 1,200,000 so'm (2 oy bepul!)
+          </button>
         </div>
       </div>
     </div>
@@ -243,9 +315,7 @@ tr:hover td { background:#fafafa; }
 <script>
 const API = 'https://onetableuz-production.up.railway.app/api';
 let token = localStorage.getItem('ownerToken');
-let allRes = [];
-let curFilter = 'all';
-let restoId = null;
+let allRes = [], curFilter = 'all', restoId = null, ownerData = null;
 
 window.onload = () => {
   document.getElementById('todayDate').textContent =
@@ -259,7 +329,17 @@ function toast(msg, ms=2500) {
   setTimeout(() => el.classList.remove('show'), ms);
 }
 
-// ── Login ────────────────────────────────────────────────────
+// ── Auth ─────────────────────────────────────────────────────
+function showLogin() {
+  document.getElementById('registerPage').style.display = 'none';
+  document.getElementById('loginPage').style.display = 'flex';
+}
+
+function showRegister() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = 'flex';
+}
+
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPassword').value;
@@ -267,8 +347,7 @@ async function doLogin() {
   const err = document.getElementById('loginErr');
   err.style.display = 'none';
   if (!email || !pass) { err.textContent='Email va parol kiriting'; err.style.display='block'; return; }
-  btn.innerHTML = '<span class="spinner"></span>Kirish...';
-  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Kirish...'; btn.disabled = true;
   try {
     const r = await fetch(`${API}/owner/login`, {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -278,6 +357,7 @@ async function doLogin() {
     if (d.token) {
       token = d.token;
       localStorage.setItem('ownerToken', token);
+      ownerData = d.owner;
       restoId = d.owner.restaurant_id;
       showApp();
     } else {
@@ -290,18 +370,55 @@ async function doLogin() {
   }
 }
 
+async function doRegister() {
+  const full_name = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const btn = document.getElementById('regBtn');
+  const err = document.getElementById('regErr');
+  err.style.display = 'none';
+  if (!full_name || !email || !password) { err.textContent='Majburiy maydonlarni to\'ldiring'; err.style.display='block'; return; }
+  if (password.length < 6) { err.textContent='Parol kamida 6 ta belgi bo\'lishi kerak'; err.style.display='block'; return; }
+  btn.innerHTML = '<span class="spinner"></span>Ro\'yxatdan o\'tilmoqda...'; btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/owner/register`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({full_name, phone, email, password})
+    });
+    const d = await r.json();
+    if (d.token) {
+      token = d.token;
+      localStorage.setItem('ownerToken', token);
+      ownerData = d.owner;
+      restoId = d.owner.restaurant_id;
+      showApp();
+      toast('✅ Xush kelibsiz! Endi restoran ma\'lumotlarini kiriting.');
+      setTimeout(() => {
+        document.querySelector('[onclick="showSec(\'restaurant\',this)"]').click();
+      }, 500);
+    } else {
+      err.textContent = d.error || 'Xatolik'; err.style.display='block';
+      btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
+    }
+  } catch(e) {
+    err.textContent='Server xatoligi'; err.style.display='block';
+    btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
+  }
+}
+
 function doLogout() {
   localStorage.removeItem('ownerToken');
-  token = null;
+  token = null; restoId = null; ownerData = null;
   document.getElementById('appPage').style.display = 'none';
   document.getElementById('loginPage').style.display = 'flex';
 }
 
 function showApp() {
   document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('registerPage').style.display = 'none';
   document.getElementById('appPage').style.display = 'flex';
-  // restoId tokendan olish
-  try { restoId = JSON.parse(atob(token.split('.')[1])).restaurant_id; } catch(e) {}
+  try { const p = JSON.parse(atob(token.split('.')[1])); restoId = p.restaurant_id; } catch(e) {}
   loadAll();
 }
 
@@ -312,39 +429,56 @@ function showSec(name, btn) {
   document.getElementById('sec-' + name).classList.add('active');
   btn.classList.add('active');
   if (name === 'menu') loadMenu();
-  if (name === 'profile') loadProfile();
+  if (name === 'restaurant') loadRestaurant();
+  if (name === 'premium') loadPremium();
 }
 
 // ── Data ─────────────────────────────────────────────────────
 async function loadAll() {
-  await Promise.all([loadStats(), loadReservations()]);
+  await Promise.all([loadReservations(), loadRestaurantName()]);
 }
 
-async function loadStats() {
+async function loadRestaurantName() {
+  if (!restoId) {
+    document.getElementById('noRestoWarning').style.display = 'block';
+    return;
+  }
   try {
-    const r = await fetch(`${API}/owner/stats`, {headers:{Authorization:`Bearer ${token}`}});
+    const r = await fetch(`${API}/restaurants/${restoId}`);
     const d = await r.json();
-    document.getElementById('st-today').textContent = d.today ?? 0;
-    document.getElementById('st-pending').textContent = d.pending ?? 0;
-    document.getElementById('st-confirmed').textContent = d.confirmed ?? 0;
-    document.getElementById('st-total').textContent = d.total ?? 0;
-    document.getElementById('pendingCount').textContent = d.pending ?? 0;
-    document.getElementById('todayBadge').textContent = (d.today ?? 0) + ' ta';
+    if (d.name) {
+      document.getElementById('sidebarName').textContent = d.name;
+      document.getElementById('noRestoWarning').style.display = 'none';
+    }
   } catch(e) {}
 }
 
 async function loadReservations() {
+  if (!restoId) return;
   try {
     const r = await fetch(`${API}/owner/reservations`, {headers:{Authorization:`Bearer ${token}`}});
     allRes = await r.json();
-    if (allRes[0]?.restaurant_name) document.getElementById('sidebarName').textContent = allRes[0].restaurant_name;
+    if (!Array.isArray(allRes)) allRes = [];
+
+    const today = new Date().toISOString().split('T')[0];
+    const todayRes = allRes.filter(r => String(r.date).startsWith(today));
+    const pendingRes = allRes.filter(r => r.status === 'pending');
+    const confirmedRes = allRes.filter(r => r.status === 'confirmed');
+
+    document.getElementById('st-today').textContent = todayRes.length;
+    document.getElementById('st-pending').textContent = pendingRes.length;
+    document.getElementById('st-confirmed').textContent = confirmedRes.length;
+    document.getElementById('st-total').textContent = allRes.length;
+    document.getElementById('pendingCount').textContent = pendingRes.length;
+    document.getElementById('todayBadge').textContent = todayRes.length + ' ta';
+
     renderPending();
     renderToday();
     renderAll();
   } catch(e) {}
 }
 
-// ── Render helpers ───────────────────────────────────────────
+// ── Render ───────────────────────────────────────────────────
 const nameOf = r => (`${r.first_name||''} ${r.last_name||''}`).trim() || 'Noma\'lum';
 const timeOf = r => (r.time||'').substring(0,5);
 
@@ -371,7 +505,7 @@ function renderPending() {
   const tb = document.getElementById('pendingTbody');
   if (!list.length) { tb.innerHTML = emptyRow(6,'Kutilayotgan bron yo\'q','✅'); return; }
   tb.innerHTML = list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b></td>
+    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
     <td>${r.date}</td><td>${timeOf(r)}</td>
     <td>👥 ${r.guests} kishi</td>
     <td>${r.comment||'—'}</td>
@@ -385,7 +519,8 @@ function renderToday() {
   const tb = document.getElementById('todayTbody');
   if (!list.length) { tb.innerHTML = emptyRow(6,'Bugun bron yo\'q'); return; }
   tb.innerHTML = list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b></td><td>${timeOf(r)}</td>
+    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
+    <td>${timeOf(r)}</td>
     <td>👥 ${r.guests} kishi</td>
     <td>${r.comment||'—'}</td>
     <td>${statusBadge(r.status)}</td>
@@ -404,7 +539,7 @@ function renderAll() {
   const list = curFilter === 'all' ? allRes : allRes.filter(r=>r.status===curFilter);
   const tb = document.getElementById('allTbody');
   if (!list.length) { tb.innerHTML = emptyRow(7,'Bron topilmadi'); return; }
-  tb.innerHTML = list.map(r=>`<tr>
+  tb.innerHTML = list.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>`<tr>
     <td><b>${nameOf(r)}</b></td>
     <td>${r.date}</td><td>${timeOf(r)}</td>
     <td>👥 ${r.guests}</td>
@@ -423,7 +558,7 @@ async function updateStatus(id, status) {
     });
     if (r.ok) {
       toast(status==='confirmed' ? '✅ Tasdiqlandi! Foydalanuvchiga xabar ketdi.' : '❌ Bekor qilindi.');
-      loadAll();
+      loadReservations();
     } else toast('❌ Xatolik yuz berdi');
   } catch(e) { toast('❌ Server xatoligi'); }
 }
@@ -441,6 +576,7 @@ async function loadMenu() {
           <div class="menu-name">${item.name}</div>
           <div class="menu-cat">${item.category||''}</div>
           <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
+          ${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}
         </div>
         <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}"
                 onclick="toggleMenu(${item.id},${!item.is_available})">
@@ -462,7 +598,7 @@ async function saveMenuItem() {
   try {
     const r = await fetch(`${API}/owner/menu`, {
       method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({name,category,price:parseInt(price),description,is_available:true})
+      body: JSON.stringify({name,category,price:parseInt(price),description})
     });
     if (r.ok) {
       toast('✅ Taom qo\'shildi!'); closeMenuModal();
@@ -478,40 +614,125 @@ async function toggleMenu(id, available) {
   try {
     await fetch(`${API}/owner/menu/${id}`, {
       method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({is_available:available})
+      body: JSON.stringify({available})
     });
     loadMenu();
   } catch(e) {}
 }
 
-// ── Profile ──────────────────────────────────────────────────
-async function loadProfile() {
+// ── Restaurant ───────────────────────────────────────────────
+async function loadRestaurant() {
+  if (!restoId) return;
   try {
-    const r = await fetch(`${API}/restaurants/${restoId}`);
+    const r = await fetch(`${API}/owner/restaurant`, {headers:{Authorization:`Bearer ${token}`}});
     const d = await r.json();
-    document.getElementById('profName').value = d.name||'';
-    document.getElementById('profAddress').value = d.address||'';
-    document.getElementById('profPhone').value = d.phone||'';
+    if (d) {
+      document.getElementById('restoName').value = d.name||'';
+      document.getElementById('restoAddress').value = d.address||'';
+      document.getElementById('restoPhone').value = d.phone||'';
+      document.getElementById('restoPriceCategory').value = d.price_category||'$$';
+      document.getElementById('restoCapacity').value = d.capacity||50;
+      document.getElementById('restoCuisine').value = Array.isArray(d.cuisine)?d.cuisine.join(', '):(d.cuisine||'');
+      document.getElementById('restoImage').value = d.image_url||'';
+      document.getElementById('restoDesc').value = d.description||'';
+      document.getElementById('restoHours').value = d.working_hours||'10:00 — 22:00';
+      document.getElementById('restoSaveBtn').textContent = '💾 Yangilash';
+    }
   } catch(e) {}
 }
 
-async function saveProfile() {
+async function saveRestaurant() {
+  const name = document.getElementById('restoName').value.trim();
+  const address = document.getElementById('restoAddress').value.trim();
+  if (!name || !address) { toast('⚠️ Nom va manzil kiritish shart!'); return; }
+
+  const body = {
+    name, address,
+    phone: document.getElementById('restoPhone').value,
+    price_category: document.getElementById('restoPriceCategory').value,
+    capacity: parseInt(document.getElementById('restoCapacity').value)||50,
+    cuisine: document.getElementById('restoCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),
+    image_url: document.getElementById('restoImage').value,
+    description: document.getElementById('restoDesc').value,
+    working_hours: document.getElementById('restoHours').value
+  };
+
+  const msg = document.getElementById('restoMsg');
   try {
-    const r = await fetch(`${API}/owner/profile`, {
-      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({
-        name: document.getElementById('profName').value,
-        address: document.getElementById('profAddress').value,
-        phone: document.getElementById('profPhone').value
-      })
+    let r;
+    if (restoId) {
+      r = await fetch(`${API}/owner/restaurant`, {
+        method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+        body: JSON.stringify(body)
+      });
+    } else {
+      r = await fetch(`${API}/owner/restaurants`, {
+        method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+        body: JSON.stringify(body)
+      });
+    }
+    const d = await r.json();
+    if (r.ok) {
+      if (!restoId) {
+        restoId = d.id;
+        const p = JSON.parse(atob(token.split('.')[1]));
+        p.restaurant_id = d.id;
+      }
+      msg.innerHTML = '<span style="color:#059669">✅ Muvaffaqiyatli saqlandi!</span>';
+      document.getElementById('sidebarName').textContent = name;
+      document.getElementById('noRestoWarning').style.display = 'none';
+      toast('✅ Restoran saqlandi!');
+    } else {
+      msg.innerHTML = `<span style="color:#dc2626">❌ ${d.error||'Xatolik'}</span>`;
+    }
+  } catch(e) {
+    msg.innerHTML = '<span style="color:#dc2626">❌ Server xatoligi</span>';
+  }
+}
+
+// ── Premium ──────────────────────────────────────────────────
+async function loadPremium() {
+  if (!restoId) return;
+  try {
+    const r = await fetch(`${API}/owner/premium`, {headers:{Authorization:`Bearer ${token}`}});
+    const d = await r.json();
+    const el = document.getElementById('premiumStatus');
+    if (d.is_premium && d.subscription) {
+      const exp = new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');
+      el.innerHTML = `<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;">
+        <b style="color:#059669">💎 Premium faol!</b>
+        <p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p>
+        <button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">
+          Bekor qilish
+        </button>
+      </div>`;
+    } else {
+      el.innerHTML = '<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';
+    }
+  } catch(e) {}
+}
+
+async function activatePremium(plan) {
+  try {
+    const r = await fetch(`${API}/owner/premium/activate`, {
+      method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({plan})
     });
-    if (r.ok) toast('✅ Saqlandi!');
+    if (r.ok) { toast('💎 Premium faollashtirildi!'); loadPremium(); }
     else toast('❌ Xatolik');
   } catch(e) { toast('❌ Server xatoligi'); }
 }
 
+async function cancelPremium() {
+  if (!confirm('Premiumni bekor qilasizmi?')) return;
+  try {
+    const r = await fetch(`${API}/owner/premium`, {method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+    if (r.ok) { toast('Premium bekor qilindi'); loadPremium(); }
+  } catch(e) {}
+}
+
 // Har 30 soniyada yangilash
-setInterval(() => { if (token) loadAll(); }, 30000);
+setInterval(() => { if (token && restoId) loadReservations(); }, 30000);
 </script>
 </body>
 </html>
