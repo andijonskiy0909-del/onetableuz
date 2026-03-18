@@ -20,8 +20,8 @@ router.post('/register', async (req, res) => {
   try {
     const { email, password, full_name, phone } = req.body;
 
-    if (!email || !password || !full_name) {
-      return res.status(400).json({ error: 'Email, parol va ism kiritish shart' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email va parol kiritish shart' });
     }
 
     // Email band emasmi?
@@ -34,20 +34,21 @@ router.post('/register', async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
+    // Faqat mavjud columnlar bilan insert
     const result = await pool.query(
-      `INSERT INTO restaurant_owners (email, password_hash, full_name, phone, role)
-       VALUES ($1, $2, $3, $4, 'owner') RETURNING *`,
-      [email, hash, full_name, phone]
+      `INSERT INTO restaurant_owners (email, password_hash)
+       VALUES ($1, $2) RETURNING *`,
+      [email, hash]
     );
 
     const owner = result.rows[0];
     const token = jwt.sign(
-      { id: owner.id, role: owner.role, restaurant_id: owner.restaurant_id },
+      { id: owner.id, role: 'owner', restaurant_id: owner.restaurant_id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
 
-    res.json({ token, owner });
+    res.json({ token, owner: { ...owner, role: 'owner' } });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
@@ -68,11 +69,11 @@ router.post('/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: "Parol noto'g'ri" });
 
     const token = jwt.sign(
-      { id: owner.id, role: owner.role, restaurant_id: owner.restaurant_id },
+      { id: owner.id, role: owner.role || 'owner', restaurant_id: owner.restaurant_id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
-    res.json({ token, owner });
+    res.json({ token, owner: { ...owner, role: owner.role || 'owner' } });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -111,7 +112,6 @@ router.post('/restaurants', ownerAuth, async (req, res) => {
 
     const restaurant = result.rows[0];
 
-    // Owner ni yangi restoranga bog'lash
     await pool.query(
       'UPDATE restaurant_owners SET restaurant_id = $1 WHERE id = $2',
       [restaurant.id, req.owner.id]
@@ -366,7 +366,7 @@ router.get('/premium', ownerAuth, async (req, res) => {
 
 router.post('/premium/activate', ownerAuth, async (req, res) => {
   try {
-    const { plan } = req.body; // monthly | yearly
+    const { plan } = req.body;
     const amount = plan === 'yearly' ? 1200000 : 150000;
     const months = plan === 'yearly' ? 12 : 1;
 
