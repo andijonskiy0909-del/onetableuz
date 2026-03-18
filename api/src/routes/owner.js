@@ -19,33 +19,26 @@ const ownerAuth = (req, res, next) => {
 router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ error: 'Email va parol kiritish shart' });
     }
-
     const existing = await pool.query(
       'SELECT id FROM restaurant_owners WHERE email = $1', [email]
     );
     if (existing.rows.length) {
       return res.status(400).json({ error: 'Bu email allaqachon ro\'yxatdan o\'tgan' });
     }
-
     const hash = await bcrypt.hash(password, 10);
-
     const result = await pool.query(
-      `INSERT INTO restaurant_owners (email, password_hash)
-       VALUES ($1, $2) RETURNING *`,
+      `INSERT INTO restaurant_owners (email, password_hash) VALUES ($1, $2) RETURNING *`,
       [email, hash]
     );
-
     const owner = result.rows[0];
     const token = jwt.sign(
       { id: owner.id, role: 'owner', restaurant_id: owner.restaurant_id },
       process.env.JWT_SECRET,
       { expiresIn: '30d' }
     );
-
     res.json({ token, owner: { ...owner, role: 'owner' } });
   } catch (err) {
     console.error(err);
@@ -62,10 +55,8 @@ router.post('/login', async (req, res) => {
     );
     const owner = result.rows[0];
     if (!owner) return res.status(404).json({ error: 'Topilmadi' });
-
     const valid = await bcrypt.compare(password, owner.password_hash);
     if (!valid) return res.status(401).json({ error: "Parol noto'g'ri" });
-
     const token = jwt.sign(
       { id: owner.id, role: owner.role || 'owner', restaurant_id: owner.restaurant_id },
       process.env.JWT_SECRET,
@@ -95,26 +86,19 @@ router.get('/restaurant', ownerAuth, async (req, res) => {
 router.post('/restaurants', ownerAuth, async (req, res) => {
   try {
     const { name, description, address, phone, cuisine, price_category, capacity, image_url } = req.body;
-
     if (!name || !address) {
       return res.status(400).json({ error: 'Nom va manzil kiritish shart' });
     }
-
     const result = await pool.query(
-      `INSERT INTO restaurants
-        (name, description, address, phone, cuisine, price_category, capacity, image_url, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved')
-       RETURNING *`,
+      `INSERT INTO restaurants (name, description, address, phone, cuisine, price_category, capacity, image_url, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'approved') RETURNING *`,
       [name, description, address, phone, cuisine, price_category, capacity || 50, image_url]
     );
-
     const restaurant = result.rows[0];
-
     await pool.query(
       'UPDATE restaurant_owners SET restaurant_id = $1 WHERE id = $2',
       [restaurant.id, req.owner.id]
     );
-
     res.json(restaurant);
   } catch (err) {
     console.error(err);
@@ -126,10 +110,8 @@ router.post('/restaurants', ownerAuth, async (req, res) => {
 router.put('/restaurant', ownerAuth, async (req, res) => {
   try {
     const { name, description, address, phone, cuisine, price_category, capacity, image_url } = req.body;
-
     const result = await pool.query(
-      `UPDATE restaurants
-       SET name=$1, description=$2, address=$3, phone=$4,
+      `UPDATE restaurants SET name=$1, description=$2, address=$3, phone=$4,
            cuisine=$5, price_category=$6, capacity=$7, image_url=$8
        WHERE id=$9 RETURNING *`,
       [name, description, address, phone, cuisine, price_category, capacity, image_url, req.owner.restaurant_id]
@@ -175,7 +157,6 @@ router.get('/reservations', ownerAuth, async (req, res) => {
     if (date) { params.push(date); query += ` AND r.date = $${params.length}`; }
     if (status) { params.push(status); query += ` AND r.status = $${params.length}`; }
     query += ' ORDER BY r.date ASC, r.time ASC';
-
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (err) {
@@ -200,16 +181,57 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
       'SELECT telegram_id FROM users WHERE id = $1', [r.user_id]
     );
     const telegramId = userRes.rows[0]?.telegram_id;
+
     if (telegramId) {
+      // ── Tasdiqlash / rad etish xabari ──────────────────────
       const text = status === 'confirmed'
         ? `✅ <b>Broningiz tasdiqlandi!</b>\n📅 ${r.date} — ⏰ ${r.time}\n👥 ${r.guests} kishi`
         : `❌ <b>Broningiz rad etildi.</b>\n📅 ${r.date} — ⏰ ${r.time}`;
+
       await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: telegramId, text, parse_mode: 'HTML' })
       });
+
+      // ── Tasdiqlanganda review so'rash (3 soniya keyin) ─────
+      if (status === 'confirmed') {
+        const restoRes = await pool.query(
+          'SELECT id, name FROM restaurants WHERE id = $1',
+          [r.restaurant_id]
+        );
+        const restoName = restoRes.rows[0]?.name || 'Restoran';
+        const restoId = restoRes.rows[0]?.id;
+
+        setTimeout(async () => {
+          try {
+            const stars = [1, 2, 3, 4, 5].map(n => ({
+              text: '⭐'.repeat(n),
+              callback_data: `review_rate_${n}_${r.id}_${restoId}`
+            }));
+
+            await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: telegramId,
+                text: `⭐ <b>${restoName}</b> restoraniga qanday baho berasiz?\n\nYulduzlardan birini tanlang:`,
+                parse_mode: 'HTML',
+                reply_markup: {
+                  inline_keyboard: [
+                    stars.slice(0, 3),
+                    stars.slice(3)
+                  ]
+                }
+              })
+            });
+          } catch (e) {
+            console.error('Review so\'rash xatoligi:', e.message);
+          }
+        }, 3000);
+      }
     }
+
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -220,56 +242,30 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
 router.get('/analytics', ownerAuth, async (req, res) => {
   try {
     const rid = req.owner.restaurant_id;
-
     const today = await pool.query(
-      `SELECT COUNT(*) FROM reservations
-       WHERE restaurant_id = $1 AND date = CURRENT_DATE AND status != 'cancelled'`,
-      [rid]
+      `SELECT COUNT(*) FROM reservations WHERE restaurant_id = $1 AND date = CURRENT_DATE AND status != 'cancelled'`, [rid]
     );
     const weekly = await pool.query(
-      `SELECT COUNT(*) FROM reservations
-       WHERE restaurant_id = $1
-         AND date >= CURRENT_DATE - INTERVAL '7 days'
-         AND status != 'cancelled'`,
-      [rid]
+      `SELECT COUNT(*) FROM reservations WHERE restaurant_id = $1 AND date >= CURRENT_DATE - INTERVAL '7 days' AND status != 'cancelled'`, [rid]
     );
     const revenue = await pool.query(
-      `SELECT COALESCE(SUM(amount), 0) as total
-       FROM payments
-       WHERE restaurant_id = $1
-         AND created_at >= DATE_TRUNC('month', CURRENT_DATE)
-         AND status = 'paid'`,
-      [rid]
+      `SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE restaurant_id = $1 AND created_at >= DATE_TRUNC('month', CURRENT_DATE) AND status = 'paid'`, [rid]
     );
     const peakHours = await pool.query(
-      `SELECT time, COUNT(*) as count
-       FROM reservations
-       WHERE restaurant_id = $1 AND status != 'cancelled'
-       GROUP BY time ORDER BY count DESC LIMIT 5`,
-      [rid]
+      `SELECT time, COUNT(*) as count FROM reservations WHERE restaurant_id = $1 AND status != 'cancelled' GROUP BY time ORDER BY count DESC LIMIT 5`, [rid]
     );
     const noshow = await pool.query(
-      `SELECT COUNT(*) FILTER (WHERE status = 'noshow') as noshow,
-              COUNT(*) as total
-       FROM reservations WHERE restaurant_id = $1`,
-      [rid]
+      `SELECT COUNT(*) FILTER (WHERE status = 'noshow') as noshow, COUNT(*) as total FROM reservations WHERE restaurant_id = $1`, [rid]
     );
     const dailyStats = await pool.query(
-      `SELECT date, COUNT(*) as count
-       FROM reservations
-       WHERE restaurant_id = $1
-         AND date >= CURRENT_DATE - INTERVAL '7 days'
-       GROUP BY date ORDER BY date ASC`,
-      [rid]
+      `SELECT date, COUNT(*) as count FROM reservations WHERE restaurant_id = $1 AND date >= CURRENT_DATE - INTERVAL '7 days' GROUP BY date ORDER BY date ASC`, [rid]
     );
-
     res.json({
       today: parseInt(today.rows[0].count),
       weekly: parseInt(weekly.rows[0].count),
       revenue: parseInt(revenue.rows[0].total),
       peakHours: peakHours.rows,
-      noshowRate: noshow.rows[0].total > 0
-        ? Math.round(noshow.rows[0].noshow / noshow.rows[0].total * 100) : 0,
+      noshowRate: noshow.rows[0].total > 0 ? Math.round(noshow.rows[0].noshow / noshow.rows[0].total * 100) : 0,
       dailyStats: dailyStats.rows
     });
   } catch (err) {
@@ -365,9 +361,7 @@ router.delete('/availability/block', ownerAuth, async (req, res) => {
 router.get('/premium', ownerAuth, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM premium_subscriptions
-       WHERE restaurant_id = $1
-       ORDER BY created_at DESC LIMIT 1`,
+      `SELECT * FROM premium_subscriptions WHERE restaurant_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [req.owner.restaurant_id]
     );
     const resto = await pool.query(
@@ -388,22 +382,17 @@ router.post('/premium/activate', ownerAuth, async (req, res) => {
     const { plan } = req.body;
     const amount = plan === 'yearly' ? 990 : 99;
     const months = plan === 'yearly' ? 12 : 1;
-
     const expires_at = new Date();
     expires_at.setMonth(expires_at.getMonth() + months);
-
     await pool.query(
-      `INSERT INTO premium_subscriptions
-        (restaurant_id, plan, amount, status, expires_at)
+      `INSERT INTO premium_subscriptions (restaurant_id, plan, amount, status, expires_at)
        VALUES ($1, $2, $3, 'active', $4)`,
       [req.owner.restaurant_id, plan, amount, expires_at]
     );
-
     await pool.query(
       'UPDATE restaurants SET is_premium = true WHERE id = $1',
       [req.owner.restaurant_id]
     );
-
     res.json({ success: true, expires_at });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
@@ -413,8 +402,7 @@ router.post('/premium/activate', ownerAuth, async (req, res) => {
 router.delete('/premium', ownerAuth, async (req, res) => {
   try {
     await pool.query(
-      `UPDATE premium_subscriptions SET status = 'cancelled'
-       WHERE restaurant_id = $1`,
+      `UPDATE premium_subscriptions SET status = 'cancelled' WHERE restaurant_id = $1`,
       [req.owner.restaurant_id]
     );
     await pool.query(
