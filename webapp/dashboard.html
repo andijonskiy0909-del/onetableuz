@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneTable — Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#1e293b; }
@@ -23,7 +25,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
 .sidebar-logo h1 { font-size:20px; font-weight:700; }
 .sidebar-logo p { font-size:12px; color:#94a3b8; margin-top:2px; }
-.nav-links { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:4px; }
+.nav-links { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
 .nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:#94a3b8; border:none; background:none; width:100%; text-align:left; transition:all .15s; }
 .nav-link:hover { background:rgba(255,255,255,0.08); color:white; }
 .nav-link.active { background:#ef4444; color:white; }
@@ -90,7 +92,6 @@ tr:hover td { background:#fafafa; }
 .btn-save { background:#ef4444; color:white; }
 .btn-cls { background:#f1f5f9; color:#64748b; }
 .prof-form { max-width:560px; }
-.prof-form .fg input { margin-bottom:0; }
 .save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
 .toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:white; padding:12px 20px; border-radius:10px; font-size:14px; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
 .toast.show { opacity:1; }
@@ -108,11 +109,20 @@ tr:hover td { background:#fafafa; }
 .premium-btn { padding:10px 20px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; }
 .premium-btn-monthly { background:white; color:#667eea; }
 .premium-btn-yearly { background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); }
+#locationMap { height:420px; border-radius:14px; border:2px solid #e2e8f0; margin-bottom:20px; cursor:crosshair; }
+.loc-tip { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px 16px; margin-bottom:16px; font-size:14px; color:#1e40af; }
+.loc-coords { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:16px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+.loc-coord-item { display:flex; flex-direction:column; gap:4px; }
+.loc-coord-label { font-size:12px; color:#64748b; }
+.loc-coord-val { font-size:15px; font-weight:600; color:#1e293b; font-family:monospace; }
+.loc-save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
+.loc-save-btn:disabled { opacity:0.5; cursor:not-allowed; }
+.loc-my-btn { background:#3b82f6; color:white; border:none; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; margin-right:10px; }
+.loc-clear-btn { background:#f1f5f9; color:#64748b; border:none; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
+.loc-status-ok { background:#d1fae5; border:1px solid #6ee7b7; border-radius:10px; padding:12px 16px; margin-bottom:16px; color:#065f46; font-size:14px; }
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div class="auth-page" id="loginPage">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
@@ -125,8 +135,6 @@ tr:hover td { background:#fafafa; }
     <div class="auth-switch">Akkauntingiz yo'qmi? <a onclick="showRegister()">Ro'yxatdan o'ting</a></div>
   </div>
 </div>
-
-<!-- REGISTER -->
 <div class="auth-page" id="registerPage" style="display:none">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
@@ -141,20 +149,16 @@ tr:hover td { background:#fafafa; }
     <div class="auth-switch">Akkauntingiz bormi? <a onclick="showLogin()">Kiring</a></div>
   </div>
 </div>
-
-<!-- APP -->
 <div class="app" id="appPage">
   <div class="sidebar">
-    <div class="sidebar-logo">
-      <h1>🍽 OneTable</h1>
-      <p>Boshqaruv paneli</p>
-    </div>
+    <div class="sidebar-logo"><h1>🍽 OneTable</h1><p>Boshqaruv paneli</p></div>
     <div class="nav-links">
       <button class="nav-link active" onclick="showSec('dashboard',this)"><span class="nav-icon">📊</span>Umumiy</button>
       <button class="nav-link" onclick="showSec('today',this)"><span class="nav-icon">📅</span>Bugungi bronlar</button>
       <button class="nav-link" onclick="showSec('all',this)"><span class="nav-icon">📋</span>Barcha bronlar</button>
       <button class="nav-link" onclick="showSec('menu',this)"><span class="nav-icon">🍜</span>Menyu</button>
       <button class="nav-link" onclick="showSec('restaurant',this)"><span class="nav-icon">🏪</span>Restoran</button>
+      <button class="nav-link" onclick="showSec('location',this)"><span class="nav-icon">📍</span>Lokatsiya</button>
       <button class="nav-link" onclick="showSec('premium',this)"><span class="nav-icon">💎</span>Premium</button>
     </div>
     <div class="sidebar-bottom">
@@ -162,18 +166,10 @@ tr:hover td { background:#fafafa; }
       <button class="logout-btn" onclick="doLogout()">🚪 Chiqish</button>
     </div>
   </div>
-
   <div class="main">
-
-    <!-- Dashboard -->
     <div class="section active" id="sec-dashboard">
-      <div class="page-header">
-        <div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div>
-      </div>
-      <div id="noRestoWarning" class="no-resto" style="display:none">
-        <h3>⚠️ Restoran qo'shilmagan!</h3>
-        <p>Iltimos, <b>Restoran</b> bo'limiga o'tib, restoran ma'lumotlaringizni kiriting.</p>
-      </div>
+      <div class="page-header"><div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div></div>
+      <div id="noRestoWarning" class="no-resto" style="display:none"><h3>⚠️ Restoran qo'shilmagan!</h3><p>Iltimos, <b>Restoran</b> bo'limiga o'tib, restoran ma'lumotlaringizni kiriting.</p></div>
       <div class="stats-grid">
         <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">0</div><div class="stat-sub">bugun</div></div>
         <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">0</div><div class="stat-sub">tasdiqlash kerak</div></div>
@@ -181,31 +177,14 @@ tr:hover td { background:#fafafa; }
         <div class="stat-card stat-red"><div class="stat-label">Jami bronlar</div><div class="stat-value" id="st-total">0</div><div class="stat-sub">hammasi</div></div>
       </div>
       <div class="card">
-        <div class="card-header">
-          <h3>⏳ Tasdiqlash kerak</h3>
-          <span class="badge-count" id="pendingCount">0</span>
-        </div>
-        <table>
-          <thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Amal</th></tr></thead>
-          <tbody id="pendingTbody"></tbody>
-        </table>
+        <div class="card-header"><h3>⏳ Tasdiqlash kerak</h3><span class="badge-count" id="pendingCount">0</span></div>
+        <table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Amal</th></tr></thead><tbody id="pendingTbody"></tbody></table>
       </div>
     </div>
-
-    <!-- Bugun -->
     <div class="section" id="sec-today">
-      <div class="page-header">
-        <div><h2>Bugungi bronlar <span class="today-badge" id="todayBadge">0</span></h2><p>Bugun kelishi kutilayotgan mehmonlar</p></div>
-      </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Mijoz</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead>
-          <tbody id="todayTbody"></tbody>
-        </table>
-      </div>
+      <div class="page-header"><div><h2>Bugungi bronlar <span class="today-badge" id="todayBadge">0</span></h2><p>Bugun kelishi kutilayotgan mehmonlar</p></div></div>
+      <div class="card"><table><thead><tr><th>Mijoz</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="todayTbody"></tbody></table></div>
     </div>
-
-    <!-- Barcha -->
     <div class="section" id="sec-all">
       <div class="page-header"><div><h2>Barcha bronlar</h2></div></div>
       <div class="filter-tabs">
@@ -214,26 +193,12 @@ tr:hover td { background:#fafafa; }
         <button class="ftab" onclick="filterAll('confirmed',this)">Tasdiqlangan</button>
         <button class="ftab" onclick="filterAll('cancelled',this)">Bekor qilingan</button>
       </div>
-      <div class="card">
-        <table>
-          <thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead>
-          <tbody id="allTbody"></tbody>
-        </table>
-      </div>
+      <div class="card"><table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="allTbody"></tbody></table></div>
     </div>
-
-    <!-- Menyu -->
     <div class="section" id="sec-menu">
-      <div class="page-header">
-        <div><h2>Menyu boshqaruvi</h2><p>Taomlar va narxlarni boshqaring</p></div>
-        <button class="add-btn" onclick="openMenuModal()">+ Taom qo'shish</button>
-      </div>
-      <div class="menu-grid" id="menuGrid">
-        <div class="empty-state"><div class="ei">🍜</div>Menyu bo'sh</div>
-      </div>
+      <div class="page-header"><div><h2>Menyu boshqaruvi</h2><p>Taomlar va narxlarni boshqaring</p></div><button class="add-btn" onclick="openMenuModal()">+ Taom qo'shish</button></div>
+      <div class="menu-grid" id="menuGrid"><div class="empty-state"><div class="ei">🍜</div>Menyu bo'sh</div></div>
     </div>
-
-    <!-- Restoran -->
     <div class="section" id="sec-restaurant">
       <div class="page-header"><div><h2>🏪 Restoran ma'lumotlari</h2></div></div>
       <div class="card" style="padding:24px;">
@@ -242,15 +207,9 @@ tr:hover td { background:#fafafa; }
             <div class="fg"><label>Restoran nomi *</label><input type="text" id="restoName" placeholder="Masalan: Plov Center"></div>
             <div class="fg"><label>Manzil *</label><input type="text" id="restoAddress" placeholder="Ko'cha, tuman, shahar"></div>
             <div class="fg"><label>Telefon</label><input type="text" id="restoPhone" placeholder="+998 90 123 45 67"></div>
-            <div class="fg"><label>Narx kategoriyasi</label>
-              <select id="restoPriceCategory">
-                <option value="$">$ — Arzon</option>
-                <option value="$$" selected>$$ — O'rta</option>
-                <option value="$$$">$$$ — Qimmat</option>
-              </select>
-            </div>
-            <div class="fg"><label>Sig'im (stol/o'rindiq soni)</label><input type="number" id="restoCapacity" placeholder="50" value="50"></div>
-            <div class="fg"><label>Oshxona turi</label><input type="text" id="restoCuisine" placeholder="Uzbek, Italian, Asian..."></div>
+            <div class="fg"><label>Narx kategoriyasi</label><select id="restoPriceCategory"><option value="$">$ — Arzon</option><option value="$$" selected>$$ — O'rta</option><option value="$$$">$$$ — Qimmat</option></select></div>
+            <div class="fg"><label>Sig'im</label><input type="number" id="restoCapacity" placeholder="50" value="50"></div>
+            <div class="fg"><label>Oshxona turi</label><input type="text" id="restoCuisine" placeholder="Uzbek, Italian..."></div>
             <div class="fg"><label>Rasm URL</label><input type="text" id="restoImage" placeholder="https://..."></div>
             <div class="fg"><label>Ish vaqti</label><input type="text" id="restoHours" placeholder="10:00 — 22:00"></div>
           </div>
@@ -261,493 +220,246 @@ tr:hover td { background:#fafafa; }
       </div>
     </div>
 
-    <!-- Premium -->
+    <!-- LOKATSIYA -->
+    <div class="section" id="sec-location">
+      <div class="page-header"><div><h2>📍 Restoran joylashuvi</h2><p>Mijozlar restoraningizni xaritada topsin</p></div></div>
+      <div class="loc-tip">💡 Xaritada <b>restoran joylashgan joyni bosing</b> — pin qo'yiladi. Keyin "Saqlash" tugmasini bosing.</div>
+      <div id="locStatusSaved" class="loc-status-ok" style="display:none">✅ Lokatsiya saqlangan! Mijozlar endi restoraningizni xaritada ko'ra oladi.</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <button class="loc-my-btn" onclick="useMyLocation()">📡 Joylashuvimni aniqlash</button>
+        <button class="loc-clear-btn" onclick="clearLocation()">🗑 Tozalash</button>
+      </div>
+      <div id="locationMap"></div>
+      <div class="loc-coords">
+        <div class="loc-coord-item"><div class="loc-coord-label">Kenglik (Latitude)</div><div class="loc-coord-val" id="locLat"><span style="color:#94a3b8;font-style:italic">Belgilanmagan</span></div></div>
+        <div class="loc-coord-item"><div class="loc-coord-label">Uzunlik (Longitude)</div><div class="loc-coord-val" id="locLng"><span style="color:#94a3b8;font-style:italic">Belgilanmagan</span></div></div>
+        <div class="loc-coord-item" style="margin-left:auto;"><div class="loc-coord-label">Google Maps</div><div id="locGmapsLink" style="font-size:13px;color:#94a3b8">—</div></div>
+      </div>
+      <button class="loc-save-btn" id="locSaveBtn" onclick="saveLocation()" disabled>💾 Lokatsiyani saqlash</button>
+      <div id="locMsg" style="margin-top:10px;font-size:14px;"></div>
+    </div>
+
     <div class="section" id="sec-premium">
       <div class="page-header"><div><h2>💎 Premium</h2><p>Restoraningizni ko'proq mijozlarga ko'rsating</p></div></div>
       <div id="premiumStatus"></div>
       <div class="premium-card">
         <h3>💎 Premium obuna</h3>
-        <p>Premium restoranlar ro'yxatda eng yuqorida ko'rinadi, premium badge oladi va ko'proq mijoz jalb qiladi.</p>
-        <div style="margin-bottom:16px;">
-          <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:8px;">
-            ✅ Ro'yxatda eng yuqorida ko'rinish<br>
-            ✅ 💎 Premium badge<br>
-            ✅ Ko'proq mijoz jalb qilish
-          </div>
-        </div>
+        <p>Premium restoranlar ro'yxatda eng yuqorida ko'rinadi va ko'proq mijoz jalb qiladi.</p>
+        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:16px;">✅ Ro'yxatda eng yuqorida<br>✅ 💎 Premium badge<br>✅ Ko'proq mijoz</div>
         <div class="premium-btns">
-          <button class="premium-btn premium-btn-monthly" onclick="activatePremium('monthly')">
-            Oylik — $99
-          </button>
-          <button class="premium-btn premium-btn-yearly" onclick="activatePremium('yearly')">
-            Yillik — $990 (2 oy bepul!)
-          </button>
+          <button class="premium-btn premium-btn-monthly" onclick="activatePremium('monthly')">Oylik — $99</button>
+          <button class="premium-btn premium-btn-yearly" onclick="activatePremium('yearly')">Yillik — $990 (2 oy bepul!)</button>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- Taom modal -->
 <div class="modal-overlay" id="menuModal">
   <div class="modal">
     <h3>Taom qo'shish</h3>
     <div class="fg"><label>Nomi *</label><input type="text" id="mName" placeholder="Masalan: Osh"></div>
-    <div class="fg"><label>Kategoriya</label>
-      <select id="mCat">
-        <option>Asosiy taomlar</option><option>Salatlar</option>
-        <option>Ichimliklar</option><option>Desertlar</option>
-        <option>Sho'rvalar</option><option>Lavash / Non</option>
-      </select>
-    </div>
+    <div class="fg"><label>Kategoriya</label><select id="mCat"><option>Asosiy taomlar</option><option>Salatlar</option><option>Ichimliklar</option><option>Desertlar</option><option>Sho'rvalar</option><option>Lavash / Non</option></select></div>
     <div class="fg"><label>Narx (so'm) *</label><input type="number" id="mPrice" placeholder="50000"></div>
     <div class="fg"><label>Tavsif</label><textarea id="mDesc" rows="2" style="resize:none;" placeholder="Qisqacha tavsif..."></textarea></div>
-    <div class="fg"><label>Rasm URL</label><input type="text" id="mImage" placeholder="https://..."><div id="mImagePreview" style="margin-top:8px;display:none;"><img id="mPreviewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;" /></div></div>
-    <div class="modal-btns">
-      <button class="btn-save" onclick="saveMenuItem()">Saqlash</button>
-      <button class="btn-cls" onclick="closeMenuModal()">Bekor</button>
-    </div>
+    <div class="fg"><label>Rasm URL</label><input type="text" id="mImage" placeholder="https://..."><div id="mImagePreview" style="margin-top:8px;display:none;"><img id="mPreviewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;"/></div></div>
+    <div class="modal-btns"><button class="btn-save" onclick="saveMenuItem()">Saqlash</button><button class="btn-cls" onclick="closeMenuModal()">Bekor</button></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://onetableuz-production.up.railway.app/api';
-let token = localStorage.getItem('ownerToken');
-let allRes = [], curFilter = 'all', restoId = null, ownerData = null;
+const API='https://onetableuz-production.up.railway.app/api';
+let token=localStorage.getItem('ownerToken');
+let allRes=[],curFilter='all',restoId=null,ownerData=null;
+let locMap=null,locMarker=null,locLat=null,locLng=null;
 
-window.onload = () => {
-  document.getElementById('todayDate').textContent =
-    new Date().toLocaleDateString('uz-UZ', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  if (token) showApp();
+window.onload=()=>{
+  document.getElementById('todayDate').textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if(token)showApp();
 };
 
-function toast(msg, ms=2500) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), ms);
+function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),ms);}
+function showLogin(){document.getElementById('registerPage').style.display='none';document.getElementById('loginPage').style.display='flex';}
+function showRegister(){document.getElementById('loginPage').style.display='none';document.getElementById('registerPage').style.display='flex';}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPassword').value;
+  const btn=document.getElementById('loginBtn');
+  const err=document.getElementById('loginErr');
+  err.style.display='none';
+  if(!email||!pass){err.textContent='Email va parol kiriting';err.style.display='block';return;}
+  btn.innerHTML='<span class="spinner"></span>Kirish...';btn.disabled=true;
+  try{
+    const r=await fetch(`${API}/owner/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const d=await r.json();
+    if(d.token){token=d.token;localStorage.setItem('ownerToken',token);ownerData=d.owner;restoId=d.owner.restaurant_id;showApp();}
+    else{err.textContent=d.error||'Xatolik';err.style.display='block';btn.textContent='Kirish';btn.disabled=false;}
+  }catch(e){err.textContent='Server xatoligi';err.style.display='block';btn.textContent='Kirish';btn.disabled=false;}
 }
 
-// ── Auth ─────────────────────────────────────────────────────
-function showLogin() {
-  document.getElementById('registerPage').style.display = 'none';
-  document.getElementById('loginPage').style.display = 'flex';
+async function doRegister(){
+  const full_name=document.getElementById('regName').value.trim();
+  const phone=document.getElementById('regPhone').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const password=document.getElementById('regPassword').value;
+  const btn=document.getElementById('regBtn');
+  const err=document.getElementById('regErr');
+  err.style.display='none';
+  if(!full_name||!email||!password){err.textContent="Majburiy maydonlarni to'ldiring";err.style.display='block';return;}
+  if(password.length<6){err.textContent="Parol kamida 6 ta belgi bo'lishi kerak";err.style.display='block';return;}
+  btn.innerHTML="<span class='spinner'></span>Ro'yxatdan o'tilmoqda...";btn.disabled=true;
+  try{
+    const r=await fetch(`${API}/owner/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,password})});
+    const d=await r.json();
+    if(d.token){token=d.token;localStorage.setItem('ownerToken',token);ownerData=d.owner;restoId=d.owner.restaurant_id;showApp();toast("✅ Xush kelibsiz! Endi restoran ma'lumotlarini kiriting.");setTimeout(()=>{document.querySelector("[onclick=\"showSec('restaurant',this)\"]").click();},500);}
+    else{err.textContent=d.error||'Xatolik';err.style.display='block';btn.textContent="Ro'yxatdan o'tish";btn.disabled=false;}
+  }catch(e){err.textContent='Server xatoligi';err.style.display='block';btn.textContent="Ro'yxatdan o'tish";btn.disabled=false;}
 }
 
-function showRegister() {
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('registerPage').style.display = 'flex';
-}
+function doLogout(){localStorage.removeItem('ownerToken');token=null;restoId=null;ownerData=null;document.getElementById('appPage').style.display='none';document.getElementById('loginPage').style.display='flex';}
+function showApp(){document.getElementById('loginPage').style.display='none';document.getElementById('registerPage').style.display='none';document.getElementById('appPage').style.display='flex';try{const p=JSON.parse(atob(token.split('.')[1]));restoId=p.restaurant_id;}catch(e){}loadAll();}
 
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
-  const btn = document.getElementById('loginBtn');
-  const err = document.getElementById('loginErr');
-  err.style.display = 'none';
-  if (!email || !pass) { err.textContent='Email va parol kiriting'; err.style.display='block'; return; }
-  btn.innerHTML = '<span class="spinner"></span>Kirish...'; btn.disabled = true;
-  try {
-    const r = await fetch(`${API}/owner/login`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email, password: pass})
-    });
-    const d = await r.json();
-    if (d.token) {
-      token = d.token;
-      localStorage.setItem('ownerToken', token);
-      ownerData = d.owner;
-      restoId = d.owner.restaurant_id;
-      showApp();
-    } else {
-      err.textContent = d.error || 'Xatolik'; err.style.display='block';
-      btn.textContent='Kirish'; btn.disabled=false;
-    }
-  } catch(e) {
-    err.textContent='Server xatoligi'; err.style.display='block';
-    btn.textContent='Kirish'; btn.disabled=false;
-  }
-}
-
-async function doRegister() {
-  const full_name = document.getElementById('regName').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const btn = document.getElementById('regBtn');
-  const err = document.getElementById('regErr');
-  err.style.display = 'none';
-  if (!full_name || !email || !password) { err.textContent='Majburiy maydonlarni to\'ldiring'; err.style.display='block'; return; }
-  if (password.length < 6) { err.textContent='Parol kamida 6 ta belgi bo\'lishi kerak'; err.style.display='block'; return; }
-  btn.innerHTML = '<span class="spinner"></span>Ro\'yxatdan o\'tilmoqda...'; btn.disabled = true;
-  try {
-    const r = await fetch(`${API}/owner/register`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({full_name, phone, email, password})
-    });
-    const d = await r.json();
-    if (d.token) {
-      token = d.token;
-      localStorage.setItem('ownerToken', token);
-      ownerData = d.owner;
-      restoId = d.owner.restaurant_id;
-      showApp();
-      toast('✅ Xush kelibsiz! Endi restoran ma\'lumotlarini kiriting.');
-      setTimeout(() => {
-        document.querySelector('[onclick="showSec(\'restaurant\',this)"]').click();
-      }, 500);
-    } else {
-      err.textContent = d.error || 'Xatolik'; err.style.display='block';
-      btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
-    }
-  } catch(e) {
-    err.textContent='Server xatoligi'; err.style.display='block';
-    btn.textContent='Ro\'yxatdan o\'tish'; btn.disabled=false;
-  }
-}
-
-function doLogout() {
-  localStorage.removeItem('ownerToken');
-  token = null; restoId = null; ownerData = null;
-  document.getElementById('appPage').style.display = 'none';
-  document.getElementById('loginPage').style.display = 'flex';
-}
-
-function showApp() {
-  document.getElementById('loginPage').style.display = 'none';
-  document.getElementById('registerPage').style.display = 'none';
-  document.getElementById('appPage').style.display = 'flex';
-  try { const p = JSON.parse(atob(token.split('.')[1])); restoId = p.restaurant_id; } catch(e) {}
-  loadAll();
-}
-
-// ── Navigation ───────────────────────────────────────────────
-function showSec(name, btn) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  document.getElementById('sec-' + name).classList.add('active');
+function showSec(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
-  if (name === 'menu') loadMenu();
-  if (name === 'restaurant') loadRestaurant();
-  if (name === 'premium') loadPremium();
+  if(name==='menu')loadMenu();
+  if(name==='restaurant')loadRestaurant();
+  if(name==='premium')loadPremium();
+  if(name==='location')initLocationMap();
 }
 
-// ── Data ─────────────────────────────────────────────────────
-async function loadAll() {
-  await Promise.all([loadReservations(), loadRestaurantName()]);
+async function loadAll(){await Promise.all([loadReservations(),loadRestaurantName()]);}
+
+async function loadRestaurantName(){
+  if(!restoId){document.getElementById('noRestoWarning').style.display='block';return;}
+  try{const r=await fetch(`${API}/restaurants/${restoId}`);const d=await r.json();if(d.name){document.getElementById('sidebarName').textContent=d.name;document.getElementById('noRestoWarning').style.display='none';}}catch(e){}
 }
 
-async function loadRestaurantName() {
-  if (!restoId) {
-    document.getElementById('noRestoWarning').style.display = 'block';
-    return;
+async function loadReservations(){
+  if(!restoId)return;
+  try{
+    const r=await fetch(`${API}/owner/reservations`,{headers:{Authorization:`Bearer ${token}`}});
+    allRes=await r.json();if(!Array.isArray(allRes))allRes=[];
+    const today=new Date().toISOString().split('T')[0];
+    const todayRes=allRes.filter(r=>String(r.date).startsWith(today));
+    const pendingRes=allRes.filter(r=>r.status==='pending');
+    const confirmedRes=allRes.filter(r=>r.status==='confirmed');
+    document.getElementById('st-today').textContent=todayRes.length;
+    document.getElementById('st-pending').textContent=pendingRes.length;
+    document.getElementById('st-confirmed').textContent=confirmedRes.length;
+    document.getElementById('st-total').textContent=allRes.length;
+    document.getElementById('pendingCount').textContent=pendingRes.length;
+    document.getElementById('todayBadge').textContent=todayRes.length+' ta';
+    renderPending();renderToday();renderAll();
+  }catch(e){}
+}
+
+const nameOf=r=>(`${r.first_name||''} ${r.last_name||''}`).trim()||"Noma'lum";
+const timeOf=r=>(r.time||'').substring(0,5);
+function statusBadge(s){const cls={pending:'badge-pending',confirmed:'badge-confirmed',cancelled:'badge-cancelled'};const txt={pending:'⏳ Kutilmoqda',confirmed:'✅ Tasdiqlangan',cancelled:'❌ Bekor'};return `<span class="badge ${cls[s]||'badge-pending'}">${txt[s]||s}</span>`;}
+function actionBtns(id,status){if(status==='cancelled')return '<span style="color:#94a3b8">—</span>';if(status==='confirmed')return `<button class="btn-reject" onclick="updateStatus(${id},'cancelled')">Bekor qilish</button>`;return `<button class="btn-confirm" onclick="updateStatus(${id},'confirmed')">✅ Tasdiqlash</button><button class="btn-reject" onclick="updateStatus(${id},'cancelled')">❌ Rad</button>`;}
+function emptyRow(cols,msg,icon='📭'){return `<tr><td colspan="${cols}"><div class="empty-state"><div class="ei">${icon}</div>${msg}</div></td></tr>`;}
+
+function renderPending(){const list=allRes.filter(r=>r.status==='pending');const tb=document.getElementById('pendingTbody');if(!list.length){tb.innerHTML=emptyRow(6,"Kutilayotgan bron yo'q",'✅');return;}tb.innerHTML=list.map(r=>`<tr><td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td><td>${r.date}</td><td>${timeOf(r)}</td><td>👥 ${r.guests} kishi</td><td>${r.comment||'—'}</td><td>${actionBtns(r.id,r.status)}</td></tr>`).join('');}
+function renderToday(){const today=new Date().toISOString().split('T')[0];const list=allRes.filter(r=>String(r.date).startsWith(today)).sort((a,b)=>a.time>b.time?1:-1);const tb=document.getElementById('todayTbody');if(!list.length){tb.innerHTML=emptyRow(6,"Bugun bron yo'q");return;}tb.innerHTML=list.map(r=>`<tr><td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td><td>${timeOf(r)}</td><td>👥 ${r.guests} kishi</td><td>${r.comment||'—'}</td><td>${statusBadge(r.status)}</td><td>${actionBtns(r.id,r.status)}</td></tr>`).join('');}
+function filterAll(f,btn){curFilter=f;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAll();}
+function renderAll(){const list=curFilter==='all'?allRes:allRes.filter(r=>r.status===curFilter);const tb=document.getElementById('allTbody');if(!list.length){tb.innerHTML=emptyRow(7,'Bron topilmadi');return;}tb.innerHTML=list.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>`<tr><td><b>${nameOf(r)}</b></td><td>${r.date}</td><td>${timeOf(r)}</td><td>👥 ${r.guests}</td><td>${r.comment||'—'}</td><td>${statusBadge(r.status)}</td><td>${actionBtns(r.id,r.status)}</td></tr>`).join('');}
+
+async function updateStatus(id,status){
+  try{const r=await fetch(`${API}/owner/reservations/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({status})});if(r.ok){toast(status==='confirmed'?'✅ Tasdiqlandi! Foydalanuvchiga xabar ketdi.':'❌ Bekor qilindi.');loadReservations();}else toast('❌ Xatolik yuz berdi');}catch(e){toast('❌ Server xatoligi');}
+}
+
+async function loadMenu(){
+  try{const r=await fetch(`${API}/owner/menu`,{headers:{Authorization:`Bearer ${token}`}});const items=await r.json();const g=document.getElementById('menuGrid');if(!items.length){g.innerHTML="<div class='empty-state'><div class='ei'>🍜</div>Menyu bo'sh. Taom qo'shing!</div>";return;}g.innerHTML=items.map(item=>`<div class="menu-item" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;">${item.image_url?`<img src="${item.image_url}" style="width:100%;height:160px;object-fit:cover;" onerror="this.style.display='none'"/>`:''}<div style="padding:14px;display:flex;justify-content:space-between;align-items:center;"><div><div class="menu-name">${item.name}</div><div class="menu-cat">${item.category||''}</div><div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}</div><button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}" onclick="toggleMenu(${item.id},${!item.is_available})">${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}</button></div></div>`).join('');}catch(e){}
+}
+
+function openMenuModal(){document.getElementById('menuModal').classList.add('open');}
+function closeMenuModal(){document.getElementById('menuModal').classList.remove('open');}
+document.addEventListener('DOMContentLoaded',()=>{document.getElementById('mImage').addEventListener('input',function(){const preview=document.getElementById('mImagePreview');const img=document.getElementById('mPreviewImg');if(this.value.trim()){img.src=this.value.trim();preview.style.display='block';}else{preview.style.display='none';}});});
+
+async function saveMenuItem(){
+  const name=document.getElementById('mName').value.trim();const category=document.getElementById('mCat').value;const price=document.getElementById('mPrice').value;const description=document.getElementById('mDesc').value;const image_url=document.getElementById('mImage').value.trim();
+  if(!name||!price){toast('⚠️ Nom va narx kerak');return;}
+  try{const r=await fetch(`${API}/owner/menu`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,category,price:parseInt(price),description,image_url})});if(r.ok){toast("✅ Taom qo'shildi!");closeMenuModal();document.getElementById('mName').value='';document.getElementById('mPrice').value='';document.getElementById('mDesc').value='';document.getElementById('mImage').value='';document.getElementById('mImagePreview').style.display='none';loadMenu();}else toast('❌ Xatolik');}catch(e){toast('❌ Server xatoligi');}
+}
+
+async function toggleMenu(id,available){try{await fetch(`${API}/owner/menu/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({available})});loadMenu();}catch(e){}}
+
+async function loadRestaurant(){
+  if(!restoId)return;
+  try{const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(d){document.getElementById('restoName').value=d.name||'';document.getElementById('restoAddress').value=d.address||'';document.getElementById('restoPhone').value=d.phone||'';document.getElementById('restoPriceCategory').value=d.price_category||'$$';document.getElementById('restoCapacity').value=d.capacity||50;document.getElementById('restoCuisine').value=Array.isArray(d.cuisine)?d.cuisine.join(', '):(d.cuisine||'');document.getElementById('restoImage').value=d.image_url||'';document.getElementById('restoDesc').value=d.description||'';document.getElementById('restoHours').value=d.working_hours||'10:00 — 22:00';document.getElementById('restoSaveBtn').textContent='💾 Yangilash';}}catch(e){}
+}
+
+async function saveRestaurant(){
+  const name=document.getElementById('restoName').value.trim();const address=document.getElementById('restoAddress').value.trim();if(!name||!address){toast('⚠️ Nom va manzil kiritish shart!');return;}
+  const body={name,address,phone:document.getElementById('restoPhone').value,price_category:document.getElementById('restoPriceCategory').value,capacity:parseInt(document.getElementById('restoCapacity').value)||50,cuisine:document.getElementById('restoCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),image_url:document.getElementById('restoImage').value,description:document.getElementById('restoDesc').value,working_hours:document.getElementById('restoHours').value};
+  const msg=document.getElementById('restoMsg');
+  try{let r;if(restoId){r=await fetch(`${API}/owner/restaurant`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}else{r=await fetch(`${API}/owner/restaurants`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}const d=await r.json();if(r.ok){if(!restoId)restoId=d.id;msg.innerHTML='<span style="color:#059669">✅ Muvaffaqiyatli saqlandi!</span>';document.getElementById('sidebarName').textContent=name;document.getElementById('noRestoWarning').style.display='none';toast('✅ Restoran saqlandi!');}else{msg.innerHTML=`<span style="color:#dc2626">❌ ${d.error||'Xatolik'}</span>`;}}catch(e){msg.innerHTML='<span style="color:#dc2626">❌ Server xatoligi</span>';}
+}
+
+// ── LOKATSIYA ─────────────────────────────────────────
+async function initLocationMap(){
+  await new Promise(r=>setTimeout(r,150));
+  if(locMap){locMap.invalidateSize();return;}
+  let startLat=41.2995,startLng=69.2401,hasSaved=false;
+  if(restoId){
+    try{const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(d&&d.latitude&&d.longitude){startLat=parseFloat(d.latitude);startLng=parseFloat(d.longitude);hasSaved=true;}}catch(e){}
   }
-  try {
-    const r = await fetch(`${API}/restaurants/${restoId}`);
-    const d = await r.json();
-    if (d.name) {
-      document.getElementById('sidebarName').textContent = d.name;
-      document.getElementById('noRestoWarning').style.display = 'none';
-    }
-  } catch(e) {}
+  locMap=L.map('locationMap').setView([startLat,startLng],13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(locMap);
+  if(hasSaved){setPin(startLat,startLng);document.getElementById('locStatusSaved').style.display='block';}
+  locMap.on('click',function(e){setPin(e.latlng.lat,e.latlng.lng);});
 }
 
-async function loadReservations() {
-  if (!restoId) return;
-  try {
-    const r = await fetch(`${API}/owner/reservations`, {headers:{Authorization:`Bearer ${token}`}});
-    allRes = await r.json();
-    if (!Array.isArray(allRes)) allRes = [];
-
-    const today = new Date().toISOString().split('T')[0];
-    const todayRes = allRes.filter(r => String(r.date).startsWith(today));
-    const pendingRes = allRes.filter(r => r.status === 'pending');
-    const confirmedRes = allRes.filter(r => r.status === 'confirmed');
-
-    document.getElementById('st-today').textContent = todayRes.length;
-    document.getElementById('st-pending').textContent = pendingRes.length;
-    document.getElementById('st-confirmed').textContent = confirmedRes.length;
-    document.getElementById('st-total').textContent = allRes.length;
-    document.getElementById('pendingCount').textContent = pendingRes.length;
-    document.getElementById('todayBadge').textContent = todayRes.length + ' ta';
-
-    renderPending();
-    renderToday();
-    renderAll();
-  } catch(e) {}
+function setPin(lat,lng){
+  locLat=parseFloat(lat.toFixed(6));locLng=parseFloat(lng.toFixed(6));
+  if(locMarker)locMap.removeLayer(locMarker);
+  locMarker=L.marker([locLat,locLng],{icon:L.divIcon({html:`<div style="background:#ef4444;width:22px;height:22px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>`,className:'',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(locMap).bindPopup(`📍 Restoran: ${locLat}, ${locLng}`).openPopup();
+  document.getElementById('locLat').textContent=locLat;
+  document.getElementById('locLng').textContent=locLng;
+  document.getElementById('locSaveBtn').disabled=false;
+  document.getElementById('locGmapsLink').innerHTML=`<a href="https://maps.google.com/?q=${locLat},${locLng}" target="_blank" style="color:#3b82f6">Google Maps da ko'rish →</a>`;
 }
 
-// ── Render ───────────────────────────────────────────────────
-const nameOf = r => (`${r.first_name||''} ${r.last_name||''}`).trim() || 'Noma\'lum';
-const timeOf = r => (r.time||'').substring(0,5);
-
-function statusBadge(s) {
-  const cls = {pending:'badge-pending',confirmed:'badge-confirmed',cancelled:'badge-cancelled'};
-  const txt = {pending:'⏳ Kutilmoqda',confirmed:'✅ Tasdiqlangan',cancelled:'❌ Bekor'};
-  return `<span class="badge ${cls[s]||'badge-pending'}">${txt[s]||s}</span>`;
+function useMyLocation(){
+  if(!navigator.geolocation){toast("⚠️ Brauzer geolokatsiyani qo'llab-quvvatlamaydi");return;}
+  toast('📡 Joylashuv aniqlanmoqda...');
+  navigator.geolocation.getCurrentPosition(pos=>{const lat=pos.coords.latitude;const lng=pos.coords.longitude;locMap.setView([lat,lng],16);setPin(lat,lng);toast('✅ Joylashuv aniqlandi!');},()=>toast('⚠️ Joylashuvni aniqlashda xatolik.'));
 }
 
-function actionBtns(id, status) {
-  if (status === 'cancelled') return '<span style="color:#94a3b8">—</span>';
-  if (status === 'confirmed')
-    return `<button class="btn-reject" onclick="updateStatus(${id},'cancelled')">Bekor qilish</button>`;
-  return `<button class="btn-confirm" onclick="updateStatus(${id},'confirmed')">✅ Tasdiqlash</button>
-          <button class="btn-reject" onclick="updateStatus(${id},'cancelled')">❌ Rad</button>`;
+function clearLocation(){
+  if(locMarker){locMap.removeLayer(locMarker);locMarker=null;}locLat=null;locLng=null;
+  document.getElementById('locLat').innerHTML='<span style="color:#94a3b8;font-style:italic">Belgilanmagan</span>';
+  document.getElementById('locLng').innerHTML='<span style="color:#94a3b8;font-style:italic">Belgilanmagan</span>';
+  document.getElementById('locGmapsLink').innerHTML='—';
+  document.getElementById('locSaveBtn').disabled=true;
+  document.getElementById('locStatusSaved').style.display='none';
 }
 
-function emptyRow(cols, msg, icon='📭') {
-  return `<tr><td colspan="${cols}"><div class="empty-state"><div class="ei">${icon}</div>${msg}</div></td></tr>`;
+async function saveLocation(){
+  if(!locLat||!locLng){toast("⚠️ Avval xaritada joyni belgilang");return;}
+  if(!restoId){toast("⚠️ Avval restoran ma'lumotlarini saqlang");return;}
+  const btn=document.getElementById('locSaveBtn');btn.textContent='Saqlanmoqda...';btn.disabled=true;
+  try{
+    const r=await fetch(`${API}/owner/restaurant/location`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({latitude:locLat,longitude:locLng})});
+    if(r.ok){toast('✅ Lokatsiya saqlandi!');document.getElementById('locStatusSaved').style.display='block';document.getElementById('locMsg').innerHTML='<span style="color:#059669">✅ Saqlandi! Mijozlar endi restoraningizni xaritada topa oladi.</span>';}
+    else{const d=await r.json();toast('❌ '+(d.error||'Xatolik'));}
+  }catch(e){toast('❌ Server xatoligi');}finally{btn.textContent='💾 Lokatsiyani saqlash';btn.disabled=false;}
 }
 
-function renderPending() {
-  const list = allRes.filter(r => r.status === 'pending');
-  const tb = document.getElementById('pendingTbody');
-  if (!list.length) { tb.innerHTML = emptyRow(6,'Kutilayotgan bron yo\'q','✅'); return; }
-  tb.innerHTML = list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
-    <td>${r.date}</td><td>${timeOf(r)}</td>
-    <td>👥 ${r.guests} kishi</td>
-    <td>${r.comment||'—'}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
+async function loadPremium(){
+  if(!restoId)return;
+  try{const r=await fetch(`${API}/owner/premium`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();const el=document.getElementById('premiumStatus');if(d.is_premium&&d.subscription){const exp=new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');el.innerHTML=`<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#059669">💎 Premium faol!</b><p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p><button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">Bekor qilish</button></div>`;}else{el.innerHTML='<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';}}catch(e){}
 }
 
-function renderToday() {
-  const today = new Date().toISOString().split('T')[0];
-  const list = allRes.filter(r => String(r.date).startsWith(today)).sort((a,b)=>a.time>b.time?1:-1);
-  const tb = document.getElementById('todayTbody');
-  if (!list.length) { tb.innerHTML = emptyRow(6,'Bugun bron yo\'q'); return; }
-  tb.innerHTML = list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
-    <td>${timeOf(r)}</td>
-    <td>👥 ${r.guests} kishi</td>
-    <td>${r.comment||'—'}</td>
-    <td>${statusBadge(r.status)}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
-}
+async function activatePremium(plan){try{const r=await fetch(`${API}/owner/premium/activate`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({plan})});if(r.ok){toast('💎 Premium faollashtirildi!');loadPremium();}else toast('❌ Xatolik');}catch(e){toast('❌ Server xatoligi');}}
+async function cancelPremium(){if(!confirm('Premiumni bekor qilasizmi?'))return;try{const r=await fetch(`${API}/owner/premium`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast('Premium bekor qilindi');loadPremium();}}catch(e){}}
 
-function filterAll(f, btn) {
-  curFilter = f;
-  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderAll();
-}
-
-function renderAll() {
-  const list = curFilter === 'all' ? allRes : allRes.filter(r=>r.status===curFilter);
-  const tb = document.getElementById('allTbody');
-  if (!list.length) { tb.innerHTML = emptyRow(7,'Bron topilmadi'); return; }
-  tb.innerHTML = list.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>`<tr>
-    <td><b>${nameOf(r)}</b></td>
-    <td>${r.date}</td><td>${timeOf(r)}</td>
-    <td>👥 ${r.guests}</td>
-    <td>${r.comment||'—'}</td>
-    <td>${statusBadge(r.status)}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
-}
-
-// ── Status update ────────────────────────────────────────────
-async function updateStatus(id, status) {
-  try {
-    const r = await fetch(`${API}/owner/reservations/${id}`, {
-      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({status})
-    });
-    if (r.ok) {
-      toast(status==='confirmed' ? '✅ Tasdiqlandi! Foydalanuvchiga xabar ketdi.' : '❌ Bekor qilindi.');
-      loadReservations();
-    } else toast('❌ Xatolik yuz berdi');
-  } catch(e) { toast('❌ Server xatoligi'); }
-}
-
-// ── Menu ─────────────────────────────────────────────────────
-async function loadMenu() {
-  try {
-    const r = await fetch(`${API}/owner/menu`, {headers:{Authorization:`Bearer ${token}`}});
-    const items = await r.json();
-    const g = document.getElementById('menuGrid');
-    if (!items.length) { g.innerHTML='<div class="empty-state"><div class="ei">🍜</div>Menyu bo\'sh. Taom qo\'shing!</div>'; return; }
-    g.innerHTML = items.map(item=>`
-      <div class="menu-item" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;">
-        ${item.image_url ? `<img src="${item.image_url}" style="width:100%;height:160px;object-fit:cover;" onerror="this.style.display='none'" />` : ''}
-        <div style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div class="menu-name">${item.name}</div>
-            <div class="menu-cat">${item.category||''}</div>
-            <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
-            ${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}
-          </div>
-          <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}"
-                  onclick="toggleMenu(${item.id},${!item.is_available})">
-            ${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}
-          </button>
-        </div>
-      </div>`).join('');
-  } catch(e) {}
-}
-
-function openMenuModal() { document.getElementById('menuModal').classList.add('open'); }
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('mImage').addEventListener('input', function() {
-    const preview = document.getElementById('mImagePreview');
-    const img = document.getElementById('mPreviewImg');
-    if (this.value.trim()) { img.src = this.value.trim(); preview.style.display = 'block'; }
-    else { preview.style.display = 'none'; }
-  });
-});
-function closeMenuModal() { document.getElementById('menuModal').classList.remove('open'); }
-
-async function saveMenuItem() {
-  const name = document.getElementById('mName').value.trim();
-  const category = document.getElementById('mCat').value;
-  const price = document.getElementById('mPrice').value;
-  const description = document.getElementById('mDesc').value;
-  const image_url = document.getElementById('mImage').value.trim();
-  if (!name || !price) { toast('⚠️ Nom va narx kerak'); return; }
-  try {
-    const r = await fetch(`${API}/owner/menu`, {
-      method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({name,category,price:parseInt(price),description,image_url})
-    });
-    if (r.ok) {
-      toast('✅ Taom qo\'shildi!'); closeMenuModal();
-      document.getElementById('mName').value='';
-      document.getElementById('mPrice').value='';
-      document.getElementById('mDesc').value='';
-      document.getElementById('mImage').value='';
-      document.getElementById('mImagePreview').style.display='none';
-      loadMenu();
-    } else toast('❌ Xatolik');
-  } catch(e) { toast('❌ Server xatoligi'); }
-}
-
-async function toggleMenu(id, available) {
-  try {
-    await fetch(`${API}/owner/menu/${id}`, {
-      method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({available})
-    });
-    loadMenu();
-  } catch(e) {}
-}
-
-// ── Restaurant ───────────────────────────────────────────────
-async function loadRestaurant() {
-  if (!restoId) return;
-  try {
-    const r = await fetch(`${API}/owner/restaurant`, {headers:{Authorization:`Bearer ${token}`}});
-    const d = await r.json();
-    if (d) {
-      document.getElementById('restoName').value = d.name||'';
-      document.getElementById('restoAddress').value = d.address||'';
-      document.getElementById('restoPhone').value = d.phone||'';
-      document.getElementById('restoPriceCategory').value = d.price_category||'$$';
-      document.getElementById('restoCapacity').value = d.capacity||50;
-      document.getElementById('restoCuisine').value = Array.isArray(d.cuisine)?d.cuisine.join(', '):(d.cuisine||'');
-      document.getElementById('restoImage').value = d.image_url||'';
-      document.getElementById('restoDesc').value = d.description||'';
-      document.getElementById('restoHours').value = d.working_hours||'10:00 — 22:00';
-      document.getElementById('restoSaveBtn').textContent = '💾 Yangilash';
-    }
-  } catch(e) {}
-}
-
-async function saveRestaurant() {
-  const name = document.getElementById('restoName').value.trim();
-  const address = document.getElementById('restoAddress').value.trim();
-  if (!name || !address) { toast('⚠️ Nom va manzil kiritish shart!'); return; }
-
-  const body = {
-    name, address,
-    phone: document.getElementById('restoPhone').value,
-    price_category: document.getElementById('restoPriceCategory').value,
-    capacity: parseInt(document.getElementById('restoCapacity').value)||50,
-    cuisine: document.getElementById('restoCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),
-    image_url: document.getElementById('restoImage').value,
-    description: document.getElementById('restoDesc').value,
-    working_hours: document.getElementById('restoHours').value
-  };
-
-  const msg = document.getElementById('restoMsg');
-  try {
-    let r;
-    if (restoId) {
-      r = await fetch(`${API}/owner/restaurant`, {
-        method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-        body: JSON.stringify(body)
-      });
-    } else {
-      r = await fetch(`${API}/owner/restaurants`, {
-        method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-        body: JSON.stringify(body)
-      });
-    }
-    const d = await r.json();
-    if (r.ok) {
-      if (!restoId) {
-        restoId = d.id;
-        const p = JSON.parse(atob(token.split('.')[1]));
-        p.restaurant_id = d.id;
-      }
-      msg.innerHTML = '<span style="color:#059669">✅ Muvaffaqiyatli saqlandi!</span>';
-      document.getElementById('sidebarName').textContent = name;
-      document.getElementById('noRestoWarning').style.display = 'none';
-      toast('✅ Restoran saqlandi!');
-    } else {
-      msg.innerHTML = `<span style="color:#dc2626">❌ ${d.error||'Xatolik'}</span>`;
-    }
-  } catch(e) {
-    msg.innerHTML = '<span style="color:#dc2626">❌ Server xatoligi</span>';
-  }
-}
-
-// ── Premium ──────────────────────────────────────────────────
-async function loadPremium() {
-  if (!restoId) return;
-  try {
-    const r = await fetch(`${API}/owner/premium`, {headers:{Authorization:`Bearer ${token}`}});
-    const d = await r.json();
-    const el = document.getElementById('premiumStatus');
-    if (d.is_premium && d.subscription) {
-      const exp = new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');
-      el.innerHTML = `<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;">
-        <b style="color:#059669">💎 Premium faol!</b>
-        <p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p>
-        <button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">
-          Bekor qilish
-        </button>
-      </div>`;
-    } else {
-      el.innerHTML = '<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';
-    }
-  } catch(e) {}
-}
-
-async function activatePremium(plan) {
-  try {
-    const r = await fetch(`${API}/owner/premium/activate`, {
-      method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body: JSON.stringify({plan})
-    });
-    if (r.ok) { toast('💎 Premium faollashtirildi!'); loadPremium(); }
-    else toast('❌ Xatolik');
-  } catch(e) { toast('❌ Server xatoligi'); }
-}
-
-async function cancelPremium() {
-  if (!confirm('Premiumni bekor qilasizmi?')) return;
-  try {
-    const r = await fetch(`${API}/owner/premium`, {method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
-    if (r.ok) { toast('Premium bekor qilindi'); loadPremium(); }
-  } catch(e) {}
-}
-
-// Har 30 soniyada yangilash
-setInterval(() => { if (token && restoId) loadReservations(); }, 30000);
+setInterval(()=>{if(token&&restoId)loadReservations();},30000);
 </script>
 </body>
 </html>
