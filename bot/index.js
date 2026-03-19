@@ -300,67 +300,33 @@ bot.on('message', async (msg) => {
 // ── AI javob berish ───────────────────────────────────────────
 async function handleAI(userId, chatId, userMessage) {
   const lang = userLangs[userId] || 'uz';
-
-  // Typing indicator
   const typingMsg = await bot.sendMessage(chatId, T(userId, 'ai_typing'));
 
   try {
-    // History ni boshqarish (max 10 xabar)
     if (!aiHistory[userId]) aiHistory[userId] = [];
     aiHistory[userId].push({ role: 'user', content: userMessage });
     if (aiHistory[userId].length > 10) aiHistory[userId] = aiHistory[userId].slice(-10);
 
-    // Restoranlar ro'yxatini olish (context uchun)
+    console.log('GROQ_KEY bor:', process.env.GROQ_API_KEY ? 'HA ✅' : 'YOQ ❌');
+
     let restaurantsContext = '';
     try {
       const r = await fetch(`${API_URL}/restaurants`);
       const restaurants = await r.json();
-      if (restaurants.length) {
+      if (Array.isArray(restaurants) && restaurants.length) {
         restaurantsContext = restaurants.slice(0, 5).map(r =>
           `- ${r.name} (${r.cuisine?.join(', ')}, ${r.price_category}, ${r.address})`
         ).join('\n');
       }
-    } catch(e) {}
+    } catch(e) { console.log('Restaurants xatoligi:', e.message); }
 
     const systemPrompts = {
-      uz: `Sen OneTable platformasining AI yordamchisisisan. Toshkentdagi restoranlar uchun smart booking platformasi.
-
-Vazifang:
-- Restoranlar haqida ma'lumot berish
-- Bron qilishga yordam berish  
-- Menyu va narxlar haqida gapirish
-- Savollarga do'stona javob berish
-
-${restaurantsContext ? `Mavjud restoranlar:\n${restaurantsContext}` : ''}
-
-Qisqa, aniq va do'stona javob ber. O'zbek tilida yoz. Emoji ishlatishing mumkin.`,
-
-      ru: `Ты AI-ассистент платформы OneTable. Умная система бронирования ресторанов в Ташкенте.
-
-Твои задачи:
-- Информация о ресторанах
-- Помощь с бронированием
-- Информация о меню и ценах
-- Дружелюбные ответы на вопросы
-
-${restaurantsContext ? `Доступные рестораны:\n${restaurantsContext}` : ''}
-
-Отвечай кратко, точно и дружелюбно. Пиши на русском. Можешь использовать эмодзи.`,
-
-      en: `You are the AI assistant for OneTable platform. A smart restaurant booking system in Tashkent.
-
-Your tasks:
-- Restaurant information
-- Help with bookings
-- Menu and price information
-- Friendly responses to questions
-
-${restaurantsContext ? `Available restaurants:\n${restaurantsContext}` : ''}
-
-Be brief, accurate and friendly. Write in English. Feel free to use emojis.`
+      uz: `Sen OneTable platformasining AI yordamchisisisan. Toshkentdagi restoranlar uchun smart booking platformasi.\nRestoranlar, bron qilish va menyu haqida yordam berasan.\n${restaurantsContext ? `Mavjud restoranlar:\n${restaurantsContext}` : ''}\nQisqa va do'stona javob ber. O'zbek tilida yoz.`,
+      ru: `Ты AI-ассистент платформы OneTable. Рестораны Ташкента.\n${restaurantsContext ? `Рестораны:\n${restaurantsContext}` : ''}\nОтвечай кратко по-русски.`,
+      en: `You are AI assistant for OneTable. Tashkent restaurants.\n${restaurantsContext ? `Restaurants:\n${restaurantsContext}` : ''}\nBe brief in English.`
     };
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -369,7 +335,7 @@ Be brief, accurate and friendly. Write in English. Feel free to use emojis.`
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         messages: [
-          { role: 'system', content: systemPrompts[lang] },
+          { role: 'system', content: systemPrompts[lang] || systemPrompts.uz },
           ...aiHistory[userId]
         ],
         max_tokens: 500,
@@ -377,18 +343,15 @@ Be brief, accurate and friendly. Write in English. Feel free to use emojis.`
       })
     });
 
-    const data = await response.json();
+    const data = await groqRes.json();
+    console.log('Groq status:', groqRes.status);
+    console.log('Groq data:', JSON.stringify(data).substring(0, 300));
+
     const reply = data.choices?.[0]?.message?.content;
+    if (!reply) throw new Error(data.error?.message || 'No reply');
 
-    if (!reply) throw new Error('No reply');
-
-    // History ga javobni qo'sh
     aiHistory[userId].push({ role: 'assistant', content: reply });
-
-    // Typing xabarini o'chir
     await bot.deleteMessage(chatId, typingMsg.message_id).catch(() => {});
-
-    // Javob yuborish
     await bot.sendMessage(chatId, reply, {
       parse_mode: 'HTML',
       reply_markup: {
