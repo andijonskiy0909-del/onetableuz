@@ -50,14 +50,11 @@ router.get('/:id/availability', async (req, res) => {
     const { date } = req.query;
     if (!date) return res.status(400).json({ error: 'date parametri kerak' });
 
-    // Band bronlar
     const reservations = await pool.query(
       `SELECT time FROM reservations
        WHERE restaurant_id = $1 AND date = $2 AND status != 'cancelled'`,
       [id, date]
     );
-
-    // Bloklangan vaqtlar
     const blocked = await pool.query(
       `SELECT time FROM availability
        WHERE restaurant_id = $1 AND date = $2 AND is_blocked = true`,
@@ -69,11 +66,25 @@ router.get('/:id/availability', async (req, res) => {
       ...blocked.rows.map(r => r.time?.substring(0, 5))
     ].filter(Boolean);
 
-    // Webapp array kutayapti
     res.json(busy_times);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// ── Zonalar ✅ YANGI ─────────────────────────────────────────
+router.get('/:id/zones', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM zones
+       WHERE restaurant_id = $1 AND is_available = true
+       ORDER BY id`,
+      [req.params.id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.json([]);
   }
 });
 
@@ -122,7 +133,6 @@ router.post('/:id/reviews', async (req, res) => {
       [user_id, req.params.id, rating, comment]
     );
 
-    // Ratingni yangilash
     await pool.query(
       `UPDATE restaurants SET rating = (
          SELECT ROUND(AVG(rating)::numeric, 2)
