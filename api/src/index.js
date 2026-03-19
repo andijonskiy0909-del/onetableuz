@@ -2,11 +2,11 @@ const express = require("express")
 const cors = require("cors")
 const path = require("path")
 require("dotenv").config()
+
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-// ── Admin sozlash (1 MARTA ishlatish) ───────────────────────
 app.get('/setup-admin', async (req, res) => {
   try {
     const bcrypt = require('bcryptjs')
@@ -21,7 +21,6 @@ app.get('/setup-admin', async (req, res) => {
   }
 })
 
-// ── Reviews jadvali yaratish (1 MARTA) ───────────────────────
 app.get('/setup-reviews', async (req, res) => {
   try {
     const pool = require('./db')
@@ -46,20 +45,18 @@ app.get('/setup-reviews', async (req, res) => {
   }
 })
 
-// ── Dashboard ────────────────────────────────────────────────
 app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../webapp/dashboard.html'))
 })
 
-// ── Routes ───────────────────────────────────────────────────
 const restaurantRoutes = require("./routes/restaurants")
 const reservationRoutes = require("./routes/reservations")
 const authRoutes = require("./routes/auth")
 const ownerRoutes = require("./routes/owner")
 const adminRoutes = require("./routes/admin")
 const reviewRoutes = require("./routes/reviews")
-const aiRoutes = require("./routes/ai") // ✅ AI
+const aiRoutes = require("./routes/ai")
 
 app.use("/api/restaurants", restaurantRoutes)
 app.use("/api/reservations", reservationRoutes)
@@ -67,7 +64,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/owner", ownerRoutes)
 app.use("/api/admin", adminRoutes)
 app.use("/api/reviews", reviewRoutes)
-app.use("/api/ai", aiRoutes) // ✅ AI
+app.use("/api/ai", aiRoutes)
 
 app.get("/", (req, res) => {
   res.send("OneTable API ishlayapti ✅")
@@ -77,4 +74,3 @@ const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server ${PORT} portda ishlayapti`)
 })
-```
