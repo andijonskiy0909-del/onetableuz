@@ -78,10 +78,3 @@ app.listen(PORT, () => {
   console.log(`Server ${PORT} portda ishlayapti`)
 })
 ```
-
-**GitHub da 2 ta fayl:**
-
-1. `src/index.js` → Edit → paste → Commit
-2. `src/routes/ai.js` → yangi fayl → yuqorida bergan `ai.js` kodni paste → Commit
-
-
