@@ -39,14 +39,37 @@ async function migrate() {
       created_at TIMESTAMP DEFAULT NOW()
     );
 
+    CREATE TABLE IF NOT EXISTS zones (
+      id SERIAL PRIMARY KEY,
+      restaurant_id INTEGER REFERENCES restaurants(id),
+      name VARCHAR(100) NOT NULL,
+      description TEXT,
+      capacity INTEGER DEFAULT 10,
+      icon VARCHAR(10) DEFAULT '🪑',
+      is_available BOOLEAN DEFAULT true,
+      created_at TIMESTAMP DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS tables (
+      id SERIAL PRIMARY KEY,
+      restaurant_id INTEGER REFERENCES restaurants(id),
+      zone_id INTEGER REFERENCES zones(id),
+      table_number INTEGER NOT NULL,
+      capacity INTEGER DEFAULT 4,
+      is_available BOOLEAN DEFAULT true
+    );
+
     CREATE TABLE IF NOT EXISTS reservations (
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
       restaurant_id INTEGER REFERENCES restaurants(id),
+      zone_id INTEGER REFERENCES zones(id),
+      table_id INTEGER REFERENCES tables(id),
       date DATE NOT NULL,
       time TIME NOT NULL,
       guests INTEGER NOT NULL,
       comment TEXT,
+      pre_order JSONB DEFAULT '[]',
       status VARCHAR(50) DEFAULT 'pending',
       created_at TIMESTAMP DEFAULT NOW()
     );
@@ -110,24 +133,55 @@ async function migrate() {
   const resto = await pool.query(`
     INSERT INTO restaurants (name, address, cuisine, price_category, capacity)
     VALUES ('Plov Center', 'Yunusobod, Toshkent', ARRAY['Uzbek'], '$$', 50)
-    ON CONFLICT DO NOTHING
-    RETURNING id;
+    ON CONFLICT DO NOTHING RETURNING id;
   `);
-
   const restoId = resto.rows[0]?.id ||
     (await pool.query('SELECT id FROM restaurants LIMIT 1')).rows[0]?.id || 1;
 
-  // Admin owner
+  // Zonalar
+  await pool.query(`
+    INSERT INTO zones (restaurant_id, name, description, capacity, icon) VALUES
+    ($1, 'Asosiy zal', 'Qulay va keng zal', 40, '🪑'),
+    ($1, 'VIP xona', 'Maxfiy va hashamatli', 10, '👑'),
+    ($1, 'Terrassa', 'Ochiq havo', 20, '🌿'),
+    ($1, 'Bolalar maydoni', 'Bolalar uchun', 15, '🎠')
+    ON CONFLICT DO NOTHING;
+  `, [restoId]);
+
+  // Stollar
+  const zones = await pool.query('SELECT id, name FROM zones WHERE restaurant_id = $1', [restoId]);
+  for (const zone of zones.rows) {
+    const count = zone.name === 'VIP xona' ? 3 : zone.name === 'Bolalar maydoni' ? 4 : 8;
+    for (let i = 1; i <= count; i++) {
+      await pool.query(`
+        INSERT INTO tables (restaurant_id, zone_id, table_number, capacity)
+        VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING
+      `, [restoId, zone.id, i, zone.name === 'VIP xona' ? 6 : 4]);
+    }
+  }
+
+  // Test menyu
+  await pool.query(`
+    INSERT INTO menu_items (restaurant_id, name, category, price, description) VALUES
+    ($1, 'Osh', 'Asosiy taomlar', 45000, 'Klassik o''zbek oshi'),
+    ($1, 'Shashlik', 'Asosiy taomlar', 60000, 'Qo''zichoq shashlik'),
+    ($1, 'Lag''mon', 'Asosiy taomlar', 35000, 'Qo''lda tayyorlangan'),
+    ($1, 'Manti', 'Asosiy taomlar', 40000, 'Bug''da pishirilgan'),
+    ($1, 'Choy', 'Ichimliklar', 8000, 'Ko''k choy'),
+    ($1, 'Limonad', 'Ichimliklar', 15000, 'Tabiiy limonad'),
+    ($1, 'Salat', 'Salatlar', 25000, 'Taze sabzavot salati')
+    ON CONFLICT DO NOTHING;
+  `, [restoId]);
+
+  // Admin va owner
   const bcrypt = require('bcryptjs');
   const hash = await bcrypt.hash('secret123', 10);
-
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id, full_name, role)
     VALUES ($1, $2, $3, 'Admin', 'admin')
     ON CONFLICT (email) DO UPDATE SET password_hash = $2;
   `, ['admin@onetable.uz', hash, restoId]);
 
-  // Test owner (yangi restoran egasi misoli)
   const hash2 = await bcrypt.hash('owner123', 10);
   await pool.query(`
     INSERT INTO restaurant_owners (email, password_hash, restaurant_id, full_name, role)
