@@ -84,6 +84,4 @@ app.listen(PORT, () => {
 1. `src/index.js` → Edit → paste → Commit
 2. `src/routes/ai.js` → yangi fayl → yuqorida bergan `ai.js` kodni paste → Commit
 
-Deploy bo'lgach brauzerda test qiling:
-```
-https://onetableuz-production.up.railway.app/api/ai/chat
+
