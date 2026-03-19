@@ -59,6 +59,7 @@ const authRoutes = require("./routes/auth")
 const ownerRoutes = require("./routes/owner")
 const adminRoutes = require("./routes/admin")
 const reviewRoutes = require("./routes/reviews")
+const aiRoutes = require("./routes/ai") // ✅ AI
 
 app.use("/api/restaurants", restaurantRoutes)
 app.use("/api/reservations", reservationRoutes)
@@ -66,6 +67,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/owner", ownerRoutes)
 app.use("/api/admin", adminRoutes)
 app.use("/api/reviews", reviewRoutes)
+app.use("/api/ai", aiRoutes) // ✅ AI
 
 app.get("/", (req, res) => {
   res.send("OneTable API ishlayapti ✅")
@@ -75,3 +77,13 @@ const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server ${PORT} portda ishlayapti`)
 })
+```
+
+**GitHub da 2 ta fayl:**
+
+1. `src/index.js` → Edit → paste → Commit
+2. `src/routes/ai.js` → yangi fayl → yuqorida bergan `ai.js` kodni paste → Commit
+
+Deploy bo'lgach brauzerda test qiling:
+```
+https://onetableuz-production.up.railway.app/api/ai/chat
