@@ -2,7 +2,6 @@ const router = require('express').Router();
 const pool = require('../db');
 const jwt = require('jsonwebtoken');
 
-// Auth middleware
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
@@ -14,7 +13,6 @@ const auth = (req, res, next) => {
   }
 };
 
-// ── Telegram bildirishnoma yuborish ─────────────────────────
 async function sendTelegramMsg(telegramId, text) {
   try {
     const token = process.env.BOT_TOKEN;
@@ -32,13 +30,12 @@ async function sendTelegramMsg(telegramId, text) {
 // ── Bron yaratish ────────────────────────────────────────────
 router.post('/', auth, async (req, res) => {
   try {
-    const { restaurant_id, date, time, guests, comment } = req.body;
+    const { restaurant_id, date, time, guests, comment, zone_id, pre_order } = req.body;
 
     if (!restaurant_id || !date || !time || !guests) {
       return res.status(400).json({ error: 'Barcha maydonlarni to\'ldiring' });
     }
 
-    // Conflict tekshiruvi — shu vaqtda joy bormi?
     const conflict = await pool.query(
       `SELECT id FROM reservations
        WHERE restaurant_id = $1 AND date = $2 AND time = $3
@@ -46,7 +43,6 @@ router.post('/', auth, async (req, res) => {
       [restaurant_id, date, time]
     );
 
-    // Restoran sig'imini olish
     const resto = await pool.query(
       'SELECT name, capacity FROM restaurants WHERE id = $1',
       [restaurant_id]
@@ -58,24 +54,48 @@ router.post('/', auth, async (req, res) => {
       return res.status(400).json({ error: 'Bu vaqtda joy mavjud emas' });
     }
 
-    // Bron yaratish
     const result = await pool.query(
       `INSERT INTO reservations
-       (user_id, restaurant_id, date, time, guests, comment, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+       (user_id, restaurant_id, zone_id, date, time, guests, comment, pre_order, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
        RETURNING *`,
-      [req.user.id, restaurant_id, date, time, guests, comment]
+      [req.user.id, restaurant_id, zone_id || null, date, time, guests, comment, JSON.stringify(pre_order || [])]
     );
 
     const booking = result.rows[0];
 
-    // Foydalanuvchiga Telegram xabar yuborish
+    // Foydalanuvchi ma'lumotlari
     const userResult = await pool.query(
-      'SELECT telegram_id, first_name FROM users WHERE id = $1',
+      'SELECT telegram_id, first_name, last_name FROM users WHERE id = $1',
       [req.user.id]
     );
     const user = userResult.rows[0];
 
+    // Zona nomi
+    let zoneName = '';
+    if (zone_id) {
+      const zoneRes = await pool.query('SELECT name FROM zones WHERE id = $1', [zone_id]);
+      zoneName = zoneRes.rows[0]?.name || '';
+    }
+
+    // ✅ Socket.io — dashboard ga real-time xabar
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`restaurant_${restaurant_id}`).emit('new_reservation', {
+        id: booking.id,
+        guest_name: `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || "Noma'lum",
+        date,
+        time,
+        guests,
+        comment,
+        zone_name: zoneName,
+        status: 'pending',
+        created_at: booking.created_at
+      });
+      console.log(`Socket: restaurant_${restaurant_id} ga yangi bron xabari yuborildi`);
+    }
+
+    // Telegram xabar
     if (user?.telegram_id) {
       const text =
         `🎉 <b>Bron qabul qilindi!</b>\n\n` +
@@ -83,6 +103,7 @@ router.post('/', auth, async (req, res) => {
         `📅 Sana: ${date}\n` +
         `⏰ Vaqt: ${time}\n` +
         `👥 Mehmonlar: ${guests} kishi\n` +
+        `${zoneName ? `🏠 Zona: ${zoneName}\n` : ''}` +
         `${comment ? `💬 Izoh: ${comment}\n` : ''}` +
         `\n⏳ Restoran tasdiqlaguncha kuting.`;
       sendTelegramMsg(user.telegram_id, text);
@@ -99,9 +120,11 @@ router.post('/', auth, async (req, res) => {
 router.get('/my', auth, async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT r.*, res.name AS restaurant_name, res.address, res.image_url
+      `SELECT r.*, res.name AS restaurant_name, res.address, res.image_url,
+              z.name AS zone_name
        FROM reservations r
        JOIN restaurants res ON r.restaurant_id = res.id
+       LEFT JOIN zones z ON r.zone_id = z.id
        WHERE r.user_id = $1
        ORDER BY r.date DESC, r.time DESC`,
       [req.user.id]
@@ -115,7 +138,6 @@ router.get('/my', auth, async (req, res) => {
 // ── Bronni bekor qilish ──────────────────────────────────────
 router.delete('/:id', auth, async (req, res) => {
   try {
-    // Faqat o'z bronini bekor qila oladi
     const check = await pool.query(
       `SELECT r.*, res.name AS restaurant_name
        FROM reservations r
@@ -129,23 +151,22 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     const booking = check.rows[0];
-
-    // O'tgan bronni bekor qilib bo'lmaydi
     const bookingDate = new Date(`${booking.date}T${booking.time}`);
     if (bookingDate < new Date()) {
       return res.status(400).json({ error: 'O\'tgan bronni bekor qilib bo\'lmaydi' });
     }
 
-    await pool.query(
-      'UPDATE reservations SET status = $1 WHERE id = $2',
-      ['cancelled', req.params.id]
-    );
+    await pool.query('UPDATE reservations SET status = $1 WHERE id = $2', ['cancelled', req.params.id]);
 
-    // Foydalanuvchiga xabar
-    const userResult = await pool.query(
-      'SELECT telegram_id FROM users WHERE id = $1',
-      [req.user.id]
-    );
+    // ✅ Socket.io — bekor qilindi xabari
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`restaurant_${booking.restaurant_id}`).emit('reservation_cancelled', {
+        id: booking.id
+      });
+    }
+
+    const userResult = await pool.query('SELECT telegram_id FROM users WHERE id = $1', [req.user.id]);
     if (userResult.rows[0]?.telegram_id) {
       const text =
         `🗑 <b>Bron bekor qilindi</b>\n\n` +
