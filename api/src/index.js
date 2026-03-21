@@ -1,11 +1,38 @@
 const express = require("express")
 const cors = require("cors")
 const path = require("path")
+const http = require("http")
+const { Server } = require("socket.io")
 require("dotenv").config()
 
 const app = express()
+const server = http.createServer(app)
+
+// Socket.io
+const io = new Server(server, {
+  cors: { origin: "*", methods: ["GET", "POST"] }
+})
+
 app.use(cors())
 app.use(express.json())
+
+// Socket.io ni routes ga uzatish
+app.set("io", io)
+
+// Socket connection
+io.on("connection", (socket) => {
+  console.log("Dashboard ulandi:", socket.id)
+
+  // Owner o'z restoran xonasiga qo'shiladi
+  socket.on("join_restaurant", (restaurantId) => {
+    socket.join(`restaurant_${restaurantId}`)
+    console.log(`Owner restaurant_${restaurantId} xonasiga qo'shildi`)
+  })
+
+  socket.on("disconnect", () => {
+    console.log("Dashboard uzildi:", socket.id)
+  })
+})
 
 app.get('/setup-admin', async (req, res) => {
   try {
@@ -71,6 +98,6 @@ app.get("/", (req, res) => {
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server ${PORT} portda ishlayapti`)
 })
