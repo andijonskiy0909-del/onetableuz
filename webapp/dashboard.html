@@ -6,6 +6,7 @@
 <title>OneTable — Dashboard</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#1e293b; }
@@ -79,7 +80,6 @@ tr:hover td { background:#fafafa; }
 .toggle-on { background:#d1fae5; color:#059669; }
 .toggle-off { background:#fee2e2; color:#dc2626; }
 .add-btn { background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
-/* Zona kartochkalari */
 .zones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-bottom:20px; }
 .zone-card-item { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:flex-start; }
 .zone-card-left { display:flex; gap:14px; align-items:flex-start; }
@@ -91,6 +91,21 @@ tr:hover td { background:#fafafa; }
 .zone-toggle-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; }
 .zone-delete-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; background:#fee2e2; color:#dc2626; }
 .zone-delete-btn:hover { background:#dc2626; color:white; }
+/* Analitika */
+.analytics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.an-stat { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center; }
+.an-stat .val { font-size:28px; font-weight:700; margin-bottom:4px; }
+.an-stat .lbl { font-size:13px; color:#64748b; }
+.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
+.chart-card { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+.chart-card h3 { font-size:15px; font-weight:600; margin-bottom:16px; color:#1e293b; }
+.chart-card canvas { max-height:220px; }
+.peak-list { list-style:none; }
+.peak-list li { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:14px; }
+.peak-list li:last-child { border-bottom:none; }
+.peak-bar { height:6px; background:#ef4444; border-radius:3px; margin-top:4px; }
+.noshow-ring { display:flex; align-items:center; justify-content:center; gap:20px; padding:16px 0; }
+.ring-label { font-size:13px; color:#64748b; }
 /* Modal */
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; justify-content:center; align-items:center; }
 .modal-overlay.open { display:flex; }
@@ -104,7 +119,6 @@ tr:hover td { background:#fafafa; }
 .modal-btns button { flex:1; padding:12px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; border:none; }
 .btn-save { background:#ef4444; color:white; }
 .btn-cls { background:#f1f5f9; color:#64748b; }
-/* Icon tanlash */
 .icon-picker { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
 .icon-opt { width:40px; height:40px; border-radius:8px; border:2px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; transition:all .15s; }
 .icon-opt.selected { border-color:#ef4444; background:#fff5f5; }
@@ -142,7 +156,6 @@ tr:hover td { background:#fafafa; }
 </head>
 <body>
 
-<!-- Login -->
 <div class="auth-page" id="loginPage">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
@@ -156,7 +169,6 @@ tr:hover td { background:#fafafa; }
   </div>
 </div>
 
-<!-- Register -->
 <div class="auth-page" id="registerPage" style="display:none">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
@@ -172,12 +184,12 @@ tr:hover td { background:#fafafa; }
   </div>
 </div>
 
-<!-- App -->
 <div class="app" id="appPage">
   <div class="sidebar">
     <div class="sidebar-logo"><h1>🍽 OneTable</h1><p>Boshqaruv paneli</p></div>
     <div class="nav-links">
       <button class="nav-link active" onclick="showSec('dashboard',this)"><span class="nav-icon">📊</span>Umumiy</button>
+      <button class="nav-link" onclick="showSec('analytics',this)"><span class="nav-icon">📈</span>Analitika</button>
       <button class="nav-link" onclick="showSec('today',this)"><span class="nav-icon">📅</span>Bugungi bronlar</button>
       <button class="nav-link" onclick="showSec('all',this)"><span class="nav-icon">📋</span>Barcha bronlar</button>
       <button class="nav-link" onclick="showSec('menu',this)"><span class="nav-icon">🍜</span>Menyu</button>
@@ -197,7 +209,7 @@ tr:hover td { background:#fafafa; }
     <!-- Dashboard -->
     <div class="section active" id="sec-dashboard">
       <div class="page-header"><div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div></div>
-      <div id="noRestoWarning" class="no-resto" style="display:none"><h3>⚠️ Restoran qo'shilmagan!</h3><p>Iltimos, <b>Restoran</b> bo'limiga o'tib, restoran ma'lumotlaringizni kiriting.</p></div>
+      <div id="noRestoWarning" class="no-resto" style="display:none"><h3>⚠️ Restoran qo'shilmagan!</h3><p>Iltimos, <b>Restoran</b> bo'limiga o'tib ma'lumotlaringizni kiriting.</p></div>
       <div class="stats-grid">
         <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">0</div><div class="stat-sub">bugun</div></div>
         <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">0</div><div class="stat-sub">tasdiqlash kerak</div></div>
@@ -207,6 +219,48 @@ tr:hover td { background:#fafafa; }
       <div class="card">
         <div class="card-header"><h3>⏳ Tasdiqlash kerak</h3><span class="badge-count" id="pendingCount">0</span></div>
         <table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona</th><th>Izoh</th><th>Amal</th></tr></thead><tbody id="pendingTbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ✅ ANALITIKA -->
+    <div class="section" id="sec-analytics">
+      <div class="page-header"><div><h2>📈 Analitika</h2><p>Restoran statistikasi va grafiklar</p></div>
+        <button onclick="loadAnalytics()" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;">🔄 Yangilash</button>
+      </div>
+
+      <div class="analytics-grid">
+        <div class="an-stat"><div class="val" style="color:#3b82f6" id="an-today">—</div><div class="lbl">Bugungi bronlar</div></div>
+        <div class="an-stat"><div class="val" style="color:#10b981" id="an-weekly">—</div><div class="lbl">Haftalik bronlar</div></div>
+        <div class="an-stat"><div class="val" style="color:#f59e0b" id="an-revenue">—</div><div class="lbl">Bu oylik daromad</div></div>
+        <div class="an-stat"><div class="val" style="color:#ef4444" id="an-noshow">—%</div><div class="lbl">No-show foizi</div></div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Kunlik bronlar grafigi -->
+        <div class="chart-card">
+          <h3>📅 Haftalik bronlar</h3>
+          <canvas id="dailyChart"></canvas>
+        </div>
+
+        <!-- Holat bo'yicha donut -->
+        <div class="chart-card">
+          <h3>📊 Bron holatlari</h3>
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Peak hours -->
+        <div class="chart-card">
+          <h3>⏰ Eng band vaqtlar</h3>
+          <canvas id="peakChart"></canvas>
+        </div>
+
+        <!-- Zona bo'yicha -->
+        <div class="chart-card">
+          <h3>🏠 Zonalar bo'yicha bronlar</h3>
+          <canvas id="zoneChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -234,15 +288,13 @@ tr:hover td { background:#fafafa; }
       <div class="menu-grid" id="menuGrid"><div class="empty-state"><div class="ei">🍜</div>Menyu bo'sh</div></div>
     </div>
 
-    <!-- ✅ YANGI: Zonalar -->
+    <!-- Zonalar -->
     <div class="section" id="sec-zones">
       <div class="page-header">
-        <div><h2>🏠 Zonalar boshqaruvi</h2><p>VIP, Terrassa, Bolalar maydoni va boshqa zonalarni boshqaring</p></div>
+        <div><h2>🏠 Zonalar boshqaruvi</h2><p>VIP, Terrassa va boshqa zonalar</p></div>
         <button class="add-btn" onclick="openZoneModal()">+ Zona qo'shish</button>
       </div>
-      <div class="zones-grid" id="zonesGrid">
-        <div class="empty-state"><div class="ei">🏠</div>Hali zona qo'shilmagan</div>
-      </div>
+      <div class="zones-grid" id="zonesGrid"><div class="empty-state"><div class="ei">🏠</div>Hali zona qo'shilmagan</div></div>
     </div>
 
     <!-- Restoran -->
@@ -270,7 +322,7 @@ tr:hover td { background:#fafafa; }
     <!-- Lokatsiya -->
     <div class="section" id="sec-location">
       <div class="page-header"><div><h2>📍 Restoran joylashuvi</h2><p>Mijozlar restoraningizni xaritada topsin</p></div></div>
-      <div class="loc-tip">💡 Xaritada <b>restoran joylashgan joyni bosing</b> — pin qo'yiladi. Keyin "Saqlash" tugmasini bosing.</div>
+      <div class="loc-tip">💡 Xaritada restoran joylashgan joyni bosing — pin qo'yiladi.</div>
       <div id="locStatusSaved" class="loc-status-ok" style="display:none">✅ Lokatsiya saqlangan!</div>
       <div style="display:flex;gap:10px;margin-bottom:14px;">
         <button class="loc-my-btn" onclick="useMyLocation()">📡 Joylashuvimni aniqlash</button>
@@ -317,7 +369,7 @@ tr:hover td { background:#fafafa; }
   </div>
 </div>
 
-<!-- ✅ YANGI: Zona modal -->
+<!-- Zona modal -->
 <div class="modal-overlay" id="zoneModal">
   <div class="modal">
     <h3>Zona qo'shish</h3>
@@ -331,9 +383,9 @@ tr:hover td { background:#fafafa; }
         <div class="icon-opt" onclick="selectIcon('🌙',this)">🌙</div>
         <div class="icon-opt" onclick="selectIcon('☀️',this)">☀️</div>
         <div class="icon-opt" onclick="selectIcon('🎭',this)">🎭</div>
-        <div class="icon-opt" onclick="selectIcon('🏊',this)">🏊</div>
         <div class="icon-opt" onclick="selectIcon('🔥',this)">🔥</div>
         <div class="icon-opt" onclick="selectIcon('⭐',this)">⭐</div>
+        <div class="icon-opt" onclick="selectIcon('🏊',this)">🏊</div>
       </div>
     </div>
     <div class="fg"><label>Zona nomi *</label><input type="text" id="zName" placeholder="Masalan: VIP xona"></div>
@@ -354,6 +406,7 @@ let token=localStorage.getItem('ownerToken');
 let allRes=[],curFilter='all',restoId=null,ownerData=null;
 let locMap=null,locMarker=null,locLat=null,locLng=null;
 let selectedZoneIcon='🪑';
+let dailyChartObj=null,statusChartObj=null,peakChartObj=null,zoneChartObj=null;
 
 window.onload=()=>{
   document.getElementById('todayDate').textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -425,6 +478,7 @@ function showSec(name,btn){
   if(name==='restaurant')loadRestaurant();
   if(name==='premium')loadPremium();
   if(name==='location')initLocationMap();
+  if(name==='analytics')loadAnalytics();
 }
 
 async function loadAll(){await Promise.all([loadReservations(),loadRestaurantName()]);}
@@ -476,10 +530,8 @@ function renderPending(){
   tb.innerHTML=list.map(r=>`<tr>
     <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
     <td>${r.date}</td><td>${timeOf(r)}</td>
-    <td>👥 ${r.guests} kishi</td>
-    <td>${zoneOf(r)}</td>
-    <td>${r.comment||'—'}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
+    <td>👥 ${r.guests} kishi</td><td>${zoneOf(r)}</td>
+    <td>${r.comment||'—'}</td><td>${actionBtns(r.id,r.status)}</td>
   </tr>`).join('');
 }
 
@@ -491,10 +543,8 @@ function renderToday(){
   tb.innerHTML=list.map(r=>`<tr>
     <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
     <td>${timeOf(r)}</td><td>👥 ${r.guests} kishi</td>
-    <td>${zoneOf(r)}</td>
-    <td>${r.comment||'—'}</td>
-    <td>${statusBadge(r.status)}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
+    <td>${zoneOf(r)}</td><td>${r.comment||'—'}</td>
+    <td>${statusBadge(r.status)}</td><td>${actionBtns(r.id,r.status)}</td>
   </tr>`).join('');
 }
 
@@ -520,7 +570,213 @@ async function updateStatus(id,status){
   }catch(e){toast('❌ Server xatoligi');}
 }
 
-// ── Menyu ────────────────────────────────────────────────────
+// ── ANALITIKA ─────────────────────────────────────────────────
+async function loadAnalytics(){
+  if(!restoId)return;
+
+  try{
+    // API dan analitika olish
+    const r=await fetch(`${API}/owner/analytics`,{headers:{Authorization:`Bearer ${token}`}});
+    const d=await r.json();
+
+    document.getElementById('an-today').textContent=d.today??0;
+    document.getElementById('an-weekly').textContent=d.weekly??0;
+    document.getElementById('an-revenue').textContent=d.revenue?(Number(d.revenue).toLocaleString()+' so\'m'):'0';
+    document.getElementById('an-noshow').textContent=(d.noshowRate??0)+'%';
+
+    // Kunlik grafik
+    buildDailyChart(d.dailyStats||[]);
+
+    // Peak hours grafik
+    buildPeakChart(d.peakHours||[]);
+
+  }catch(e){
+    // API yo'q bo'lsa — mavjud allRes dan hisoblash
+    buildChartsFromLocal();
+  }
+
+  // Holat donut — har doim local dan
+  buildStatusChart();
+
+  // Zona grafigi — local dan
+  buildZoneChart();
+}
+
+function buildChartsFromLocal(){
+  // Oxirgi 7 kun bo'yicha
+  const days={};
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    days[d.toISOString().split('T')[0]]=0;
+  }
+  allRes.forEach(r=>{
+    const dt=String(r.date).split('T')[0];
+    if(days[dt]!==undefined)days[dt]++;
+  });
+  buildDailyChart(Object.entries(days).map(([date,count])=>({date,count})));
+
+  // Peak hours
+  const hours={};
+  allRes.forEach(r=>{
+    if(r.status==='cancelled')return;
+    const h=(r.time||'').substring(0,5);
+    if(h)hours[h]=(hours[h]||0)+1;
+  });
+  const peak=Object.entries(hours).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([time,count])=>({time,count}));
+  buildPeakChart(peak);
+
+  // Stats
+  document.getElementById('an-today').textContent=allRes.filter(r=>String(r.date).startsWith(new Date().toISOString().split('T')[0])).length;
+  document.getElementById('an-weekly').textContent=allRes.filter(r=>{const d=new Date(r.date);const week=new Date();week.setDate(week.getDate()-7);return d>=week;}).length;
+  document.getElementById('an-revenue').textContent='0 so\'m';
+  const noshow=allRes.filter(r=>r.status==='noshow').length;
+  document.getElementById('an-noshow').textContent=(allRes.length?Math.round(noshow/allRes.length*100):0)+'%';
+}
+
+function buildDailyChart(data){
+  const ctx=document.getElementById('dailyChart').getContext('2d');
+  if(dailyChartObj)dailyChartObj.destroy();
+
+  const labels=data.map(d=>{
+    const dt=new Date(d.date);
+    return dt.toLocaleDateString('uz-UZ',{month:'short',day:'numeric'});
+  });
+  const values=data.map(d=>parseInt(d.count)||0);
+
+  dailyChartObj=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'Bronlar',
+        data:values,
+        backgroundColor:'rgba(239,68,68,0.7)',
+        borderColor:'#ef4444',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+}
+
+function buildStatusChart(){
+  const ctx=document.getElementById('statusChart').getContext('2d');
+  if(statusChartObj)statusChartObj.destroy();
+
+  const pending=allRes.filter(r=>r.status==='pending').length;
+  const confirmed=allRes.filter(r=>r.status==='confirmed').length;
+  const cancelled=allRes.filter(r=>r.status==='cancelled').length;
+
+  statusChartObj=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Kutilmoqda','Tasdiqlangan','Bekor qilingan'],
+      datasets:[{
+        data:[pending,confirmed,cancelled],
+        backgroundColor:['#f59e0b','#10b981','#ef4444'],
+        borderWidth:2,
+        borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:12},padding:12}}
+      },
+      cutout:'65%'
+    }
+  });
+}
+
+function buildPeakChart(data){
+  const ctx=document.getElementById('peakChart').getContext('2d');
+  if(peakChartObj)peakChartObj.destroy();
+
+  if(!data.length){
+    ctx.font='14px sans-serif';
+    ctx.fillStyle='#94a3b8';
+    ctx.textAlign='center';
+    ctx.fillText("Ma'lumot yo'q",ctx.canvas.width/2,ctx.canvas.height/2);
+    return;
+  }
+
+  peakChartObj=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:data.map(d=>d.time),
+      datasets:[{
+        label:'Bronlar soni',
+        data:data.map(d=>parseInt(d.count)||0),
+        backgroundColor:'rgba(59,130,246,0.7)',
+        borderColor:'#3b82f6',
+        borderWidth:1,
+        borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,
+      indexAxis:'y',
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{grid:{display:false}}
+      }
+    }
+  });
+}
+
+function buildZoneChart(){
+  const ctx=document.getElementById('zoneChart').getContext('2d');
+  if(zoneChartObj)zoneChartObj.destroy();
+
+  // Zona bo'yicha bronlarni hisoblash
+  const zoneCount={};
+  allRes.forEach(r=>{
+    const z=r.zone_name||'Zona ko\'rsatilmagan';
+    zoneCount[z]=(zoneCount[z]||0)+1;
+  });
+
+  const labels=Object.keys(zoneCount);
+  const values=Object.values(zoneCount);
+  const colors=['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899'];
+
+  if(!labels.length){
+    ctx.font='14px sans-serif';
+    ctx.fillStyle='#94a3b8';
+    ctx.textAlign='center';
+    ctx.fillText("Zona ma'lumoti yo'q",ctx.canvas.width/2,ctx.canvas.height/2);
+    return;
+  }
+
+  zoneChartObj=new Chart(ctx,{
+    type:'pie',
+    data:{
+      labels,
+      datasets:[{
+        data:values,
+        backgroundColor:colors.slice(0,labels.length),
+        borderWidth:2,
+        borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{size:12},padding:10}}
+      }
+    }
+  });
+}
+
+// ── Menyu ─────────────────────────────────────────────────────
 async function loadMenu(){
   try{
     const r=await fetch(`${API}/owner/menu`,{headers:{Authorization:`Bearer ${token}`}});
@@ -557,24 +813,16 @@ async function saveMenuItem(){
   if(!name||!price){toast('⚠️ Nom va narx kerak');return;}
   try{
     const r=await fetch(`${API}/owner/menu`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,category,price:parseInt(price),description,image_url})});
-    if(r.ok){
-      toast("✅ Taom qo'shildi!");closeMenuModal();
-      document.getElementById('mName').value='';document.getElementById('mPrice').value='';
-      document.getElementById('mDesc').value='';document.getElementById('mImage').value='';
-      document.getElementById('mImagePreview').style.display='none';
-      loadMenu();
-    }else toast('❌ Xatolik');
+    if(r.ok){toast("✅ Taom qo'shildi!");closeMenuModal();document.getElementById('mName').value='';document.getElementById('mPrice').value='';document.getElementById('mDesc').value='';document.getElementById('mImage').value='';document.getElementById('mImagePreview').style.display='none';loadMenu();}
+    else toast('❌ Xatolik');
   }catch(e){toast('❌ Server xatoligi');}
 }
 
 async function toggleMenu(id,available){
-  try{
-    await fetch(`${API}/owner/menu/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({available})});
-    loadMenu();
-  }catch(e){}
+  try{await fetch(`${API}/owner/menu/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({available})});loadMenu();}catch(e){}
 }
 
-// ── ZONALAR ──────────────────────────────────────────────────
+// ── Zonalar ───────────────────────────────────────────────────
 async function loadZones(){
   if(!restoId)return;
   const grid=document.getElementById('zonesGrid');
@@ -582,10 +830,7 @@ async function loadZones(){
   try{
     const r=await fetch(`${API}/restaurants/${restoId}/zones`);
     const zones=await r.json();
-    if(!zones.length){
-      grid.innerHTML='<div class="empty-state"><div class="ei">🏠</div>Hali zona qo\'shilmagan.<br><small>Yuqoridagi "+ Zona qo\'shish" tugmasini bosing</small></div>';
-      return;
-    }
+    if(!zones.length){grid.innerHTML='<div class="empty-state"><div class="ei">🏠</div>Hali zona qo\'shilmagan.</div>';return;}
     grid.innerHTML=zones.map(z=>`
       <div class="zone-card-item">
         <div class="zone-card-left">
@@ -597,77 +842,38 @@ async function loadZones(){
           </div>
         </div>
         <div class="zone-actions">
-          <button class="zone-toggle-btn ${z.is_available?'toggle-on':'toggle-off'}"
-                  onclick="toggleZone(${z.id},${!z.is_available})">
-            ${z.is_available?'✅ Faol':'❌ Nofaol'}
-          </button>
-          <button class="zone-delete-btn" onclick="deleteZone(${z.id},'${z.name}')">
-            🗑 O'chirish
-          </button>
+          <button class="zone-toggle-btn ${z.is_available?'toggle-on':'toggle-off'}" onclick="toggleZone(${z.id},${!z.is_available})">${z.is_available?'✅ Faol':'❌ Nofaol'}</button>
+          <button class="zone-delete-btn" onclick="deleteZone(${z.id},'${z.name}')">🗑 O'chirish</button>
         </div>
       </div>`).join('');
-  }catch(e){
-    grid.innerHTML='<div class="empty-state"><div class="ei">❌</div>Xatolik yuz berdi</div>';
-  }
+  }catch(e){grid.innerHTML='<div class="empty-state"><div class="ei">❌</div>Xatolik</div>';}
 }
 
-function selectIcon(icon,el){
-  selectedZoneIcon=icon;
-  document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));
-  el.classList.add('selected');
-}
+function selectIcon(icon,el){selectedZoneIcon=icon;document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
 
-function openZoneModal(){
-  document.getElementById('zName').value='';
-  document.getElementById('zDesc').value='';
-  document.getElementById('zCapacity').value='10';
-  selectedZoneIcon='🪑';
-  document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));
-  document.querySelector('.icon-opt').classList.add('selected');
-  document.getElementById('zoneModal').classList.add('open');
-}
+function openZoneModal(){document.getElementById('zName').value='';document.getElementById('zDesc').value='';document.getElementById('zCapacity').value='10';selectedZoneIcon='🪑';document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));document.querySelector('.icon-opt').classList.add('selected');document.getElementById('zoneModal').classList.add('open');}
 function closeZoneModal(){document.getElementById('zoneModal').classList.remove('open');}
 
 async function saveZone(){
   const name=document.getElementById('zName').value.trim();
-  const description=document.getElementById('zDesc').value.trim();
-  const capacity=parseInt(document.getElementById('zCapacity').value)||10;
   if(!name){toast('⚠️ Zona nomini kiriting');return;}
   try{
-    const r=await fetch(`${API}/owner/zones`,{method:'POST',
-      headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body:JSON.stringify({name,description,capacity,icon:selectedZoneIcon})});
-    if(r.ok){
-      toast(`✅ "${name}" zonasi qo'shildi!`);
-      closeZoneModal();
-      loadZones();
-    }else{
-      const d=await r.json();
-      toast('❌ '+(d.error||'Xatolik'));
-    }
+    const r=await fetch(`${API}/owner/zones`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,description:document.getElementById('zDesc').value,capacity:parseInt(document.getElementById('zCapacity').value)||10,icon:selectedZoneIcon})});
+    if(r.ok){toast(`✅ "${name}" qo'shildi!`);closeZoneModal();loadZones();}
+    else{const d=await r.json();toast('❌ '+(d.error||'Xatolik'));}
   }catch(e){toast('❌ Server xatoligi');}
 }
 
 async function toggleZone(id,available){
-  try{
-    await fetch(`${API}/owner/zones/${id}`,{method:'PUT',
-      headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
-      body:JSON.stringify({is_available:available})});
-    loadZones();
-    toast(available?'✅ Zona faollashtirildi':'❌ Zona o\'chirildi');
-  }catch(e){toast('❌ Xatolik');}
+  try{await fetch(`${API}/owner/zones/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({is_available:available})});loadZones();toast(available?'✅ Faollashtirildi':'❌ O\'chirildi');}catch(e){toast('❌ Xatolik');}
 }
 
 async function deleteZone(id,name){
   if(!confirm(`"${name}" zonasini o'chirasizmi?`))return;
-  try{
-    const r=await fetch(`${API}/owner/zones/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
-    if(r.ok){toast(`🗑 "${name}" o'chirildi`);loadZones();}
-    else toast('❌ O\'chirib bo\'lmadi');
-  }catch(e){toast('❌ Xatolik');}
+  try{const r=await fetch(`${API}/owner/zones/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast(`🗑 "${name}" o'chirildi`);loadZones();}else toast('❌ O\'chirib bo\'lmadi');}catch(e){toast('❌ Xatolik');}
 }
 
-// ── Restoran ─────────────────────────────────────────────────
+// ── Restoran ──────────────────────────────────────────────────
 async function loadRestaurant(){
   if(!restoId)return;
   try{
@@ -699,7 +905,7 @@ async function saveRestaurant(){
     if(restoId){r=await fetch(`${API}/owner/restaurant`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}
     else{r=await fetch(`${API}/owner/restaurants`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}
     const d=await r.json();
-    if(r.ok){if(!restoId)restoId=d.id;msg.innerHTML='<span style="color:#059669">✅ Saqlandi!</span>';document.getElementById('sidebarName').textContent=name;document.getElementById('noRestoWarning').style.display='none';toast('✅ Restoran saqlandi!');}
+    if(r.ok){if(!restoId)restoId=d.id;msg.innerHTML='<span style="color:#059669">✅ Saqlandi!</span>';document.getElementById('sidebarName').textContent=name;document.getElementById('noRestoWarning').style.display='none';toast('✅ Saqlandi!');}
     else{msg.innerHTML=`<span style="color:#dc2626">❌ ${d.error||'Xatolik'}</span>`;}
   }catch(e){msg.innerHTML='<span style="color:#dc2626">❌ Server xatoligi</span>';}
 }
@@ -709,9 +915,7 @@ async function initLocationMap(){
   await new Promise(r=>setTimeout(r,150));
   if(locMap){locMap.invalidateSize();return;}
   let startLat=41.2995,startLng=69.2401,hasSaved=false;
-  if(restoId){
-    try{const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(d&&d.latitude&&d.longitude){startLat=parseFloat(d.latitude);startLng=parseFloat(d.longitude);hasSaved=true;}}catch(e){}
-  }
+  if(restoId){try{const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(d&&d.latitude&&d.longitude){startLat=parseFloat(d.latitude);startLng=parseFloat(d.longitude);hasSaved=true;}}catch(e){}}
   locMap=L.map('locationMap').setView([startLat,startLng],13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(locMap);
   if(hasSaved){setPin(startLat,startLng);document.getElementById('locStatusSaved').style.display='block';}
@@ -762,22 +966,13 @@ async function loadPremium(){
     const r=await fetch(`${API}/owner/premium`,{headers:{Authorization:`Bearer ${token}`}});
     const d=await r.json();
     const el=document.getElementById('premiumStatus');
-    if(d.is_premium&&d.subscription){
-      const exp=new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');
-      el.innerHTML=`<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#059669">💎 Premium faol!</b><p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p><button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">Bekor qilish</button></div>`;
-    }else{
-      el.innerHTML='<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';
-    }
+    if(d.is_premium&&d.subscription){const exp=new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');el.innerHTML=`<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#059669">💎 Premium faol!</b><p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p><button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">Bekor qilish</button></div>`;}
+    else{el.innerHTML='<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';}
   }catch(e){}
 }
 
-async function activatePremium(plan){
-  try{const r=await fetch(`${API}/owner/premium/activate`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({plan})});if(r.ok){toast('💎 Premium faollashtirildi!');loadPremium();}else toast('❌ Xatolik');}catch(e){toast('❌ Server xatoligi');}
-}
-async function cancelPremium(){
-  if(!confirm('Premiumni bekor qilasizmi?'))return;
-  try{const r=await fetch(`${API}/owner/premium`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast('Premium bekor qilindi');loadPremium();}}catch(e){}
-}
+async function activatePremium(plan){try{const r=await fetch(`${API}/owner/premium/activate`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({plan})});if(r.ok){toast('💎 Premium faollashtirildi!');loadPremium();}else toast('❌ Xatolik');}catch(e){toast('❌ Server xatoligi');}}
+async function cancelPremium(){if(!confirm('Premiumni bekor qilasizmi?'))return;try{const r=await fetch(`${API}/owner/premium`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast('Premium bekor qilindi');loadPremium();}}catch(e){}}
 
 setInterval(()=>{if(token&&restoId)loadReservations();},30000);
 </script>
