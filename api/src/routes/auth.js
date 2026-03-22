@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const pool = require('../db');
-const jwt = require('jsonwebtoken');
+const { createToken } = require('../middleware/auth');
 
 // ── Telegram auth ────────────────────────────────────────────
 router.post('/telegram', async (req, res) => {
@@ -14,14 +14,12 @@ router.post('/telegram', async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      // Yangi foydalanuvchi
       result = await pool.query(
         `INSERT INTO users (telegram_id, first_name, last_name)
          VALUES ($1, $2, $3) RETURNING *`,
         [telegram_id, first_name || username || 'User', last_name || '']
       );
     } else {
-      // Mavjud foydalanuvchini yangilash
       result = await pool.query(
         `UPDATE users SET first_name = $1, last_name = $2
          WHERE telegram_id = $3 RETURNING *`,
@@ -30,12 +28,7 @@ router.post('/telegram', async (req, res) => {
     }
 
     const user = result.rows[0];
-    const token = jwt.sign(
-      { id: user.id, telegram_id },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' }
-    );
-
+    const token = createToken({ id: user.id, telegram_id });
     res.json({ token, user });
   } catch (err) {
     console.error(err);
