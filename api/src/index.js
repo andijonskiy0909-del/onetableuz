@@ -8,18 +8,14 @@ require("dotenv").config()
 const app = express()
 const server = http.createServer(app)
 
-// Socket.io
 const io = new Server(server, {
   cors: { origin: "*", methods: ["GET", "POST"] }
 })
 
 app.use(cors())
 app.use(express.json())
-
-// Socket.io ni routes ga uzatish
 app.set("io", io)
 
-// Socket connection
 io.on("connection", (socket) => {
   console.log("Dashboard ulandi:", socket.id)
   socket.on("join_restaurant", (restaurantId) => {
@@ -33,36 +29,46 @@ io.on("connection", (socket) => {
 
 // ── DB Patch ─────────────────────────────────────────────────
 const pool = require('./db')
-pool.query(`
-  CREATE TABLE IF NOT EXISTS zones (
-    id SERIAL PRIMARY KEY,
-    restaurant_id INTEGER REFERENCES restaurants(id),
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    capacity INTEGER DEFAULT 10,
-    icon VARCHAR(10) DEFAULT '🪑',
-    is_available BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW()
-  );
-  CREATE TABLE IF NOT EXISTS premium_subscriptions (
-    id SERIAL PRIMARY KEY,
-    restaurant_id INTEGER REFERENCES restaurants(id),
-    plan VARCHAR(20) DEFAULT 'monthly',
-    amount INTEGER NOT NULL,
-    status VARCHAR(20) DEFAULT 'active',
-    started_at TIMESTAMP DEFAULT NOW(),
-    expires_at TIMESTAMP,
-    created_at TIMESTAMP DEFAULT NOW()
-  );
-  ALTER TABLE reservations ADD COLUMN IF NOT EXISTS zone_id INTEGER REFERENCES zones(id);
-  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS working_hours VARCHAR(50) DEFAULT '10:00 — 22:00';
-  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,6);
-  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS longitude DECIMAL(10,6);
-  ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image_url TEXT;
-  ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
-  ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner';
-`).then(() => console.log("✅ DB patch qo'llanildi"))
-  .catch(e => console.error("DB patch xato:", e.message))
+
+const PORT = process.env.PORT || 3000
+server.listen(PORT, async () => {
+  console.log(`Server ${PORT} portda ishlayapti`)
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS zones (
+        id SERIAL PRIMARY KEY,
+        restaurant_id INTEGER REFERENCES restaurants(id),
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        capacity INTEGER DEFAULT 10,
+        icon VARCHAR(10) DEFAULT '🪑',
+        is_available BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS premium_subscriptions (
+        id SERIAL PRIMARY KEY,
+        restaurant_id INTEGER REFERENCES restaurants(id),
+        plan VARCHAR(20) DEFAULT 'monthly',
+        amount INTEGER NOT NULL,
+        status VARCHAR(20) DEFAULT 'active',
+        started_at TIMESTAMP DEFAULT NOW(),
+        expires_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS zone_id INTEGER REFERENCES zones(id);
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS pre_order JSONB DEFAULT '[]';
+      ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS working_hours VARCHAR(50) DEFAULT '10:00 — 22:00';
+      ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,6);
+      ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS longitude DECIMAL(10,6);
+      ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image_url TEXT;
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner';
+    `)
+    console.log("✅ DB patch qo'llanildi")
+  } catch(e) {
+    console.error("DB patch xato:", e.message)
+  }
+})
 
 // ── Setup endpoints ───────────────────────────────────────────
 app.get('/setup-admin', async (req, res) => {
@@ -76,9 +82,7 @@ app.get('/setup-admin', async (req, res) => {
       [hash]
     )
     res.send(`<h2>✅ Admin yaratildi!</h2><p><b>Email:</b> admin@onetable.uz</p><p><b>Parol:</b> admin123</p>`)
-  } catch(e) {
-    res.send('Xato: ' + e.message)
-  }
+  } catch(e) { res.send('Xato: ' + e.message) }
 })
 
 app.get('/setup-reviews', async (req, res) => {
@@ -99,9 +103,7 @@ app.get('/setup-reviews', async (req, res) => {
     await pool.query(`ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS rating NUMERIC(3,1) DEFAULT 0`)
     await pool.query(`ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0`)
     res.send('✅ Reviews jadvali tayyor!')
-  } catch(e) {
-    res.send('Xato: ' + e.message)
-  }
+  } catch(e) { res.send('Xato: ' + e.message) }
 })
 
 app.get('/fix-owner', async (req, res) => {
@@ -115,9 +117,7 @@ app.get('/fix-owner', async (req, res) => {
       [hash]
     )
     res.send('✅ Tayyor! Login: admin@onetable.uz | Parol: secret123')
-  } catch(e) {
-    res.send('Xato: ' + e.message)
-  }
+  } catch(e) { res.send('Xato: ' + e.message) }
 })
 
 // ── Dashboard ─────────────────────────────────────────────────
@@ -145,9 +145,4 @@ app.use("/api/ai", aiRoutes)
 
 app.get("/", (req, res) => {
   res.send("OneTable API ishlayapti ✅")
-})
-
-const PORT = process.env.PORT || 3000
-server.listen(PORT, () => {
-  console.log(`Server ${PORT} portda ishlayapti`)
 })
