@@ -152,9 +152,8 @@ function checkEnvVars() {
   const missing = required.filter(key => !process.env[key]);
 
   if (missing.length) {
-    console.error('❌ Muhim env variablelar topilmadi:', missing.join(', '));
-    console.error('Iltimos .env faylini tekshiring!');
-    process.exit(1);
+   console.warn('⚠️ Env variablelar topilmadi:', missing.join(', '));
+    return;
   }
   console.log('✅ Env variablelar tekshirildi');
 }
