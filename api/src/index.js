@@ -22,26 +22,59 @@ app.set("io", io)
 // Socket connection
 io.on("connection", (socket) => {
   console.log("Dashboard ulandi:", socket.id)
-
-  // Owner o'z restoran xonasiga qo'shiladi
   socket.on("join_restaurant", (restaurantId) => {
     socket.join(`restaurant_${restaurantId}`)
     console.log(`Owner restaurant_${restaurantId} xonasiga qo'shildi`)
   })
-
   socket.on("disconnect", () => {
     console.log("Dashboard uzildi:", socket.id)
   })
 })
 
+// ── DB Patch ─────────────────────────────────────────────────
+const pool = require('./db')
+pool.query(`
+  CREATE TABLE IF NOT EXISTS zones (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INTEGER REFERENCES restaurants(id),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    capacity INTEGER DEFAULT 10,
+    icon VARCHAR(10) DEFAULT '🪑',
+    is_available BOOLEAN DEFAULT true,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+  CREATE TABLE IF NOT EXISTS premium_subscriptions (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INTEGER REFERENCES restaurants(id),
+    plan VARCHAR(20) DEFAULT 'monthly',
+    amount INTEGER NOT NULL,
+    status VARCHAR(20) DEFAULT 'active',
+    started_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+  );
+  ALTER TABLE reservations ADD COLUMN IF NOT EXISTS zone_id INTEGER REFERENCES zones(id);
+  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS working_hours VARCHAR(50) DEFAULT '10:00 — 22:00';
+  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS latitude DECIMAL(10,6);
+  ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS longitude DECIMAL(10,6);
+  ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS image_url TEXT;
+  ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
+  ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner';
+`).then(() => console.log("✅ DB patch qo'llanildi"))
+  .catch(e => console.error("DB patch xato:", e.message))
+
+// ── Setup endpoints ───────────────────────────────────────────
 app.get('/setup-admin', async (req, res) => {
   try {
     const bcrypt = require('bcryptjs')
-    const pool = require('./db')
     await pool.query(`ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner'`)
     await pool.query(`DELETE FROM restaurant_owners WHERE email = 'admin@onetable.uz'`)
     const hash = await bcrypt.hash('admin123', 10)
-    await pool.query(`INSERT INTO restaurant_owners (email, password_hash, role) VALUES ('admin@onetable.uz', $1, 'admin')`, [hash])
+    await pool.query(
+      `INSERT INTO restaurant_owners (email, password_hash, role) VALUES ('admin@onetable.uz', $1, 'admin')`,
+      [hash]
+    )
     res.send(`<h2>✅ Admin yaratildi!</h2><p><b>Email:</b> admin@onetable.uz</p><p><b>Parol:</b> admin123</p>`)
   } catch(e) {
     res.send('Xato: ' + e.message)
@@ -50,7 +83,6 @@ app.get('/setup-admin', async (req, res) => {
 
 app.get('/setup-reviews', async (req, res) => {
   try {
-    const pool = require('./db')
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
@@ -72,11 +104,29 @@ app.get('/setup-reviews', async (req, res) => {
   }
 })
 
+app.get('/fix-owner', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs')
+    const hash = await bcrypt.hash('secret123', 10)
+    await pool.query(`DELETE FROM restaurant_owners WHERE email = 'admin@onetable.uz'`)
+    await pool.query(
+      `INSERT INTO restaurant_owners (email, password_hash, restaurant_id, full_name, role)
+       VALUES ('admin@onetable.uz', $1, 1, 'Admin', 'admin')`,
+      [hash]
+    )
+    res.send('✅ Tayyor! Login: admin@onetable.uz | Parol: secret123')
+  } catch(e) {
+    res.send('Xato: ' + e.message)
+  }
+})
+
+// ── Dashboard ─────────────────────────────────────────────────
 app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../webapp/dashboard.html'))
 })
 
+// ── Routes ────────────────────────────────────────────────────
 const restaurantRoutes = require("./routes/restaurants")
 const reservationRoutes = require("./routes/reservations")
 const authRoutes = require("./routes/auth")
