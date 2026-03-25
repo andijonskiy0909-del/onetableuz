@@ -1,65 +1,46 @@
-/**
- * OneTable — Auth Middleware
- * JWT authentication for users and owners
- */
 const jwt = require('jsonwebtoken');
+const config = require('../config/env');
 
-// ── User Auth ─────────────────────────────────────────────────
 function userAuth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = jwt.verify(token, config.JWT_SECRET);
     next();
-  } catch (e) {
-    if (e.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token muddati tugagan. Qayta kiring.' });
-    }
-    return res.status(401).json({ error: 'Token noto\'g\'ri' });
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') return res.status(401).json({ error: 'Token expired' });
+    return res.status(401).json({ error: 'Invalid token' });
   }
 }
 
-// ── Owner Auth ────────────────────────────────────────────────
 function ownerAuth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== 'owner' && decoded.role !== 'admin') {
-      return res.status(403).json({ error: 'Ruxsat yo\'q' });
-    }
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    if (decoded.role !== 'owner' && decoded.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
     req.owner = decoded;
     next();
-  } catch (e) {
-    if (e.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token muddati tugagan. Qayta kiring.' });
-    }
-    return res.status(401).json({ error: 'Token noto\'g\'ri' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
   }
 }
 
-// ── Admin Only ────────────────────────────────────────────────
 function adminAuth(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== 'admin') {
-      return res.status(403).json({ error: 'Faqat admin uchun' });
-    }
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    if (decoded.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
     req.admin = decoded;
     next();
-  } catch (e) {
-    return res.status(401).json({ error: 'Token noto\'g\'ri' });
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
   }
 }
 
-// ── Token yaratish ────────────────────────────────────────────
-function createToken(payload, expiresIn = '30d') {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+function createToken(payload) {
+  return jwt.sign(payload, config.JWT_SECRET, { expiresIn: config.JWT_EXPIRES_IN });
 }
 
 module.exports = { userAuth, ownerAuth, adminAuth, createToken };
