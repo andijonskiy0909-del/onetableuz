@@ -1,12 +1,62 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
 const fetch = require('node-fetch');
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const WEBHOOK_URL = process.env.WEBHOOK_URL || 'https://onetableuz-bot.up.railway.app';
+const BOT_TOKEN = process.env.BOT_TOKEN;
 const WEBAPP_URL = process.env.WEBAPP_URL || 'https://onetableuz.vercel.app';
 const API_URL = process.env.API_URL || 'https://onetableuz-production.up.railway.app/api';
 
-// ── Tarjimalar ───────────────────────────────────────────────
+// ── Webhook mode ──────────────────────────────────────────────
+const bot = new TelegramBot(BOT_TOKEN, { polling: false });
+
+// Webhook sozlash
+bot.setWebHook(`${WEBHOOK_URL}/webhook/${BOT_TOKEN}`)
+  .then(() => console.log('✅ Webhook sozlandi:', `${WEBHOOK_URL}/webhook/${BOT_TOKEN}`))
+  .catch(e => console.error('Webhook xatoligi:', e.message));
+
+// Express server
+const app = express();
+app.use(express.json());
+
+// Webhook endpoint
+app.post(`/webhook/${BOT_TOKEN}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', bot: 'OneTable', timestamp: new Date().toISOString() });
+});
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ OneTable bot ishga tushdi! (UZ/RU/EN) — AI + Review faol 🤖⭐`);
+  console.log(`🚀 Server ${PORT} portda`);
+});
+
+// ── Cron: Review so'rash ──────────────────────────────────────
+async function checkAndAskReviews() {
+  try {
+    const res = await fetch(`${API_URL}/reservations/past-unreviewed`);
+    if (!res.ok) return;
+    const reservations = await res.json();
+    for (const r of reservations) {
+      if (r.telegram_id) {
+        await askForReview(r.telegram_id, r.id, r.restaurant_id, r.restaurant_name);
+        await fetch(`${API_URL}/reservations/${r.id}/review-asked`, { method: 'PUT' });
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+  } catch(e) {
+    console.error('Review cron xatoligi:', e.message);
+  }
+}
+setInterval(checkAndAskReviews, 30 * 60 * 1000);
+setTimeout(checkAndAskReviews, 15000);
+
+// ── Tarjimalar ────────────────────────────────────────────────
 const i18n = {
   uz: {
     welcome: (name) => `Salom, ${name}! 👋\n\nOneTable — Har bir kechani unutilmas qiling. ✨\n\n🍽 Restoranlarni ko'ring\n📅 Bron qiling\n⭐ Baholang`,
@@ -19,8 +69,7 @@ const i18n = {
     new_booking: (name, date, time, guests) => `🎉 Yangi bron!\n\n🍽 Restoran: ${name}\n📅 Sana: ${date}\n⏰ Vaqt: ${time}\n👥 Mehmonlar: ${guests} kishi`,
     booking_confirmed: (name, date, time) => `✅ Broningiz tasdiqlandi!\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}\n\nRestoranga vaqtida keling! 🙌`,
     booking_cancelled: (name, date, time) => `❌ Afsuski, broningiz bekor qilindi.\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}`,
-    choose_lang: 'Tilni tanlang:',
-    review_ask: (name) => `⭐ <b>${name}</b> restoraniga qanday baho berasiz?\n\nQuyidagi yulduzlardan birini tanlang:`,
+    review_ask: (name) => `⭐ <b>${name}</b> restoraniga qanday baho berasiz?\n\nYulduzlardan birini tanlang:`,
     review_comment_ask: '💬 Sharh yozmoqchimisiz? Yozing yoki o\'tkazib yuboring:',
     review_photo_ask: '📸 Rasm yubormoqchimisiz? Yuboring yoki o\'tkazib yuboring:',
     review_skip: '⏭ O\'tkazib yuborish',
@@ -43,7 +92,6 @@ const i18n = {
     new_booking: (name, date, time, guests) => `🎉 Новое бронирование!\n\n🍽 Ресторан: ${name}\n📅 Дата: ${date}\n⏰ Время: ${time}\n👥 Гостей: ${guests}`,
     booking_confirmed: (name, date, time) => `✅ Бронирование подтверждено!\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}\n\nПриходите вовремя! 🙌`,
     booking_cancelled: (name, date, time) => `❌ К сожалению, ваше бронирование отменено.\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}`,
-    choose_lang: 'Выберите язык:',
     review_ask: (name) => `⭐ Как вы оцениваете ресторан <b>${name}</b>?\n\nВыберите звёзды:`,
     review_comment_ask: '💬 Хотите написать отзыв? Напишите или пропустите:',
     review_photo_ask: '📸 Хотите прикрепить фото? Отправьте или пропустите:',
@@ -67,7 +115,6 @@ const i18n = {
     new_booking: (name, date, time, guests) => `🎉 New booking!\n\n🍽 Restaurant: ${name}\n📅 Date: ${date}\n⏰ Time: ${time}\n👥 Guests: ${guests}`,
     booking_confirmed: (name, date, time) => `✅ Booking confirmed!\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}\n\nSee you there! 🙌`,
     booking_cancelled: (name, date, time) => `❌ Unfortunately, your booking was cancelled.\n\n🍽 ${name}\n📅 ${date} — ⏰ ${time}`,
-    choose_lang: 'Choose language:',
     review_ask: (name) => `⭐ How would you rate <b>${name}</b>?\n\nChoose your rating:`,
     review_comment_ask: '💬 Want to leave a comment? Write it or skip:',
     review_photo_ask: '📸 Want to add a photo? Send it or skip:',
@@ -85,8 +132,8 @@ const i18n = {
 // ── State ─────────────────────────────────────────────────────
 const userLangs = {};
 const reviewStates = {};
-const aiModes = {}; // userId -> true/false
-const aiHistory = {}; // userId -> [{role, content}]
+const aiModes = {};
+const aiHistory = {};
 
 function T(userId, key, ...args) {
   const lang = userLangs[userId] || 'uz';
@@ -95,14 +142,13 @@ function T(userId, key, ...args) {
   return val || key;
 }
 
-// ── /start ───────────────────────────────────────────────────
+// ── /start ────────────────────────────────────────────────────
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
   const userId = msg.from.id;
   const firstName = msg.from.first_name || 'Foydalanuvchi';
   const langCode = msg.from.language_code || 'uz';
 
-  // AI moddan chiq
   aiModes[userId] = false;
   aiHistory[userId] = [];
 
@@ -129,41 +175,30 @@ bot.onText(/\/start/, (msg) => {
   });
 });
 
-// ── /help ────────────────────────────────────────────────────
 bot.onText(/\/help/, (msg) => {
   bot.sendMessage(msg.chat.id, T(msg.from.id, 'help'));
 });
 
-// ── /ai ──────────────────────────────────────────────────────
 bot.onText(/\/ai/, (msg) => {
   const userId = msg.from.id;
-  const chatId = msg.chat.id;
   aiModes[userId] = true;
   aiHistory[userId] = [];
-  bot.sendMessage(chatId, T(userId, 'ai_welcome'), {
-    reply_markup: {
-      inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]]
-    }
+  bot.sendMessage(msg.chat.id, T(userId, 'ai_welcome'), {
+    reply_markup: { inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]] }
   });
 });
 
-// ── /restaurants ─────────────────────────────────────────────
 bot.onText(/\/restaurants/, (msg) => {
   const userId = msg.from.id;
   bot.sendMessage(msg.chat.id, T(userId, 'open_restaurants'), {
-    reply_markup: {
-      inline_keyboard: [[{ text: T(userId, 'open_btn'), web_app: { url: WEBAPP_URL } }]]
-    }
+    reply_markup: { inline_keyboard: [[{ text: T(userId, 'open_btn'), web_app: { url: WEBAPP_URL } }]] }
   });
 });
 
-// ── /mybookings ──────────────────────────────────────────────
 bot.onText(/\/mybookings/, (msg) => {
   const userId = msg.from.id;
   bot.sendMessage(msg.chat.id, T(userId, 'btn_bookings'), {
-    reply_markup: {
-      inline_keyboard: [[{ text: T(userId, 'btn_bookings'), web_app: { url: WEBAPP_URL } }]]
-    }
+    reply_markup: { inline_keyboard: [[{ text: T(userId, 'btn_bookings'), web_app: { url: WEBAPP_URL } }]] }
   });
 });
 
@@ -173,55 +208,41 @@ bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const data = query.data;
 
-  // Til tanlash
   if (data.startsWith('lang_')) {
     const lang = data.replace('lang_', '');
     userLangs[userId] = lang;
     await bot.answerCallbackQuery(query.id);
     const firstName = query.from.first_name || '';
     bot.editMessageText(T(userId, 'welcome', firstName), {
-      chat_id: chatId,
-      message_id: query.message.message_id,
-      parse_mode: 'HTML',
+      chat_id: chatId, message_id: query.message.message_id, parse_mode: 'HTML',
       reply_markup: {
         inline_keyboard: [
           [{ text: T(userId, 'btn_restaurants'), web_app: { url: WEBAPP_URL } }],
           [{ text: T(userId, 'btn_bookings'), web_app: { url: WEBAPP_URL } }],
           [{ text: T(userId, 'btn_ai'), callback_data: 'open_ai' }],
-          [
-            { text: '🇺🇿', callback_data: 'lang_uz' },
-            { text: '🇷🇺', callback_data: 'lang_ru' },
-            { text: '🇬🇧', callback_data: 'lang_en' }
-          ]
+          [{ text: '🇺🇿', callback_data: 'lang_uz' }, { text: '🇷🇺', callback_data: 'lang_ru' }, { text: '🇬🇧', callback_data: 'lang_en' }]
         ]
       }
     });
     return;
   }
 
-  // AI ochish
   if (data === 'open_ai') {
     await bot.answerCallbackQuery(query.id);
-    aiModes[userId] = true;
-    aiHistory[userId] = [];
+    aiModes[userId] = true; aiHistory[userId] = [];
     bot.sendMessage(chatId, T(userId, 'ai_welcome'), {
-      reply_markup: {
-        inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]]
-      }
+      reply_markup: { inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]] }
     });
     return;
   }
 
-  // AI dan chiqish
   if (data === 'exit_ai') {
     await bot.answerCallbackQuery(query.id);
-    aiModes[userId] = false;
-    aiHistory[userId] = [];
+    aiModes[userId] = false; aiHistory[userId] = [];
     bot.sendMessage(chatId, T(userId, 'ai_exit'));
     return;
   }
 
-  // Review rating
   if (data.startsWith('review_rate_')) {
     const parts = data.split('_');
     const rating = parseInt(parts[2]);
@@ -230,8 +251,7 @@ bot.on('callback_query', async (query) => {
     await bot.answerCallbackQuery(query.id, { text: T(userId, 'review_star', rating) });
     reviewStates[userId] = {
       step: 'comment', reservationId, restaurantId,
-      restaurantName: reviewStates[userId]?.restaurantName || '',
-      rating
+      restaurantName: reviewStates[userId]?.restaurantName || '', rating
     };
     bot.sendMessage(chatId, T(userId, 'review_comment_ask'), {
       reply_markup: { inline_keyboard: [[{ text: T(userId, 'review_skip'), callback_data: 'review_skip_comment' }]] }
@@ -265,17 +285,13 @@ bot.on('callback_query', async (query) => {
 bot.on('message', async (msg) => {
   const userId = msg.from.id;
   const chatId = msg.chat.id;
-
-  // /start va boshqa buyruqlarni skip
   if (msg.text && msg.text.startsWith('/')) return;
 
-  // ── AI mode ──────────────────────────────────────────────
   if (aiModes[userId] && msg.text) {
     await handleAI(userId, chatId, msg.text);
     return;
   }
 
-  // ── Review state ─────────────────────────────────────────
   const state = reviewStates[userId];
   if (!state) return;
 
@@ -291,23 +307,20 @@ bot.on('message', async (msg) => {
   if (state.step === 'photo' && msg.photo) {
     const photoId = msg.photo[msg.photo.length - 1].file_id;
     const fileInfo = await bot.getFile(photoId);
-    const photoUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${fileInfo.file_path}`;
+    const photoUrl = `https://api.telegram.org/file/bot${BOT_TOKEN}/${fileInfo.file_path}`;
     await saveReview(userId, chatId, photoUrl);
     return;
   }
 });
 
-// ── AI javob berish ───────────────────────────────────────────
+// ── AI ────────────────────────────────────────────────────────
 async function handleAI(userId, chatId, userMessage) {
   const lang = userLangs[userId] || 'uz';
   const typingMsg = await bot.sendMessage(chatId, T(userId, 'ai_typing'));
-
   try {
     if (!aiHistory[userId]) aiHistory[userId] = [];
     aiHistory[userId].push({ role: 'user', content: userMessage });
     if (aiHistory[userId].length > 10) aiHistory[userId] = aiHistory[userId].slice(-10);
-
-    console.log('GROQ_KEY bor:', process.env.GROQ_API_KEY ? 'HA ✅' : 'YOQ ❌');
 
     let restaurantsContext = '';
     try {
@@ -318,35 +331,25 @@ async function handleAI(userId, chatId, userMessage) {
           `- ${r.name} (${r.cuisine?.join(', ')}, ${r.price_category}, ${r.address})`
         ).join('\n');
       }
-    } catch(e) { console.log('Restaurants xatoligi:', e.message); }
+    } catch(e) {}
 
     const systemPrompts = {
-      uz: `Sen OneTable platformasining AI yordamchisisisan. Toshkentdagi restoranlar uchun smart booking platformasi.\nRestoranlar, bron qilish va menyu haqida yordam berasan.\n${restaurantsContext ? `Mavjud restoranlar:\n${restaurantsContext}` : ''}\nQisqa va do'stona javob ber. O'zbek tilida yoz.`,
+      uz: `Sen OneTable platformasining AI yordamchisisisan. Toshkentdagi restoranlar uchun smart booking platformasi.\n${restaurantsContext ? `Mavjud restoranlar:\n${restaurantsContext}` : ''}\nQisqa va do'stona javob ber. O'zbek tilida yoz.`,
       ru: `Ты AI-ассистент платформы OneTable. Рестораны Ташкента.\n${restaurantsContext ? `Рестораны:\n${restaurantsContext}` : ''}\nОтвечай кратко по-русски.`,
       en: `You are AI assistant for OneTable. Tashkent restaurants.\n${restaurantsContext ? `Restaurants:\n${restaurantsContext}` : ''}\nBe brief in English.`
     };
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: systemPrompts[lang] || systemPrompts.uz },
-          ...aiHistory[userId]
-        ],
-        max_tokens: 500,
-        temperature: 0.7
+        messages: [{ role: 'system', content: systemPrompts[lang] || systemPrompts.uz }, ...aiHistory[userId]],
+        max_tokens: 500, temperature: 0.7
       })
     });
 
     const data = await groqRes.json();
-    console.log('Groq status:', groqRes.status);
-    console.log('Groq data:', JSON.stringify(data).substring(0, 300));
-
     const reply = data.choices?.[0]?.message?.content;
     if (!reply) throw new Error(data.error?.message || 'No reply');
 
@@ -354,19 +357,16 @@ async function handleAI(userId, chatId, userMessage) {
     await bot.deleteMessage(chatId, typingMsg.message_id).catch(() => {});
     await bot.sendMessage(chatId, reply, {
       parse_mode: 'HTML',
-      reply_markup: {
-        inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]]
-      }
+      reply_markup: { inline_keyboard: [[{ text: '❌ AI dan chiqish', callback_data: 'exit_ai' }]] }
     });
-
-  } catch (err) {
+  } catch(err) {
     console.error('AI xatoligi:', err.message);
     await bot.deleteMessage(chatId, typingMsg.message_id).catch(() => {});
     bot.sendMessage(chatId, T(userId, 'ai_error'));
   }
 }
 
-// ── Review saqlash ────────────────────────────────────────────
+// ── Review ────────────────────────────────────────────────────
 async function saveReview(userId, chatId, photoUrl) {
   const state = reviewStates[userId];
   if (!state) return;
@@ -375,24 +375,20 @@ async function saveReview(userId, chatId, photoUrl) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        telegram_id: userId,
-        reservation_id: state.reservationId,
-        restaurant_id: state.restaurantId,
-        rating: state.rating,
-        comment: state.comment || null,
-        photo_url: photoUrl || null
+        telegram_id: userId, reservation_id: state.reservationId,
+        restaurant_id: state.restaurantId, rating: state.rating,
+        comment: state.comment || null, photo_url: photoUrl || null
       })
     });
     if (res.ok) bot.sendMessage(chatId, T(userId, 'review_saved'));
     else bot.sendMessage(chatId, '❌ Saqlashda xatolik. Keyinroq urinib ko\'ring.');
-  } catch (e) {
+  } catch(e) {
     console.error('Review saqlashda xatolik:', e.message);
   } finally {
     delete reviewStates[userId];
   }
 }
 
-// ── Review so'rash ────────────────────────────────────────────
 async function askForReview(telegramId, reservationId, restaurantId, restaurantName) {
   try {
     const userId = telegramId;
@@ -406,12 +402,11 @@ async function askForReview(telegramId, reservationId, restaurantId, restaurantN
       parse_mode: 'HTML',
       reply_markup: { inline_keyboard: [stars.slice(0,3), [...stars.slice(3), { text: i18n[lang].review_cancel, callback_data: 'review_cancel' }]] }
     });
-  } catch (e) {
+  } catch(e) {
     console.error('Review so\'rash xatoligi:', e.message);
   }
 }
 
-// ── Bildirishnoma ─────────────────────────────────────────────
 async function sendBookingNotification(telegramId, type, data) {
   try {
     const userId = telegramId;
@@ -423,10 +418,9 @@ async function sendBookingNotification(telegramId, type, data) {
       setTimeout(() => askForReview(telegramId, data.reservation_id, data.restaurant_id, data.restaurant_name), 2000);
     } else if (type === 'cancelled') text = i18n[lang].booking_cancelled(data.restaurant_name, data.date, data.time);
     if (text) await bot.sendMessage(telegramId, text, { parse_mode: 'HTML' });
-  } catch (err) {
+  } catch(err) {
     console.error('Bildirishnoma xatoligi:', err.message);
   }
 }
 
 module.exports = { bot, sendBookingNotification, askForReview };
-console.log('✅ OneTable bot ishga tushdi! (UZ/RU/EN) — AI + Review faol 🤖⭐');
