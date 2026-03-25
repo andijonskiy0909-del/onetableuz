@@ -1,23 +1,34 @@
 {
-  "name": "onetable-api",
-  "version": "1.0.0",
-  "main": "src/index.js",
+  "name": "onetable",
+  "version": "2.0.0",
+  "description": "OneTable Restaurant Booking Platform",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "migrate": "node src/migrate.js",
-    "seed": "node src/seed.js",
-    "setup": "node src/migrate.js && node src/seed.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "bot": "node bot/index.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "setup": "npm run migrate && npm run seed"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.0",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "bull": "^4.12.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.3.2",
+    "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.0",
-    "bcryptjs": "^2.4.3",
+    "node-fetch": "^2.7.0",
     "node-telegram-bot-api": "^0.64.0",
-    "socket.io": "^4.7.2"
+    "pg": "^8.11.3",
+    "socket.io": "^4.7.2",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
