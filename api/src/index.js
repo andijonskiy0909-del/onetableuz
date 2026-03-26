@@ -1,97 +1,187 @@
-const express = require("express")
-const cors = require("cors")
-const path = require("path")
-require("dotenv").config()
-const app = express()
-app.use(cors())
-app.use(express.json())
+/**
+ * OneTable — Chat System
+ * Mijoz ↔ Restoran xabarlashuvi
+ */
+const router = require('express').Router()
+const pool = require('../db')
+const { userAuth } = require('../middleware/auth')
+const { ownerAuth } = require('../middleware/auth')
 
-// ── Admin sozlash (1 MARTA) ───────────────────────────────────
-app.get('/setup-admin', async (req, res) => {
+// ── Xabar yuborish (Mijoz) ────────────────────────────────────
+router.post('/:reservation_id/messages', userAuth, async (req, res) => {
   try {
-    const bcrypt = require('bcryptjs')
-    const pool = require('./db')
-    await pool.query(`ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner'`)
-    await pool.query(`DELETE FROM restaurant_owners WHERE email = 'admin@onetable.uz'`)
-    const hash = await bcrypt.hash('admin123', 10)
-    await pool.query(`INSERT INTO restaurant_owners (email, password_hash, role) VALUES ('admin@onetable.uz', $1, 'admin')`, [hash])
-    res.send(`<h2>✅ Admin yaratildi!</h2><p>Email: admin@onetable.uz | Parol: admin123</p>`)
-  } catch(e) { res.send('Xato: ' + e.message) }
+    const { message } = req.body
+    const reservationId = parseInt(req.params.reservation_id)
+
+    if (!message?.trim()) return res.status(400).json({ error: 'Xabar bo\'sh bo\'lishi mumkin emas' })
+
+    // Bron mavjudligini tekshirish
+    const reservation = await pool.query(
+      'SELECT * FROM reservations WHERE id=$1 AND user_id=$2',
+      [reservationId, req.user.id]
+    )
+    if (!reservation.rows.length) return res.status(404).json({ error: 'Bron topilmadi' })
+
+    const result = await pool.query(`
+      INSERT INTO chat_messages (reservation_id, restaurant_id, user_id, sender_type, message)
+      VALUES ($1, $2, $3, 'user', $4) RETURNING *
+    `, [reservationId, reservation.rows[0].restaurant_id, req.user.id, message.trim()])
+
+    const newMsg = result.rows[0]
+
+    // Socket.io — real-time
+    const io = req.app.get('io')
+    if (io) {
+      io.to(`restaurant_${reservation.rows[0].restaurant_id}`).emit('new_message', {
+        ...newMsg, sender_type: 'user'
+      })
+    }
+
+    // Restoran egasiga Telegram xabar
+    const ownerResult = await pool.query(
+      'SELECT telegram_id FROM restaurant_owners WHERE restaurant_id=$1',
+      [reservation.rows[0].restaurant_id]
+    )
+    if (ownerResult.rows[0]?.telegram_id) {
+      const userInfo = await pool.query('SELECT first_name FROM users WHERE id=$1', [req.user.id])
+      const userName = userInfo.rows[0]?.first_name || 'Mijoz'
+      sendTelegramMsg(ownerResult.rows[0].telegram_id,
+        `💬 <b>Yangi xabar!</b>\n👤 ${userName}: ${message}\n\n📅 Bron #${reservationId}`
+      ).catch(() => {})
+    }
+
+    res.status(201).json(newMsg)
+  } catch (err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
 })
 
-// ── Barcha jadvallarni yaratish (1 MARTA) ─────────────────────
-app.get('/setup-db', async (req, res) => {
+// ── Xabar yuborish (Restoran egasi) ──────────────────────────
+router.post('/:reservation_id/messages/owner', ownerAuth, async (req, res) => {
   try {
-    const pool = require('./db')
+    const { message } = req.body
+    const reservationId = parseInt(req.params.reservation_id)
 
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS reviews (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id),
-        restaurant_id INTEGER REFERENCES restaurants(id),
-        reservation_id INTEGER REFERENCES reservations(id),
-        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-        comment TEXT, photo_url TEXT,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `)
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS payments (
-        id SERIAL PRIMARY KEY,
-        reservation_id INTEGER REFERENCES reservations(id),
-        user_id INTEGER REFERENCES users(id),
-        restaurant_id INTEGER REFERENCES restaurants(id),
-        amount INTEGER NOT NULL,
-        type VARCHAR(20) DEFAULT 'deposit',
-        provider VARCHAR(20),
-        status VARCHAR(20) DEFAULT 'pending',
-        transaction_id VARCHAR(100),
-        paid_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT NOW(),
-        UNIQUE(reservation_id, provider)
-      )
-    `)
-    await pool.query(`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS requires_deposit BOOLEAN DEFAULT false`)
-    await pool.query(`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'not_required'`)
-    await pool.query(`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS special_request TEXT`)
-    await pool.query(`ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS rating NUMERIC(3,1) DEFAULT 0`)
-    await pool.query(`ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS review_count INTEGER DEFAULT 0`)
+    if (!message?.trim()) return res.status(400).json({ error: 'Xabar bo\'sh bo\'lishi mumkin emas' })
 
-    res.send(`<h2>✅ Barcha jadvallar tayyor!</h2>
-      <p>✅ reviews, payments, reservations (yangi ustunlar), restaurants (rating)</p>
-      <p><a href="/setup-admin">Admin yaratish →</a></p>`)
-  } catch(e) { res.send('Xato: ' + e.message) }
+    const reservation = await pool.query(
+      'SELECT * FROM reservations WHERE id=$1 AND restaurant_id=$2',
+      [reservationId, req.owner.restaurant_id]
+    )
+    if (!reservation.rows.length) return res.status(404).json({ error: 'Bron topilmadi' })
+
+    const result = await pool.query(`
+      INSERT INTO chat_messages (reservation_id, restaurant_id, user_id, sender_type, message)
+      VALUES ($1, $2, $3, 'owner', $4) RETURNING *
+    `, [reservationId, req.owner.restaurant_id, reservation.rows[0].user_id, message.trim()])
+
+    const newMsg = result.rows[0]
+
+    // Socket.io
+    const io = req.app.get('io')
+    if (io) {
+      io.to(`user_${reservation.rows[0].user_id}`).emit('new_message', {
+        ...newMsg, sender_type: 'owner'
+      })
+    }
+
+    // Foydalanuvchiga Telegram xabar
+    const userResult = await pool.query(
+      'SELECT telegram_id, first_name FROM users WHERE id=$1',
+      [reservation.rows[0].user_id]
+    )
+    if (userResult.rows[0]?.telegram_id) {
+      const restoResult = await pool.query('SELECT name FROM restaurants WHERE id=$1', [req.owner.restaurant_id])
+      const restoName = restoResult.rows[0]?.name || 'Restoran'
+      sendTelegramMsg(userResult.rows[0].telegram_id,
+        `💬 <b>${restoName} dan xabar:</b>\n${message}\n\n📅 Bron #${reservationId}`
+      ).catch(() => {})
+    }
+
+    // O'qilmagan xabarlarni belgilash
+    await pool.query(
+      `UPDATE chat_messages SET is_read=true
+       WHERE reservation_id=$1 AND sender_type='user' AND is_read=false`,
+      [reservationId]
+    )
+
+    res.status(201).json(newMsg)
+  } catch (err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
 })
 
-// ── Dashboard ─────────────────────────────────────────────────
-app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../webapp/dashboard.html'))
+// ── Xabarlarni olish ──────────────────────────────────────────
+router.get('/:reservation_id/messages', userAuth, async (req, res) => {
+  try {
+    const reservationId = parseInt(req.params.reservation_id)
+
+    // Foydalanuvchi o'z bronining xabarlarini ko'ra oladi
+    const reservation = await pool.query(
+      'SELECT id FROM reservations WHERE id=$1 AND user_id=$2',
+      [reservationId, req.user.id]
+    )
+    if (!reservation.rows.length) return res.status(404).json({ error: 'Bron topilmadi' })
+
+    const result = await pool.query(`
+      SELECT cm.*, u.first_name
+      FROM chat_messages cm
+      LEFT JOIN users u ON cm.user_id = u.id
+      WHERE cm.reservation_id = $1
+      ORDER BY cm.created_at ASC
+    `, [reservationId])
+
+    // Owner xabarlarini o'qilgan deb belgilash
+    await pool.query(
+      `UPDATE chat_messages SET is_read=true
+       WHERE reservation_id=$1 AND sender_type='owner' AND is_read=false`,
+      [reservationId]
+    )
+
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
 })
 
-// ── Routes ────────────────────────────────────────────────────
-const restaurantRoutes = require("./routes/restaurants")
-const reservationRoutes = require("./routes/reservations")
-const authRoutes = require("./routes/auth")
-const ownerRoutes = require("./routes/owner")
-const adminRoutes = require("./routes/admin")
-const reviewRoutes = require("./routes/reviews")
-const paymentRoutes = require("./routes/payments")
+// ── Owner uchun barcha xabarlar ───────────────────────────────
+router.get('/owner/messages', ownerAuth, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT cm.*, u.first_name, u.last_name,
+             r.date, r.time, r.guests
+      FROM chat_messages cm
+      JOIN users u ON cm.user_id = u.id
+      JOIN reservations r ON cm.reservation_id = r.id
+      WHERE cm.restaurant_id = $1
+      ORDER BY cm.created_at DESC
+      LIMIT 100
+    `, [req.owner.restaurant_id])
 
-app.use("/api/restaurants", restaurantRoutes)
-app.use("/api/reservations", reservationRoutes)
-app.use("/api/auth", authRoutes)
-app.use("/api/owner", ownerRoutes)
-app.use("/api/admin", adminRoutes)
-app.use("/api/reviews", reviewRoutes)
-app.use("/api/payments", paymentRoutes)
+    // O'qilmagan xabarlar soni
+    const unread = await pool.query(
+      `SELECT COUNT(*) FROM chat_messages
+       WHERE restaurant_id=$1 AND sender_type='user' AND is_read=false`,
+      [req.owner.restaurant_id]
+    )
 
-app.get("/", (req, res) => {
-  res.send("OneTable API ishlayapti ✅")
+    res.json({
+      messages: result.rows,
+      unread_count: parseInt(unread.rows[0].count)
+    })
+  } catch (err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
 })
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Server ${PORT} portda ishlayapti`)
-})
+async function sendTelegramMsg(telegramId, text) {
+  const token = process.env.BOT_TOKEN
+  if (!token || !telegramId) return
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: telegramId, text, parse_mode: 'HTML' })
+  })
+}
+
+module.exports = router
