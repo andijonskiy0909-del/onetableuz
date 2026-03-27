@@ -1,75 +1,44 @@
-const jwt = require('jsonwebtoken');
-const logger = require('../config/logger');
+const jwt = require('jsonwebtoken')
 
-function verifyToken(token) {
-  return jwt.verify(token, process.env.JWT_SECRET);
+function userAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) return res.status(401).json({ error: 'Token kerak' })
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET)
+    next()
+  } catch(e) {
+    return res.status(401).json({ error: e.name === 'TokenExpiredError' ? 'Token muddati tugagan' : 'Token noto\'g\'ri' })
+  }
 }
 
-function extractToken(req) {
-  return req.headers.authorization?.split(' ')[1] || null;
+function ownerAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) return res.status(401).json({ error: 'Token kerak' })
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if (!['owner','admin'].includes(decoded.role)) return res.status(403).json({ error: 'Ruxsat yo\'q' })
+    req.owner = decoded
+    next()
+  } catch(e) {
+    return res.status(401).json({ error: 'Token noto\'g\'ri' })
+  }
+}
+
+function adminAuth(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) return res.status(401).json({ error: 'Token kerak' })
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if (decoded.role !== 'admin') return res.status(403).json({ error: 'Faqat admin' })
+    req.admin = decoded
+    next()
+  } catch(e) {
+    return res.status(401).json({ error: 'Token noto\'g\'ri' })
+  }
 }
 
 function createToken(payload, expiresIn = '30d') {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn })
 }
 
-// ── User Auth ──────────────────────────────────────────────────
-function userAuth(req, res, next) {
-  const token = extractToken(req);
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-  try {
-    req.user = verifyToken(token);
-    next();
-  } catch (e) {
-    if (e.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token muddati tugagan. Qayta kiring.' });
-    }
-    return res.status(401).json({ error: "Token noto'g'ri" });
-  }
-}
-
-// ── Owner Auth ─────────────────────────────────────────────────
-function ownerAuth(req, res, next) {
-  const token = extractToken(req);
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-  try {
-    const decoded = verifyToken(token);
-    if (decoded.role !== 'owner' && decoded.role !== 'admin') {
-      return res.status(403).json({ error: "Ruxsat yo'q" });
-    }
-    req.owner = decoded;
-    next();
-  } catch (e) {
-    if (e.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token muddati tugagan. Qayta kiring.' });
-    }
-    return res.status(401).json({ error: "Token noto'g'ri" });
-  }
-}
-
-// ── Admin Auth ─────────────────────────────────────────────────
-function adminAuth(req, res, next) {
-  const token = extractToken(req);
-  if (!token) return res.status(401).json({ error: 'Token kerak' });
-  try {
-    const decoded = verifyToken(token);
-    if (decoded.role !== 'admin') {
-      return res.status(403).json({ error: 'Faqat admin uchun' });
-    }
-    req.admin = decoded;
-    next();
-  } catch (e) {
-    return res.status(401).json({ error: "Token noto'g'ri" });
-  }
-}
-
-// ── Optional Auth (public routes) ─────────────────────────────
-function optionalAuth(req, res, next) {
-  const token = extractToken(req);
-  if (token) {
-    try { req.user = verifyToken(token); } catch (e) {}
-  }
-  next();
-}
-
-module.exports = { userAuth, ownerAuth, adminAuth, optionalAuth, createToken };
+module.exports = { userAuth, ownerAuth, adminAuth, createToken }
