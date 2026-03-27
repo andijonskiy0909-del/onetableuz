@@ -1,150 +1,116 @@
-const rateLimit = require('express-rate-limit');
-const Joi = require('joi');
+const requestCounts = new Map()
+const WINDOW_MS = 15 * 60 * 1000
+setInterval(() => requestCounts.clear(), WINDOW_MS)
 
-// ── Rate Limiters ──────────────────────────────────────────────
-const apiRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 200,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Juda ko'p so'rov. 15 daqiqadan keyin urinib ko'ring." }
-});
-
-const authRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 15,
-  message: { error: "Juda ko'p urinish. 15 daqiqadan keyin urinib ko'ring." }
-});
-
-const strictRateLimiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 5,
-  message: { error: "Juda ko'p so'rov. Biroz kuting." }
-});
-
-// ── XSS Protection ────────────────────────────────────────────
-function escapeHtml(str) {
-  if (typeof str !== 'string') return str;
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;');
+function rateLimiter(max) {
+  return (req, res, next) => {
+    const key = req.ip || req.headers['x-forwarded-for'] || 'unknown'
+    const count = (requestCounts.get(key) || 0) + 1
+    requestCounts.set(key, count)
+    res.setHeader('X-RateLimit-Limit', max)
+    res.setHeader('X-RateLimit-Remaining', Math.max(0, max - count))
+    if (count > max) return res.status(429).json({ error: 'Juda ko\'p so\'rov. Keyinroq urinib ko\'ring.' })
+    next()
+  }
 }
 
-function sanitizeObject(obj) {
-  if (!obj || typeof obj !== 'object') return obj;
-  if (Array.isArray(obj)) return obj.map(sanitizeObject);
-  const clean = {};
-  for (const [key, val] of Object.entries(obj)) {
-    if (typeof val === 'string') clean[key] = escapeHtml(val.trim());
-    else if (typeof val === 'object' && val !== null) clean[key] = sanitizeObject(val);
-    else clean[key] = val;
+function escapeHtml(str) {
+  if (typeof str !== 'string') return str
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#x27;')
+}
+
+function sanitize(obj) {
+  if (!obj || typeof obj !== 'object') return obj
+  const out = {}
+  for (const [k, v] of Object.entries(obj)) {
+    if (typeof v === 'string') out[k] = escapeHtml(v.trim())
+    else if (Array.isArray(v)) out[k] = v
+    else if (v && typeof v === 'object') out[k] = sanitize(v)
+    else out[k] = v
   }
-  return clean;
+  return out
 }
 
 function xssProtection(req, res, next) {
-  if (req.body && typeof req.body === 'object') {
-    req.body = sanitizeObject(req.body);
-  }
-  next();
+  if (req.body && typeof req.body === 'object') req.body = sanitize(req.body)
+  next()
 }
 
-// ── Security Headers ──────────────────────────────────────────
 function securityHeaders(req, res, next) {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.removeHeader('X-Powered-By');
-  next();
+  res.removeHeader('X-Powered-By')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('X-XSS-Protection', '1; mode=block')
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  next()
 }
 
-// ── Joi Validation Middleware ─────────────────────────────────
-function validate(schema, source = 'body') {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req[source], { abortEarly: false, stripUnknown: true });
-    if (error) {
-      const messages = error.details.map(d => d.message.replace(/"/g, '')).join('. ');
-      return res.status(400).json({ error: messages });
-    }
-    req[source] = value;
-    next();
-  };
+function checkEnvVars() {
+  const required = ['DATABASE_URL', 'JWT_SECRET', 'BOT_TOKEN']
+  const missing = required.filter(k => !process.env[k])
+  if (missing.length) {
+    console.warn('⚠️ Env variablelar topilmadi:', missing.join(', '))
+  } else {
+    console.log('✅ Env variablelar OK')
+  }
 }
 
-// ── Schemas ───────────────────────────────────────────────────
-const schemas = {
-  ownerRegister: Joi.object({
-    email: Joi.string().email().required().messages({ 'string.email': "Email noto'g'ri format", 'any.required': 'Email kerak' }),
-    password: Joi.string().min(6).required().messages({ 'string.min': 'Parol kamida 6 ta belgi', 'any.required': 'Parol kerak' }),
-    full_name: Joi.string().min(2).max(100).required().messages({ 'string.min': 'Ism kamida 2 ta belgi', 'any.required': 'Ism kerak' }),
-    phone: Joi.string().allow('', null).optional()
-  }),
+// Validators
+function validateReservation(req, res, next) {
+  const { restaurant_id, date, time, guests } = req.body
+  const errors = []
+  if (!restaurant_id || isNaN(+restaurant_id)) errors.push('restaurant_id noto\'g\'ri')
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) errors.push('date noto\'g\'ri (YYYY-MM-DD)')
+  if (!time || !/^\d{2}:\d{2}$/.test(time)) errors.push('time noto\'g\'ri (HH:MM)')
+  if (!guests || guests < 1 || guests > 50) errors.push('guests 1-50 orasida bo\'lishi kerak')
+  if (date) {
+    const d = new Date(date); const t = new Date(); t.setHours(0,0,0,0)
+    if (d < t) errors.push('O\'tgan sanaga bron qilib bo\'lmaydi')
+  }
+  if (errors.length) return res.status(400).json({ error: errors.join('. ') })
+  next()
+}
 
-  ownerLogin: Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required()
-  }),
+function validateOwnerRegister(req, res, next) {
+  const { email, password, full_name } = req.body
+  const errors = []
+  if (!full_name || full_name.length < 2) errors.push('Ism kamida 2 ta belgi')
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Email noto\'g\'ri')
+  if (!password || password.length < 6) errors.push('Parol kamida 6 ta belgi')
+  if (errors.length) return res.status(400).json({ error: errors.join('. ') })
+  next()
+}
 
-  restaurant: Joi.object({
-    name: Joi.string().min(2).max(200).required().messages({ 'any.required': 'Restoran nomi kerak' }),
-    address: Joi.string().min(5).max(500).required().messages({ 'any.required': 'Manzil kerak' }),
-    description: Joi.string().max(2000).allow('', null).optional(),
-    phone: Joi.string().max(20).allow('', null).optional(),
-    cuisine: Joi.array().items(Joi.string()).allow(null).optional(),
-    price_category: Joi.string().valid('$', '$$', '$$$').default('$$'),
-    capacity: Joi.number().integer().min(1).max(1000).default(50),
-    image_url: Joi.string().uri().allow('', null).optional(),
-    working_hours: Joi.string().max(100).allow('', null).optional()
-  }),
+function validateMenuItem(req, res, next) {
+  const { name, price } = req.body
+  const errors = []
+  if (!name || name.length < 2) errors.push('Nom kamida 2 ta belgi')
+  if (!price || isNaN(price) || price < 0) errors.push('Narx musbat son bo\'lishi kerak')
+  if (errors.length) return res.status(400).json({ error: errors.join('. ') })
+  next()
+}
 
-  reservation: Joi.object({
-    restaurant_id: Joi.number().integer().positive().required(),
-    date: Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).required().messages({ 'string.pattern.base': "Sana formati: YYYY-MM-DD" }),
-    time: Joi.string().pattern(/^\d{2}:\d{2}$/).required().messages({ 'string.pattern.base': "Vaqt formati: HH:MM" }),
-    guests: Joi.number().integer().min(1).max(50).required(),
-    zone_id: Joi.number().integer().positive().allow(null).optional(),
-    comment: Joi.string().max(500).allow('', null).optional(),
-    special_request: Joi.string().max(500).allow('', null).optional(),
-    pre_order: Joi.array().items(Joi.object()).default([])
-  }),
-
-  menuItem: Joi.object({
-    name: Joi.string().min(2).max(200).required(),
-    category: Joi.string().max(100).allow('', null).optional(),
-    price: Joi.number().positive().required().messages({ 'number.positive': 'Narx musbat son bo\'lishi kerak' }),
-    description: Joi.string().max(500).allow('', null).optional(),
-    image_url: Joi.string().uri().allow('', null).optional(),
-    is_available: Joi.boolean().default(true)
-  }),
-
-  zone: Joi.object({
-    name: Joi.string().min(1).max(100).required(),
-    description: Joi.string().max(300).allow('', null).optional(),
-    capacity: Joi.number().integer().min(1).default(10),
-    icon: Joi.string().max(10).default('🪑')
-  }),
-
-  review: Joi.object({
-    telegram_id: Joi.alternatives().try(Joi.string(), Joi.number()).required(),
-    restaurant_id: Joi.number().integer().positive().required(),
-    reservation_id: Joi.number().integer().positive().allow(null).optional(),
-    rating: Joi.number().integer().min(1).max(5).required(),
-    comment: Joi.string().max(1000).allow('', null).optional(),
-    photo_url: Joi.string().uri().allow('', null).optional()
-  })
-};
+function validateRestaurant(req, res, next) {
+  const { name, address } = req.body
+  const errors = []
+  if (!name || name.length < 2) errors.push('Nom kamida 2 ta belgi')
+  if (!address || address.length < 5) errors.push('Manzil kamida 5 ta belgi')
+  if (errors.length) return res.status(400).json({ error: errors.join('. ') })
+  next()
+}
 
 module.exports = {
-  apiRateLimiter,
-  authRateLimiter,
-  strictRateLimiter,
+  rateLimiter,
+  apiRateLimiter: rateLimiter(100),
+  authRateLimiter: rateLimiter(10),
   xssProtection,
   securityHeaders,
-  validate,
-  schemas,
-  escapeHtml
-};
+  checkEnvVars,
+  validateReservation,
+  validateOwnerRegister,
+  validateMenuItem,
+  validateRestaurant,
+  escapeHtml,
+  sanitize
+}
