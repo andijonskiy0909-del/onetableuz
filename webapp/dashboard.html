@@ -3,352 +3,413 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OneTable — Dashboard</title>
+<title>OneTable Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f1f5f9; color:#1e293b; }
-.auth-page { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#1a1a2e; }
-.auth-box { background:white; border-radius:20px; padding:40px; width:100%; max-width:400px; }
-.auth-logo { text-align:center; font-size:40px; margin-bottom:8px; }
-.auth-title { text-align:center; font-size:22px; font-weight:700; margin-bottom:4px; }
-.auth-sub { text-align:center; color:#64748b; font-size:14px; margin-bottom:28px; }
-.auth-box input { width:100%; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:15px; outline:none; margin-bottom:12px; }
-.auth-box input:focus { border-color:#ef4444; }
-.auth-btn { width:100%; background:#ef4444; color:white; border:none; padding:14px; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer; }
-.auth-err { color:#ef4444; font-size:13px; text-align:center; margin-top:10px; display:none; }
-.auth-switch { text-align:center; margin-top:16px; font-size:14px; color:#64748b; }
-.auth-switch a { color:#ef4444; cursor:pointer; font-weight:600; text-decoration:none; }
-.app { display:none; }
-.sidebar { width:240px; background:#1a1a2e; color:white; position:fixed; top:0; left:0; height:100vh; display:flex; flex-direction:column; z-index:100; }
-.sidebar-logo { padding:24px 20px; border-bottom:1px solid rgba(255,255,255,0.1); }
-.sidebar-logo h1 { font-size:20px; font-weight:700; }
-.sidebar-logo p { font-size:12px; color:#94a3b8; margin-top:2px; }
-.nav-links { flex:1; padding:16px 12px; display:flex; flex-direction:column; gap:4px; overflow-y:auto; }
-.nav-link { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:#94a3b8; border:none; background:none; width:100%; text-align:left; transition:all .15s; }
-.nav-link:hover { background:rgba(255,255,255,0.08); color:white; }
-.nav-link.active { background:#ef4444; color:white; }
-.nav-icon { font-size:18px; width:24px; }
-.sidebar-bottom { padding:16px 12px; border-top:1px solid rgba(255,255,255,0.1); }
-.resto-info { font-size:13px; color:#94a3b8; padding:8px 12px; margin-bottom:4px; }
-.logout-btn { display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:10px; cursor:pointer; font-size:14px; color:#94a3b8; border:none; background:none; width:100%; }
-.logout-btn:hover { color:#ef4444; }
-.main { margin-left:240px; padding:28px; min-height:100vh; }
-.page-header { margin-bottom:24px; display:flex; justify-content:space-between; align-items:flex-start; }
-.page-header h2 { font-size:22px; font-weight:700; }
-.page-header p { color:#64748b; font-size:14px; margin-top:2px; }
-.section { display:none; }
-.section.active { display:block; }
-.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
-.stat-card { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
-.stat-label { font-size:13px; color:#64748b; margin-bottom:8px; }
-.stat-value { font-size:32px; font-weight:700; }
-.stat-sub { font-size:12px; color:#94a3b8; margin-top:4px; }
-.stat-blue .stat-value { color:#3b82f6; }
-.stat-green .stat-value { color:#10b981; }
-.stat-orange .stat-value { color:#f59e0b; }
-.stat-red .stat-value { color:#ef4444; }
-.card { background:white; border-radius:14px; box-shadow:0 1px 4px rgba(0,0,0,0.06); overflow:hidden; margin-bottom:20px; }
-.card-header { padding:16px 20px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; }
-.card-header h3 { font-size:16px; font-weight:600; }
-.badge-count { background:#f1f5f9; color:#64748b; font-size:12px; padding:3px 10px; border-radius:20px; }
-table { width:100%; border-collapse:collapse; }
-th { text-align:left; padding:12px 16px; font-size:12px; color:#64748b; font-weight:600; text-transform:uppercase; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
-td { padding:13px 16px; border-bottom:1px solid #f1f5f9; font-size:14px; vertical-align:middle; }
-tr:last-child td { border-bottom:none; }
-tr:hover td { background:#fafafa; }
-.badge { display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-.badge-pending { background:#fef3c7; color:#d97706; }
-.badge-confirmed { background:#d1fae5; color:#059669; }
-.badge-cancelled { background:#fee2e2; color:#dc2626; }
-.btn-confirm { border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:#d1fae5; color:#059669; margin-right:6px; }
-.btn-confirm:hover { background:#059669; color:white; }
-.btn-reject { border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; background:#fee2e2; color:#dc2626; }
-.btn-reject:hover { background:#dc2626; color:white; }
-.today-badge { background:#eff6ff; color:#3b82f6; font-size:12px; padding:3px 10px; border-radius:8px; margin-left:8px; font-weight:600; }
-.filter-tabs { display:flex; gap:8px; margin-bottom:16px; }
-.ftab { padding:7px 16px; border-radius:8px; border:1.5px solid #e2e8f0; background:white; font-size:13px; cursor:pointer; font-weight:500; }
-.ftab.active { background:#ef4444; color:white; border-color:#ef4444; }
-.menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
-.menu-item { background:white; border-radius:12px; padding:16px; box-shadow:0 1px 4px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:center; }
-.menu-name { font-weight:600; font-size:15px; }
-.menu-cat { font-size:12px; color:#94a3b8; margin-top:2px; }
-.menu-price { font-size:15px; color:#ef4444; font-weight:600; margin-top:6px; }
-.toggle-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; }
-.toggle-on { background:#d1fae5; color:#059669; }
-.toggle-off { background:#fee2e2; color:#dc2626; }
-.add-btn { background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
-.zones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-bottom:20px; }
-.zone-card-item { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); display:flex; justify-content:space-between; align-items:flex-start; }
-.zone-card-left { display:flex; gap:14px; align-items:flex-start; }
-.zone-icon-big { font-size:32px; }
-.zone-info .zone-title { font-size:16px; font-weight:600; margin-bottom:4px; }
-.zone-info .zone-desc { font-size:13px; color:#64748b; }
-.zone-info .zone-cap { font-size:12px; color:#94a3b8; margin-top:4px; }
-.zone-actions { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
-.zone-toggle-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; }
-.zone-delete-btn { padding:5px 12px; border-radius:8px; border:none; font-size:12px; cursor:pointer; font-weight:500; background:#fee2e2; color:#dc2626; }
-.zone-delete-btn:hover { background:#dc2626; color:white; }
-/* Analitika */
-.analytics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
-.an-stat { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); text-align:center; }
-.an-stat .val { font-size:28px; font-weight:700; margin-bottom:4px; }
-.an-stat .lbl { font-size:13px; color:#64748b; }
-.charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; }
-.chart-card { background:white; border-radius:14px; padding:20px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
-.chart-card h3 { font-size:15px; font-weight:600; margin-bottom:16px; color:#1e293b; }
-.chart-card canvas { max-height:220px; }
-.peak-list { list-style:none; }
-.peak-list li { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:14px; }
-.peak-list li:last-child { border-bottom:none; }
-.peak-bar { height:6px; background:#ef4444; border-radius:3px; margin-top:4px; }
-.noshow-ring { display:flex; align-items:center; justify-content:center; gap:20px; padding:16px 0; }
-.ring-label { font-size:13px; color:#64748b; }
-/* Modal */
-.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:500; justify-content:center; align-items:center; }
-.modal-overlay.open { display:flex; }
-.modal { background:white; border-radius:16px; padding:28px; width:100%; max-width:440px; max-height:90vh; overflow-y:auto; }
-.modal h3 { font-size:18px; font-weight:700; margin-bottom:20px; }
-.fg { margin-bottom:14px; }
-.fg label { font-size:13px; color:#64748b; margin-bottom:4px; display:block; }
-.fg input, .fg select, .fg textarea { width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; }
-.fg input:focus, .fg select:focus, .fg textarea:focus { border-color:#ef4444; }
-.modal-btns { display:flex; gap:10px; margin-top:20px; }
-.modal-btns button { flex:1; padding:12px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; border:none; }
-.btn-save { background:#ef4444; color:white; }
-.btn-cls { background:#f1f5f9; color:#64748b; }
-.icon-picker { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-.icon-opt { width:40px; height:40px; border-radius:8px; border:2px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:20px; cursor:pointer; transition:all .15s; }
-.icon-opt.selected { border-color:#ef4444; background:#fff5f5; }
-.icon-opt:hover { border-color:#ef4444; }
-.prof-form { max-width:560px; }
-.save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:8px; }
-.toast { position:fixed; bottom:24px; right:24px; background:#1e293b; color:white; padding:12px 20px; border-radius:10px; font-size:14px; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
-.toast.show { opacity:1; }
-.empty-state { text-align:center; padding:60px 20px; color:#94a3b8; }
-.empty-state .ei { font-size:48px; margin-bottom:12px; }
-.spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:white; border-radius:50%; animation:spin .6s linear infinite; vertical-align:middle; margin-right:6px; }
-@keyframes spin { to { transform:rotate(360deg); } }
-.no-resto { background:#fff3cd; border:1px solid #ffc107; border-radius:12px; padding:20px; margin-bottom:20px; }
-.no-resto h3 { color:#856404; margin-bottom:8px; }
-.no-resto p { color:#664d03; font-size:14px; }
-.premium-card { background:linear-gradient(135deg,#667eea,#764ba2); border-radius:14px; padding:24px; color:white; margin-bottom:20px; }
-.premium-card h3 { font-size:18px; margin-bottom:8px; }
-.premium-card p { font-size:14px; opacity:0.9; margin-bottom:16px; }
-.premium-btns { display:flex; gap:10px; }
-.premium-btn { padding:10px 20px; border-radius:10px; border:none; font-size:14px; font-weight:600; cursor:pointer; }
-.premium-btn-monthly { background:white; color:#667eea; }
-.premium-btn-yearly { background:rgba(255,255,255,0.2); color:white; border:1px solid rgba(255,255,255,0.4); }
-#locationMap { height:420px; border-radius:14px; border:2px solid #e2e8f0; margin-bottom:20px; cursor:crosshair; }
-.loc-tip { background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:14px 16px; margin-bottom:16px; font-size:14px; color:#1e40af; }
-.loc-coords { background:#f8fafc; border-radius:10px; padding:14px 16px; margin-bottom:16px; display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
-.loc-coord-item { display:flex; flex-direction:column; gap:4px; }
-.loc-coord-label { font-size:12px; color:#64748b; }
-.loc-coord-val { font-size:15px; font-weight:600; color:#1e293b; font-family:monospace; }
-.loc-save-btn { background:#ef4444; color:white; border:none; padding:12px 28px; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; }
-.loc-save-btn:disabled { opacity:0.5; cursor:not-allowed; }
-.loc-my-btn { background:#3b82f6; color:white; border:none; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; margin-right:10px; }
-.loc-clear-btn { background:#f1f5f9; color:#64748b; border:none; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; }
-.loc-status-ok { background:#d1fae5; border:1px solid #6ee7b7; border-radius:10px; padding:12px 16px; margin-bottom:16px; color:#065f46; font-size:14px; }
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c26;
+  --border: rgba(255,255,255,0.07);
+  --red: #ff3b5c;
+  --red-dim: rgba(255,59,92,0.12);
+  --green: #00d68f;
+  --yellow: #ffb800;
+  --blue: #4d9fff;
+  --text: #f0f0f5;
+  --muted: #6b6b80;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── AUTH ─────────────────────────────────── */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 0%,rgba(255,59,92,0.15) 0%,transparent 60%);}
+.auth-box{width:400px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;}
+.auth-logo{font-size:36px;margin-bottom:4px;text-align:center;}
+.auth-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;}
+.auth-sub{color:var(--muted);font-size:14px;text-align:center;margin-bottom:28px;}
+.field{margin-bottom:14px;}
+.field input{width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s;}
+.field input:focus{border-color:var(--red);}
+.field input::placeholder{color:var(--muted);}
+.btn-auth{width:100%;padding:13px;background:var(--red);border:none;border-radius:12px;color:white;font-size:15px;font-weight:600;font-family:var(--font);cursor:pointer;transition:opacity .2s;}
+.btn-auth:hover{opacity:0.9;}
+.auth-err{color:#ff6b6b;font-size:13px;text-align:center;margin-top:10px;display:none;}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+.auth-switch a{color:var(--red);cursor:pointer;font-weight:600;}
+
+/* ── APP LAYOUT ───────────────────────────── */
+.app{display:none;min-height:100vh;}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;z-index:100;}
+.sidebar-logo{padding:22px 20px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.sidebar-logo p{font-size:12px;color:var(--muted);margin-top:2px;}
+.nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;width:100%;text-align:left;transition:all .15s;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--red-dim);color:var(--red);}
+.nav-item .ni{font-size:16px;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;min-width:18px;text-align:center;}
+.sidebar-foot{padding:14px 10px;border-top:1px solid var(--border);}
+.sidebar-resto{font-size:12px;color:var(--muted);padding:6px 12px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.btn-logout{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--muted);border:none;background:none;width:100%;transition:all .15s;}
+.btn-logout:hover{color:#ff6b6b;}
+
+.main{margin-left:220px;padding:28px;min-height:100vh;}
+.sec{display:none;}
+.sec.active{display:block;}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;}
+.sec-head h2{font-size:20px;font-weight:700;}
+.sec-head p{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* ── STATS ───────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.stat-lbl{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.stat-val{font-size:30px;font-weight:700;font-family:var(--mono);}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.stat-blue .stat-val{color:var(--blue);}
+.stat-green .stat-val{color:var(--green);}
+.stat-yellow .stat-val{color:var(--yellow);}
+.stat-red .stat-val{color:var(--red);}
+
+/* ── CARD ────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.card-hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.card-hd h3{font-size:15px;font-weight:600;}
+.cnt-badge{background:var(--surface2);color:var(--muted);font-size:12px;padding:3px 10px;border-radius:20px;font-family:var(--mono);}
+
+/* ── TABLE ───────────────────────────────── */
+table{width:100%;border-collapse:collapse;}
+th{padding:11px 16px;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;text-align:left;background:var(--surface2);}
+td{padding:13px 16px;border-top:1px solid var(--border);font-size:13px;vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-pending{background:rgba(255,184,0,0.15);color:var(--yellow);}
+.badge-confirmed{background:rgba(0,214,143,0.15);color:var(--green);}
+.badge-cancelled{background:rgba(255,59,92,0.15);color:var(--red);}
+.badge-completed{background:rgba(77,159,255,0.15);color:var(--blue);}
+
+/* ── BUTTONS ──────────────────────────────── */
+.btn{padding:7px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;transition:all .15s;}
+.btn-ok{background:rgba(0,214,143,0.15);color:var(--green);}
+.btn-ok:hover{background:var(--green);color:var(--bg);}
+.btn-no{background:rgba(255,59,92,0.15);color:var(--red);}
+.btn-no:hover{background:var(--red);color:white;}
+.btn-primary{background:var(--red);color:white;padding:10px 20px;border-radius:10px;font-size:14px;}
+.btn-primary:hover{opacity:.9;}
+.btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:14px;}
+.btn-sec:hover{border-color:var(--red);color:var(--red);}
+
+/* ── FILTER TABS ─────────────────────────── */
+.ftabs{display:flex;gap:6px;margin-bottom:16px;}
+.ftab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);font-family:var(--font);transition:all .15s;}
+.ftab:hover{color:var(--text);}
+.ftab.active{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+
+/* ── MENU GRID ───────────────────────────── */
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.menu-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .15s;}
+.menu-item:hover{border-color:rgba(255,59,92,.3);}
+.menu-img{height:140px;object-fit:cover;width:100%;}
+.menu-body{padding:14px;}
+.menu-name{font-size:14px;font-weight:600;margin-bottom:3px;}
+.menu-cat{font-size:12px;color:var(--muted);}
+.menu-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+.menu-price{font-size:15px;font-weight:700;color:var(--red);font-family:var(--mono);}
+.toggle-btn{padding:5px 12px;border-radius:8px;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);}
+.toggle-on{background:rgba(0,214,143,0.15);color:var(--green);}
+.toggle-off{background:rgba(255,59,92,0.15);color:var(--red);}
+
+/* ── ZONES ───────────────────────────────── */
+.zones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:20px;}
+.zone-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;justify-content:space-between;align-items:flex-start;transition:border-color .15s;}
+.zone-card:hover{border-color:rgba(255,59,92,.3);}
+.zone-icon{font-size:30px;margin-bottom:8px;}
+.zone-name{font-size:15px;font-weight:600;margin-bottom:3px;}
+.zone-desc{font-size:12px;color:var(--muted);}
+.zone-cap{font-size:11px;color:var(--muted);margin-top:4px;font-family:var(--mono);}
+.zone-actions{display:flex;flex-direction:column;gap:6px;}
+
+/* ── FORM ────────────────────────────────── */
+.fg{margin-bottom:14px;}
+.fg label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--red);}
+.fg select option{background:var(--surface2);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* ── ANALYTICS ───────────────────────────── */
+.an-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.an-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;}
+.an-val{font-size:26px;font-weight:700;font-family:var(--mono);margin-bottom:4px;}
+.an-lbl{font-size:12px;color:var(--muted);}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--muted);}
+canvas{max-height:220px;}
+
+/* ── MAP ──────────────────────────────────── */
+#mapEl{height:400px;border-radius:12px;border:1px solid var(--border);}
+.map-coords{display:flex;gap:20px;padding:14px 0;}
+.coord-item .lbl{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-bottom:4px;}
+.coord-item .val{font-size:15px;font-weight:600;font-family:var(--mono);}
+
+/* ── MODAL ───────────────────────────────── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;justify-content:center;align-items:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:28px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:17px;font-weight:700;margin-bottom:20px;}
+.modal-btns{display:flex;gap:10px;margin-top:20px;}
+.icon-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.icon-opt{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .15s;}
+.icon-opt:hover,.icon-opt.sel{border-color:var(--red);background:var(--red-dim);}
+
+/* ── PREMIUM ──────────────────────────────── */
+.premium-card{background:linear-gradient(135deg,#1a1a3e,#0d0d22);border:1px solid rgba(77,159,255,.3);border-radius:16px;padding:24px;margin-bottom:20px;}
+.premium-card h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--blue);}
+.premium-card p{font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.premium-features{background:rgba(255,255,255,.04);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:2;color:var(--muted);}
+.premium-btns{display:flex;gap:10px;}
+.btn-prem{padding:11px 22px;border-radius:10px;border:none;font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer;}
+.btn-prem-m{background:var(--blue);color:white;}
+.btn-prem-y{background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.3);}
+
+/* ── TOAST ───────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:all .3s;transform:translateY(10px);pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.4);}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ── MISC ────────────────────────────────── */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty .ei{font-size:48px;margin-bottom:12px;opacity:.5;}
+.no-resto{background:var(--surface2);border:1px solid rgba(255,184,0,.3);border-radius:12px;padding:18px;margin-bottom:20px;font-size:14px;color:var(--yellow);}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:rot .6s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes rot{to{transform:rotate(360deg)}}
+.realtime-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite;margin-right:6px;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.chat-unread{background:var(--red);color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 </style>
 </head>
 <body>
 
-<div class="auth-page" id="loginPage">
+<!-- LOGIN -->
+<div id="loginPage" class="auth-wrap">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
     <div class="auth-title">OneTable Dashboard</div>
     <div class="auth-sub">Restoran boshqaruv paneli</div>
-    <input type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')doLogin()">
-    <input type="password" id="loginPassword" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="auth-btn" id="loginBtn" onclick="doLogin()">Kirish</button>
+    <div class="field"><input type="email" id="loginEmail" placeholder="Email" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="field"><input type="password" id="loginPass" placeholder="Parol" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-auth" id="loginBtn" onclick="doLogin()">Kirish</button>
     <div class="auth-err" id="loginErr"></div>
-    <div class="auth-switch">Akkauntingiz yo'qmi? <a onclick="showRegister()">Ro'yxatdan o'ting</a></div>
+    <div class="auth-switch">Akkaunt yo'qmi? <a onclick="showReg()">Ro'yxatdan o'ting</a></div>
   </div>
 </div>
 
-<div class="auth-page" id="registerPage" style="display:none">
+<!-- REGISTER -->
+<div id="regPage" class="auth-wrap" style="display:none">
   <div class="auth-box">
     <div class="auth-logo">🍽</div>
     <div class="auth-title">Ro'yxatdan o'tish</div>
-    <div class="auth-sub">Restoran egasi sifatida qo'shiling</div>
-    <input type="text" id="regName" placeholder="Ismingiz *">
-    <input type="text" id="regPhone" placeholder="Telefon raqam">
-    <input type="email" id="regEmail" placeholder="Email *">
-    <input type="password" id="regPassword" placeholder="Parol (min 6 ta) *">
-    <button class="auth-btn" id="regBtn" onclick="doRegister()">Ro'yxatdan o'tish</button>
+    <div class="auth-sub">Restoran egasi sifatida</div>
+    <div class="field"><input type="text" id="regName" placeholder="Ismingiz *"></div>
+    <div class="field"><input type="text" id="regPhone" placeholder="Telefon"></div>
+    <div class="field"><input type="email" id="regEmail" placeholder="Email *"></div>
+    <div class="field"><input type="password" id="regPass" placeholder="Parol (min 6) *"></div>
+    <button class="btn-auth" id="regBtn" onclick="doRegister()">Ro'yxatdan o'tish</button>
     <div class="auth-err" id="regErr"></div>
-    <div class="auth-switch">Akkauntingiz bormi? <a onclick="showLogin()">Kiring</a></div>
+    <div class="auth-switch">Akkaunt bormi? <a onclick="showLogin()">Kiring</a></div>
   </div>
 </div>
 
-<div class="app" id="appPage">
+<!-- APP -->
+<div id="appPage" class="app">
   <div class="sidebar">
-    <div class="sidebar-logo"><h1>🍽 OneTable</h1><p>Boshqaruv paneli</p></div>
-    <div class="nav-links">
-      <button class="nav-link active" onclick="showSec('dashboard',this)"><span class="nav-icon">📊</span>Umumiy</button>
-      <button class="nav-link" onclick="showSec('analytics',this)"><span class="nav-icon">📈</span>Analitika</button>
-      <button class="nav-link" onclick="showSec('today',this)"><span class="nav-icon">📅</span>Bugungi bronlar</button>
-      <button class="nav-link" onclick="showSec('all',this)"><span class="nav-icon">📋</span>Barcha bronlar</button>
-      <button class="nav-link" onclick="showSec('menu',this)"><span class="nav-icon">🍜</span>Menyu</button>
-      <button class="nav-link" onclick="showSec('zones',this)"><span class="nav-icon">🏠</span>Zonalar</button>
-      <button class="nav-link" onclick="showSec('restaurant',this)"><span class="nav-icon">🏪</span>Restoran</button>
-      <button class="nav-link" onclick="showSec('location',this)"><span class="nav-icon">📍</span>Lokatsiya</button>
-      <button class="nav-link" onclick="showSec('premium',this)"><span class="nav-icon">💎</span>Premium</button>
+    <div class="sidebar-logo">
+      <h1>🍽 OneTable</h1>
+      <p>Dashboard v2.0</p>
     </div>
-    <div class="sidebar-bottom">
-      <div class="resto-info" id="sidebarName">—</div>
-      <button class="logout-btn" onclick="doLogout()">🚪 Chiqish</button>
+    <div class="nav">
+      <button class="nav-item active" onclick="go('dash',this)"><span class="ni">📊</span>Umumiy</button>
+      <button class="nav-item" onclick="go('analytics',this)"><span class="ni">📈</span>Analitika</button>
+      <button class="nav-item" onclick="go('today',this)"><span class="ni">📅</span>Bugun</button>
+      <button class="nav-item" onclick="go('all',this)"><span class="ni">📋</span>Barcha bronlar</button>
+      <button class="nav-item" onclick="go('menu',this)"><span class="ni">🍜</span>Menyu</button>
+      <button class="nav-item" onclick="go('zones',this)"><span class="ni">🏠</span>Zonalar</button>
+      <button class="nav-item" onclick="go('tables',this)"><span class="ni">🪑</span>Stollar</button>
+      <button class="nav-item" onclick="go('chat',this)"><span class="ni">💬</span>Chat <span class="nav-badge" id="chatBadge" style="display:none">0</span></button>
+      <button class="nav-item" onclick="go('resto',this)"><span class="ni">🏪</span>Restoran</button>
+      <button class="nav-item" onclick="go('location',this)"><span class="ni">📍</span>Lokatsiya</button>
+      <button class="nav-item" onclick="go('premium',this)"><span class="ni">💎</span>Premium</button>
+    </div>
+    <div class="sidebar-foot">
+      <div class="sidebar-resto" id="sidebarName">—</div>
+      <button class="btn-logout" onclick="doLogout()">🚪 Chiqish</button>
     </div>
   </div>
 
   <div class="main">
 
-    <!-- Dashboard -->
-    <div class="section active" id="sec-dashboard">
-      <div class="page-header"><div><h2>Umumiy ko'rinish</h2><p id="todayDate"></p></div></div>
-      <div id="noRestoWarning" class="no-resto" style="display:none"><h3>⚠️ Restoran qo'shilmagan!</h3><p>Iltimos, <b>Restoran</b> bo'limiga o'tib ma'lumotlaringizni kiriting.</p></div>
-      <div class="stats-grid">
-        <div class="stat-card stat-blue"><div class="stat-label">Bugungi bronlar</div><div class="stat-value" id="st-today">0</div><div class="stat-sub">bugun</div></div>
-        <div class="stat-card stat-orange"><div class="stat-label">Kutilmoqda</div><div class="stat-value" id="st-pending">0</div><div class="stat-sub">tasdiqlash kerak</div></div>
-        <div class="stat-card stat-green"><div class="stat-label">Tasdiqlangan</div><div class="stat-value" id="st-confirmed">0</div><div class="stat-sub">jami</div></div>
-        <div class="stat-card stat-red"><div class="stat-label">Jami bronlar</div><div class="stat-value" id="st-total">0</div><div class="stat-sub">hammasi</div></div>
+    <!-- DASHBOARD -->
+    <div class="sec active" id="sec-dash">
+      <div class="sec-head">
+        <div><h2><span class="realtime-dot"></span>Umumiy ko'rinish</h2><p id="dateStr"></p></div>
+        <button class="btn-sec" onclick="loadAll()" style="font-size:13px;padding:8px 16px;">🔄 Yangilash</button>
+      </div>
+      <div id="noRestoWarn" class="no-resto" style="display:none">⚠️ Restoran qo'shilmagan! <b>Restoran</b> bo'limiga o'ting.</div>
+      <div class="stats">
+        <div class="stat stat-blue"><div class="stat-lbl">Bugungi bronlar</div><div class="stat-val" id="s-today">—</div><div class="stat-sub">bugun</div></div>
+        <div class="stat stat-yellow"><div class="stat-lbl">Kutilmoqda</div><div class="stat-val" id="s-pending">—</div><div class="stat-sub">tasdiqlash kerak</div></div>
+        <div class="stat stat-green"><div class="stat-lbl">Tasdiqlangan</div><div class="stat-val" id="s-confirmed">—</div><div class="stat-sub">jami</div></div>
+        <div class="stat stat-red"><div class="stat-lbl">Jami bronlar</div><div class="stat-val" id="s-total">—</div><div class="stat-sub">hammasi</div></div>
       </div>
       <div class="card">
-        <div class="card-header"><h3>⏳ Tasdiqlash kerak</h3><span class="badge-count" id="pendingCount">0</span></div>
-        <table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona</th><th>Izoh</th><th>Amal</th></tr></thead><tbody id="pendingTbody"></tbody></table>
+        <div class="card-hd"><h3>⏳ Tasdiqlash kerak</h3><span class="cnt-badge" id="pendingCnt">0</span></div>
+        <table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona/Stol</th><th>Izoh</th><th>Amal</th></tr></thead><tbody id="pendingBody"></tbody></table>
       </div>
     </div>
 
-    <!-- ✅ ANALITIKA -->
-    <div class="section" id="sec-analytics">
-      <div class="page-header"><div><h2>📈 Analitika</h2><p>Restoran statistikasi va grafiklar</p></div>
-        <button onclick="loadAnalytics()" style="background:#ef4444;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;">🔄 Yangilash</button>
+    <!-- ANALYTICS -->
+    <div class="sec" id="sec-analytics">
+      <div class="sec-head">
+        <div><h2>📈 Analitika</h2><p>Restoran statistikasi</p></div>
+        <button class="btn-primary" onclick="loadAnalytics()" style="font-size:13px;padding:8px 16px;">🔄 Yangilash</button>
       </div>
-
-      <div class="analytics-grid">
-        <div class="an-stat"><div class="val" style="color:#3b82f6" id="an-today">—</div><div class="lbl">Bugungi bronlar</div></div>
-        <div class="an-stat"><div class="val" style="color:#10b981" id="an-weekly">—</div><div class="lbl">Haftalik bronlar</div></div>
-        <div class="an-stat"><div class="val" style="color:#f59e0b" id="an-revenue">—</div><div class="lbl">Bu oylik daromad</div></div>
-        <div class="an-stat"><div class="val" style="color:#ef4444" id="an-noshow">—%</div><div class="lbl">No-show foizi</div></div>
+      <div class="an-stats">
+        <div class="an-stat"><div class="an-val" style="color:var(--blue)" id="an-today">—</div><div class="an-lbl">Bugun</div></div>
+        <div class="an-stat"><div class="an-val" style="color:var(--green)" id="an-weekly">—</div><div class="an-lbl">Haftalik</div></div>
+        <div class="an-stat"><div class="an-val" style="color:var(--yellow)" id="an-monthly">—</div><div class="an-lbl">Oylik</div></div>
+        <div class="an-stat"><div class="an-val" style="color:var(--red)" id="an-revenue">—</div><div class="an-lbl">Daromad</div></div>
       </div>
-
       <div class="charts-grid">
-        <!-- Kunlik bronlar grafigi -->
-        <div class="chart-card">
-          <h3>📅 Haftalik bronlar</h3>
-          <canvas id="dailyChart"></canvas>
-        </div>
-
-        <!-- Holat bo'yicha donut -->
-        <div class="chart-card">
-          <h3>📊 Bron holatlari</h3>
-          <canvas id="statusChart"></canvas>
-        </div>
+        <div class="chart-card"><h3>📅 Haftalik bronlar</h3><canvas id="dailyChart"></canvas></div>
+        <div class="chart-card"><h3>📊 Bron holatlari</h3><canvas id="statusChart"></canvas></div>
       </div>
-
       <div class="charts-grid">
-        <!-- Peak hours -->
-        <div class="chart-card">
-          <h3>⏰ Eng band vaqtlar</h3>
-          <canvas id="peakChart"></canvas>
-        </div>
-
-        <!-- Zona bo'yicha -->
-        <div class="chart-card">
-          <h3>🏠 Zonalar bo'yicha bronlar</h3>
-          <canvas id="zoneChart"></canvas>
-        </div>
+        <div class="chart-card"><h3>⏰ Eng band vaqtlar</h3><canvas id="peakChart"></canvas></div>
+        <div class="chart-card"><h3>🏠 Zonalar bo'yicha</h3><canvas id="zoneChart"></canvas></div>
       </div>
     </div>
 
-    <!-- Bugun -->
-    <div class="section" id="sec-today">
-      <div class="page-header"><div><h2>Bugungi bronlar <span class="today-badge" id="todayBadge">0</span></h2><p>Bugun kelishi kutilayotgan mehmonlar</p></div></div>
-      <div class="card"><table><thead><tr><th>Mijoz</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="todayTbody"></tbody></table></div>
+    <!-- BUGUN -->
+    <div class="sec" id="sec-today">
+      <div class="sec-head"><div><h2>📅 Bugungi bronlar</h2><p>Kelishi kutilayotgan mehmonlar</p></div></div>
+      <div class="card"><table><thead><tr><th>Mijoz</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona/Stol</th><th>Maxsus so'rov</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="todayBody"></tbody></table></div>
     </div>
 
-    <!-- Barcha -->
-    <div class="section" id="sec-all">
-      <div class="page-header"><div><h2>Barcha bronlar</h2></div></div>
-      <div class="filter-tabs">
+    <!-- BARCHA BRONLAR -->
+    <div class="sec" id="sec-all">
+      <div class="sec-head"><div><h2>📋 Barcha bronlar</h2></div></div>
+      <div class="ftabs">
         <button class="ftab active" onclick="filterAll('all',this)">Hammasi</button>
         <button class="ftab" onclick="filterAll('pending',this)">Kutilmoqda</button>
         <button class="ftab" onclick="filterAll('confirmed',this)">Tasdiqlangan</button>
-        <button class="ftab" onclick="filterAll('cancelled',this)">Bekor qilingan</button>
+        <button class="ftab" onclick="filterAll('completed',this)">Tugallangan</button>
+        <button class="ftab" onclick="filterAll('cancelled',this)">Bekor</button>
       </div>
-      <div class="card"><table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona</th><th>Izoh</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="allTbody"></tbody></table></div>
+      <div class="card"><table><thead><tr><th>Mijoz</th><th>Sana</th><th>Vaqt</th><th>Mehmonlar</th><th>Zona/Stol</th><th>Pre-order</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="allBody"></tbody></table></div>
     </div>
 
-    <!-- Menyu -->
-    <div class="section" id="sec-menu">
-      <div class="page-header"><div><h2>Menyu boshqaruvi</h2><p>Taomlar va narxlarni boshqaring</p></div><button class="add-btn" onclick="openMenuModal()">+ Taom qo'shish</button></div>
-      <div class="menu-grid" id="menuGrid"><div class="empty-state"><div class="ei">🍜</div>Menyu bo'sh</div></div>
-    </div>
-
-    <!-- Zonalar -->
-    <div class="section" id="sec-zones">
-      <div class="page-header">
-        <div><h2>🏠 Zonalar boshqaruvi</h2><p>VIP, Terrassa va boshqa zonalar</p></div>
-        <button class="add-btn" onclick="openZoneModal()">+ Zona qo'shish</button>
+    <!-- MENYU -->
+    <div class="sec" id="sec-menu">
+      <div class="sec-head">
+        <div><h2>🍜 Menyu</h2><p>Taomlar va narxlar</p></div>
+        <button class="btn-primary" onclick="openMenuModal()">+ Taom qo'shish</button>
       </div>
-      <div class="zones-grid" id="zonesGrid"><div class="empty-state"><div class="ei">🏠</div>Hali zona qo'shilmagan</div></div>
+      <div class="menu-grid" id="menuGrid"><div class="empty"><div class="ei">🍜</div>Menyu bo'sh</div></div>
     </div>
 
-    <!-- Restoran -->
-    <div class="section" id="sec-restaurant">
-      <div class="page-header"><div><h2>🏪 Restoran ma'lumotlari</h2></div></div>
-      <div class="card" style="padding:24px;">
-        <div class="prof-form">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-            <div class="fg"><label>Restoran nomi *</label><input type="text" id="restoName" placeholder="Masalan: Plov Center"></div>
-            <div class="fg"><label>Manzil *</label><input type="text" id="restoAddress" placeholder="Ko'cha, tuman, shahar"></div>
-            <div class="fg"><label>Telefon</label><input type="text" id="restoPhone" placeholder="+998 90 123 45 67"></div>
-            <div class="fg"><label>Narx kategoriyasi</label><select id="restoPriceCategory"><option value="$">$ — Arzon</option><option value="$$" selected>$$ — O'rta</option><option value="$$$">$$$ — Qimmat</option></select></div>
-            <div class="fg"><label>Sig'im</label><input type="number" id="restoCapacity" placeholder="50" value="50"></div>
-            <div class="fg"><label>Oshxona turi</label><input type="text" id="restoCuisine" placeholder="Uzbek, Italian..."></div>
-            <div class="fg"><label>Rasm URL</label><input type="text" id="restoImage" placeholder="https://..."></div>
-            <div class="fg"><label>Ish vaqti</label><input type="text" id="restoHours" placeholder="10:00 — 22:00"></div>
+    <!-- ZONALAR -->
+    <div class="sec" id="sec-zones">
+      <div class="sec-head">
+        <div><h2>🏠 Zonalar</h2><p>VIP, Terrassa va boshqa zonalar</p></div>
+        <button class="btn-primary" onclick="openZoneModal()">+ Zona qo'shish</button>
+      </div>
+      <div class="zones-grid" id="zonesGrid"><div class="empty"><div class="ei">🏠</div>Zona yo'q</div></div>
+    </div>
+
+    <!-- STOLLAR -->
+    <div class="sec" id="sec-tables">
+      <div class="sec-head">
+        <div><h2>🪑 Stollar</h2><p>Stol boshqaruvi</p></div>
+        <button class="btn-primary" onclick="openTableModal()">+ Stol qo'shish</button>
+      </div>
+      <div class="card"><table><thead><tr><th>Stol #</th><th>Zona</th><th>Sig'im</th><th>Holat</th><th>Amal</th></tr></thead><tbody id="tablesBody"></tbody></table></div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="sec" id="sec-chat">
+      <div class="sec-head"><div><h2>💬 Xabarlar</h2><p>Mijozlar bilan muloqot</p></div></div>
+      <div id="chatList"><div class="empty"><div class="ei">💬</div>Xabar yo'q</div></div>
+    </div>
+
+    <!-- RESTORAN -->
+    <div class="sec" id="sec-resto">
+      <div class="sec-head"><div><h2>🏪 Restoran ma'lumotlari</h2></div></div>
+      <div class="card" style="padding:24px">
+        <div class="grid2">
+          <div class="fg"><label>Restoran nomi *</label><input type="text" id="rName" placeholder="Plov Center"></div>
+          <div class="fg"><label>Manzil *</label><input type="text" id="rAddr" placeholder="Ko'cha, tuman, shahar"></div>
+          <div class="fg"><label>Telefon</label><input type="text" id="rPhone" placeholder="+998 90 123 45 67"></div>
+          <div class="fg"><label>Email</label><input type="email" id="rEmail" placeholder="info@restoran.uz"></div>
+          <div class="fg"><label>Narx kategoriyasi</label>
+            <select id="rPrice"><option value="$">$ — Arzon</option><option value="$$" selected>$$ — O'rta</option><option value="$$$">$$$ — Qimmat</option></select>
           </div>
-          <div class="fg"><label>Tavsif</label><textarea id="restoDesc" rows="3" style="resize:vertical;" placeholder="Restoran haqida qisqacha..."></textarea></div>
-          <button class="save-btn" id="restoSaveBtn" onclick="saveRestaurant()">💾 Saqlash</button>
-          <div id="restoMsg" style="margin-top:10px;font-size:14px;"></div>
+          <div class="fg"><label>Sig'im</label><input type="number" id="rCapacity" value="50"></div>
+          <div class="fg"><label>Oshxona turi</label><input type="text" id="rCuisine" placeholder="Uzbek, Italian..."></div>
+          <div class="fg"><label>Ish vaqti</label><input type="text" id="rHours" placeholder="10:00 — 22:00"></div>
+        </div>
+        <div class="fg"><label>Rasm URL</label><input type="text" id="rImage" placeholder="https://..."></div>
+        <div class="fg"><label>Tavsif</label><textarea id="rDesc" rows="3" style="resize:vertical" placeholder="Restoran haqida..."></textarea></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+          <button class="btn-primary" id="rSaveBtn" onclick="saveResto()">💾 Saqlash</button>
+          <span id="rMsg" style="font-size:13px"></span>
         </div>
       </div>
     </div>
 
-    <!-- Lokatsiya -->
-    <div class="section" id="sec-location">
-      <div class="page-header"><div><h2>📍 Restoran joylashuvi</h2><p>Mijozlar restoraningizni xaritada topsin</p></div></div>
-      <div class="loc-tip">💡 Xaritada restoran joylashgan joyni bosing — pin qo'yiladi.</div>
-      <div id="locStatusSaved" class="loc-status-ok" style="display:none">✅ Lokatsiya saqlangan!</div>
-      <div style="display:flex;gap:10px;margin-bottom:14px;">
-        <button class="loc-my-btn" onclick="useMyLocation()">📡 Joylashuvimni aniqlash</button>
-        <button class="loc-clear-btn" onclick="clearLocation()">🗑 Tozalash</button>
+    <!-- LOKATSIYA -->
+    <div class="sec" id="sec-location">
+      <div class="sec-head"><div><h2>📍 Lokatsiya</h2><p>Xaritada joyni belgilang</p></div></div>
+      <div style="background:rgba(77,159,255,.08);border:1px solid rgba(77,159,255,.2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--blue);">💡 Xaritada restoraniz joylashgan joyni bosing</div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <button class="btn-sec" onclick="useMyLoc()" style="font-size:13px;padding:9px 16px;">📡 Joylashuvimni aniqlash</button>
+        <button class="btn-sec" onclick="clearLoc()" style="font-size:13px;padding:9px 16px;">🗑 Tozalash</button>
       </div>
-      <div id="locationMap"></div>
-      <div class="loc-coords">
-        <div class="loc-coord-item"><div class="loc-coord-label">Kenglik</div><div class="loc-coord-val" id="locLat"><span style="color:#94a3b8;font-style:italic">Belgilanmagan</span></div></div>
-        <div class="loc-coord-item"><div class="loc-coord-label">Uzunlik</div><div class="loc-coord-val" id="locLng"><span style="color:#94a3b8;font-style:italic">Belgilanmagan</span></div></div>
-        <div class="loc-coord-item" style="margin-left:auto;"><div class="loc-coord-label">Google Maps</div><div id="locGmapsLink" style="font-size:13px;color:#94a3b8">—</div></div>
+      <div id="mapEl"></div>
+      <div class="map-coords">
+        <div class="coord-item"><div class="lbl">Kenglik</div><div class="val" id="locLat">—</div></div>
+        <div class="coord-item"><div class="lbl">Uzunlik</div><div class="val" id="locLng">—</div></div>
+        <div class="coord-item" style="margin-left:auto"><div class="lbl">Google Maps</div><div id="gmLink" style="font-size:13px;color:var(--muted)">—</div></div>
       </div>
-      <button class="loc-save-btn" id="locSaveBtn" onclick="saveLocation()" disabled>💾 Lokatsiyani saqlash</button>
-      <div id="locMsg" style="margin-top:10px;font-size:14px;"></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn-primary" id="locSaveBtn" onclick="saveLoc()" disabled>💾 Saqlash</button>
+        <span id="locMsg" style="font-size:13px"></span>
+      </div>
     </div>
 
-    <!-- Premium -->
-    <div class="section" id="sec-premium">
-      <div class="page-header"><div><h2>💎 Premium</h2><p>Restoraningizni ko'proq mijozlarga ko'rsating</p></div></div>
-      <div id="premiumStatus"></div>
+    <!-- PREMIUM -->
+    <div class="sec" id="sec-premium">
+      <div class="sec-head"><div><h2>💎 Premium</h2><p>Obuna va xususiyatlar</p></div></div>
+      <div id="premStatus"></div>
       <div class="premium-card">
-        <h3>💎 Premium obuna</h3>
-        <p>Premium restoranlar ro'yxatda eng yuqorida ko'rinadi va ko'proq mijoz jalb qiladi.</p>
-        <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:12px;margin-bottom:16px;">✅ Ro'yxatda eng yuqorida<br>✅ 💎 Premium badge<br>✅ Ko'proq mijoz</div>
+        <h3>💎 Premium Obuna</h3>
+        <p>Premium restoranlar ro'yxatda birinchi o'rinda ko'rinadi va ko'proq mijoz jalb qiladi.</p>
+        <div class="premium-features">
+          ✅ Ro'yxatda eng yuqorida<br>
+          ✅ 💎 Premium badge<br>
+          ✅ Ko'proq mijoz<br>
+          ✅ AI tavsiyalar
+        </div>
         <div class="premium-btns">
-          <button class="premium-btn premium-btn-monthly" onclick="activatePremium('monthly')">Oylik — $99</button>
-          <button class="premium-btn premium-btn-yearly" onclick="activatePremium('yearly')">Yillik — $990</button>
+          <button class="btn-prem btn-prem-m" onclick="activatePrem('monthly')">Oylik — 150,000 so'm</button>
+          <button class="btn-prem btn-prem-y" onclick="activatePrem('yearly')">Yillik — 1,200,000 so'm</button>
         </div>
       </div>
     </div>
@@ -356,44 +417,63 @@ tr:hover td { background:#fafafa; }
   </div>
 </div>
 
-<!-- Taom modal -->
+<!-- MENU MODAL -->
 <div class="modal-overlay" id="menuModal">
   <div class="modal">
     <h3>Taom qo'shish</h3>
-    <div class="fg"><label>Nomi *</label><input type="text" id="mName" placeholder="Masalan: Osh"></div>
-    <div class="fg"><label>Kategoriya</label><select id="mCat"><option>Asosiy taomlar</option><option>Salatlar</option><option>Ichimliklar</option><option>Desertlar</option><option>Sho'rvalar</option><option>Lavash / Non</option></select></div>
+    <div class="fg"><label>Nomi *</label><input type="text" id="mName" placeholder="Osh, Shashlik..."></div>
+    <div class="fg"><label>Kategoriya</label>
+      <select id="mCat"><option>Asosiy taomlar</option><option>Salatlar</option><option>Ichimliklar</option><option>Desertlar</option><option>Sho'rvalar</option><option>Non / Lavash</option></select>
+    </div>
     <div class="fg"><label>Narx (so'm) *</label><input type="number" id="mPrice" placeholder="50000"></div>
-    <div class="fg"><label>Tavsif</label><textarea id="mDesc" rows="2" style="resize:none;" placeholder="Qisqacha tavsif..."></textarea></div>
-    <div class="fg"><label>Rasm URL</label><input type="text" id="mImage" placeholder="https://..."><div id="mImagePreview" style="margin-top:8px;display:none;"><img id="mPreviewImg" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;"/></div></div>
-    <div class="modal-btns"><button class="btn-save" onclick="saveMenuItem()">Saqlash</button><button class="btn-cls" onclick="closeMenuModal()">Bekor</button></div>
+    <div class="fg"><label>Tavsif</label><textarea id="mDesc" rows="2" style="resize:none" placeholder="Qisqacha tavsif..."></textarea></div>
+    <div class="fg"><label>Rasm URL</label><input type="text" id="mImg" placeholder="https://..."></div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveMenu()">Saqlash</button>
+      <button class="btn-sec" onclick="closeModal('menuModal')">Bekor</button>
+    </div>
   </div>
 </div>
 
-<!-- Zona modal -->
+<!-- ZONE MODAL -->
 <div class="modal-overlay" id="zoneModal">
   <div class="modal">
     <h3>Zona qo'shish</h3>
     <div class="fg">
-      <label>Icon tanlang</label>
-      <div class="icon-picker" id="iconPicker">
-        <div class="icon-opt selected" onclick="selectIcon('🪑',this)">🪑</div>
-        <div class="icon-opt" onclick="selectIcon('👑',this)">👑</div>
-        <div class="icon-opt" onclick="selectIcon('🌿',this)">🌿</div>
-        <div class="icon-opt" onclick="selectIcon('🎠',this)">🎠</div>
-        <div class="icon-opt" onclick="selectIcon('🌙',this)">🌙</div>
-        <div class="icon-opt" onclick="selectIcon('☀️',this)">☀️</div>
-        <div class="icon-opt" onclick="selectIcon('🎭',this)">🎭</div>
-        <div class="icon-opt" onclick="selectIcon('🔥',this)">🔥</div>
-        <div class="icon-opt" onclick="selectIcon('⭐',this)">⭐</div>
-        <div class="icon-opt" onclick="selectIcon('🏊',this)">🏊</div>
+      <label>Icon</label>
+      <div class="icon-picker" id="iconPick">
+        <div class="icon-opt sel" onclick="selIcon('🪑',this)">🪑</div>
+        <div class="icon-opt" onclick="selIcon('👑',this)">👑</div>
+        <div class="icon-opt" onclick="selIcon('🌿',this)">🌿</div>
+        <div class="icon-opt" onclick="selIcon('🎠',this)">🎠</div>
+        <div class="icon-opt" onclick="selIcon('🌙',this)">🌙</div>
+        <div class="icon-opt" onclick="selIcon('☀️',this)">☀️</div>
+        <div class="icon-opt" onclick="selIcon('🔥',this)">🔥</div>
+        <div class="icon-opt" onclick="selIcon('⭐',this)">⭐</div>
+        <div class="icon-opt" onclick="selIcon('🏊',this)">🏊</div>
+        <div class="icon-opt" onclick="selIcon('🎭',this)">🎭</div>
       </div>
     </div>
-    <div class="fg"><label>Zona nomi *</label><input type="text" id="zName" placeholder="Masalan: VIP xona"></div>
-    <div class="fg"><label>Tavsif</label><input type="text" id="zDesc" placeholder="Masalan: Maxfiy va qulay xona"></div>
-    <div class="fg"><label>Sig'im (max mehmonlar)</label><input type="number" id="zCapacity" placeholder="10" value="10"></div>
+    <div class="fg"><label>Zona nomi *</label><input type="text" id="zName" placeholder="VIP xona, Terrassa..."></div>
+    <div class="fg"><label>Tavsif</label><input type="text" id="zDesc" placeholder="Qisqacha..."></div>
+    <div class="fg"><label>Sig'im</label><input type="number" id="zCap" value="10"></div>
     <div class="modal-btns">
-      <button class="btn-save" onclick="saveZone()">Saqlash</button>
-      <button class="btn-cls" onclick="closeZoneModal()">Bekor</button>
+      <button class="btn-primary" onclick="saveZone()">Saqlash</button>
+      <button class="btn-sec" onclick="closeModal('zoneModal')">Bekor</button>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE MODAL -->
+<div class="modal-overlay" id="tableModal">
+  <div class="modal">
+    <h3>Stol qo'shish</h3>
+    <div class="fg"><label>Stol raqami *</label><input type="text" id="tNum" placeholder="1, 2, A1, VIP-1..."></div>
+    <div class="fg"><label>Zona</label><select id="tZone"><option value="">— Zona tanlang —</option></select></div>
+    <div class="fg"><label>Sig'im (kishi soni)</label><input type="number" id="tCap" value="4"></div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveTable()">Saqlash</button>
+      <button class="btn-sec" onclick="closeModal('tableModal')">Bekor</button>
     </div>
   </div>
 </div>
@@ -401,580 +481,650 @@ tr:hover td { background:#fafafa; }
 <div class="toast" id="toast"></div>
 
 <script>
-const API='https://onetableuz-production.up.railway.app/api';
-let token=localStorage.getItem('ownerToken');
-let allRes=[],curFilter='all',restoId=null,ownerData=null;
-let locMap=null,locMarker=null,locLat=null,locLng=null;
-let selectedZoneIcon='🪑';
-let dailyChartObj=null,statusChartObj=null,peakChartObj=null,zoneChartObj=null;
+const API = 'https://onetableuz-production.up.railway.app/api'
+let token = localStorage.getItem('ownerToken')
+let allRes = [], curFilter = 'all', restoId = null
+let mapInst = null, mapMarker = null, locLat = null, locLng = null
+let selZoneIcon = '🪑'
+let chartDaily = null, chartStatus = null, chartPeak = null, chartZone = null
+let socket = null
 
-window.onload=()=>{
-  document.getElementById('todayDate').textContent=new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  if(token)showApp();
-  document.getElementById('mImage').addEventListener('input',function(){
-    const preview=document.getElementById('mImagePreview');
-    const img=document.getElementById('mPreviewImg');
-    if(this.value.trim()){img.src=this.value.trim();preview.style.display='block';}
-    else{preview.style.display='none';}
-  });
-};
-
-function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),ms);}
-function showLogin(){document.getElementById('registerPage').style.display='none';document.getElementById('loginPage').style.display='flex';}
-function showRegister(){document.getElementById('loginPage').style.display='none';document.getElementById('registerPage').style.display='flex';}
-
-async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPassword').value;
-  const btn=document.getElementById('loginBtn');
-  const err=document.getElementById('loginErr');
-  err.style.display='none';
-  if(!email||!pass){err.textContent='Email va parol kiriting';err.style.display='block';return;}
-  btn.innerHTML='<span class="spinner"></span>Kirish...';btn.disabled=true;
-  try{
-    const r=await fetch(`${API}/owner/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    const d=await r.json();
-    if(d.token){token=d.token;localStorage.setItem('ownerToken',token);ownerData=d.owner;restoId=d.owner.restaurant_id;showApp();}
-    else{err.textContent=d.error||'Xatolik';err.style.display='block';btn.textContent='Kirish';btn.disabled=false;}
-  }catch(e){err.textContent='Server xatoligi';err.style.display='block';btn.textContent='Kirish';btn.disabled=false;}
+window.onload = () => {
+  document.getElementById('dateStr').textContent = new Date().toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'})
+  if (token) showApp()
 }
 
-async function doRegister(){
-  const full_name=document.getElementById('regName').value.trim();
-  const phone=document.getElementById('regPhone').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const password=document.getElementById('regPassword').value;
-  const btn=document.getElementById('regBtn');
-  const err=document.getElementById('regErr');
-  err.style.display='none';
-  if(!full_name||!email||!password){err.textContent="Majburiy maydonlarni to'ldiring";err.style.display='block';return;}
-  if(password.length<6){err.textContent="Parol kamida 6 ta belgi";err.style.display='block';return;}
-  btn.innerHTML="<span class='spinner'></span>...";btn.disabled=true;
-  try{
-    const r=await fetch(`${API}/owner/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,password})});
-    const d=await r.json();
-    if(d.token){token=d.token;localStorage.setItem('ownerToken',token);ownerData=d.owner;restoId=d.owner.restaurant_id;showApp();toast("✅ Xush kelibsiz!");setTimeout(()=>{document.querySelector("[onclick=\"showSec('restaurant',this)\"]").click();},500);}
-    else{err.textContent=d.error||'Xatolik';err.style.display='block';btn.textContent="Ro'yxatdan o'tish";btn.disabled=false;}
-  }catch(e){err.textContent='Server xatoligi';err.style.display='block';btn.textContent="Ro'yxatdan o'tish";btn.disabled=false;}
+function toast(msg, ms=2500) {
+  const el = document.getElementById('toast')
+  el.textContent = msg; el.classList.add('show')
+  setTimeout(() => el.classList.remove('show'), ms)
 }
 
-function doLogout(){localStorage.removeItem('ownerToken');token=null;restoId=null;ownerData=null;document.getElementById('appPage').style.display='none';document.getElementById('loginPage').style.display='flex';}
+// ── AUTH ───────────────────────────────────────────────────────
+function showLogin() { document.getElementById('regPage').style.display='none'; document.getElementById('loginPage').style.display='flex' }
+function showReg() { document.getElementById('loginPage').style.display='none'; document.getElementById('regPage').style.display='flex' }
 
-function showApp(){
-  document.getElementById('loginPage').style.display='none';
-  document.getElementById('registerPage').style.display='none';
-  document.getElementById('appPage').style.display='flex';
-  try{const p=JSON.parse(atob(token.split('.')[1]));restoId=p.restaurant_id;}catch(e){}
-  loadAll();
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim()
+  const pass = document.getElementById('loginPass').value
+  const btn = document.getElementById('loginBtn')
+  const err = document.getElementById('loginErr')
+  err.style.display = 'none'
+  if (!email || !pass) { err.textContent = 'Email va parol kiriting'; err.style.display = 'block'; return }
+  btn.innerHTML = '<span class="spin"></span>...'
+  btn.disabled = true
+  try {
+    const r = await fetch(`${API}/owner/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email,password:pass}) })
+    const d = await r.json()
+    if (d.token) { token = d.token; localStorage.setItem('ownerToken', token); restoId = d.owner.restaurant_id; showApp() }
+    else { err.textContent = d.error || 'Xatolik'; err.style.display = 'block'; btn.textContent = 'Kirish'; btn.disabled = false }
+  } catch(e) { err.textContent = 'Server xatoligi'; err.style.display = 'block'; btn.textContent = 'Kirish'; btn.disabled = false }
 }
 
-function showSec(name,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
-  document.getElementById('sec-'+name).classList.add('active');
-  btn.classList.add('active');
-  if(name==='menu')loadMenu();
-  if(name==='zones')loadZones();
-  if(name==='restaurant')loadRestaurant();
-  if(name==='premium')loadPremium();
-  if(name==='location')initLocationMap();
-  if(name==='analytics')loadAnalytics();
+async function doRegister() {
+  const full_name = document.getElementById('regName').value.trim()
+  const phone = document.getElementById('regPhone').value.trim()
+  const email = document.getElementById('regEmail').value.trim()
+  const password = document.getElementById('regPass').value
+  const err = document.getElementById('regErr')
+  const btn = document.getElementById('regBtn')
+  err.style.display = 'none'
+  if (!full_name || !email || !password) { err.textContent = "Majburiy maydonlar to'ldirilmagan"; err.style.display = 'block'; return }
+  if (password.length < 6) { err.textContent = "Parol kamida 6 ta belgi"; err.style.display = 'block'; return }
+  btn.innerHTML = "<span class='spin'></span>..."
+  btn.disabled = true
+  try {
+    const r = await fetch(`${API}/owner/register`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({full_name,phone,email,password}) })
+    const d = await r.json()
+    if (d.token) { token = d.token; localStorage.setItem('ownerToken', token); restoId = d.owner.restaurant_id; showApp(); setTimeout(()=>go('resto',document.querySelector('.nav-item:nth-child(9)')),300) }
+    else { err.textContent = d.error || 'Xatolik'; err.style.display = 'block'; btn.textContent = "Ro'yxatdan o'tish"; btn.disabled = false }
+  } catch(e) { err.textContent = 'Server xatoligi'; err.style.display = 'block'; btn.textContent = "Ro'yxatdan o'tish"; btn.disabled = false }
 }
 
-async function loadAll(){await Promise.all([loadReservations(),loadRestaurantName()]);}
+function doLogout() { localStorage.removeItem('ownerToken'); token = null; restoId = null; document.getElementById('appPage').style.display='none'; document.getElementById('loginPage').style.display='flex' }
 
-async function loadRestaurantName(){
-  if(!restoId){document.getElementById('noRestoWarning').style.display='block';return;}
-  try{const r=await fetch(`${API}/restaurants/${restoId}`);const d=await r.json();if(d.name){document.getElementById('sidebarName').textContent=d.name;document.getElementById('noRestoWarning').style.display='none';}}catch(e){}
+function showApp() {
+  document.getElementById('loginPage').style.display = 'none'
+  document.getElementById('regPage').style.display = 'none'
+  document.getElementById('appPage').style.display = 'flex'
+  try { const p = JSON.parse(atob(token.split('.')[1])); restoId = p.restaurant_id } catch(e) {}
+  initSocket()
+  loadAll()
 }
 
-async function loadReservations(){
-  if(!restoId)return;
-  try{
-    const r=await fetch(`${API}/owner/reservations`,{headers:{Authorization:`Bearer ${token}`}});
-    allRes=await r.json();if(!Array.isArray(allRes))allRes=[];
-    const today=new Date().toISOString().split('T')[0];
-    const todayRes=allRes.filter(r=>String(r.date).startsWith(today));
-    const pendingRes=allRes.filter(r=>r.status==='pending');
-    const confirmedRes=allRes.filter(r=>r.status==='confirmed');
-    document.getElementById('st-today').textContent=todayRes.length;
-    document.getElementById('st-pending').textContent=pendingRes.length;
-    document.getElementById('st-confirmed').textContent=confirmedRes.length;
-    document.getElementById('st-total').textContent=allRes.length;
-    document.getElementById('pendingCount').textContent=pendingRes.length;
-    document.getElementById('todayBadge').textContent=todayRes.length+' ta';
-    renderPending();renderToday();renderAll();
-  }catch(e){}
+function initSocket() {
+  try {
+    socket = io('https://onetableuz-production.up.railway.app')
+    if (restoId) socket.emit('join_restaurant', restoId)
+    socket.on('new_reservation', () => { loadReservations(); toast('🔔 Yangi bron!') })
+    socket.on('reservation_updated', () => loadReservations())
+    socket.on('reservation_cancelled', () => loadReservations())
+    socket.on('new_message', () => loadChatCount())
+  } catch(e) {}
 }
 
-const nameOf=r=>(`${r.first_name||''} ${r.last_name||''}`).trim()||"Noma'lum";
-const timeOf=r=>(r.time||'').substring(0,5);
-const zoneOf=r=>r.zone_name?`<span style="background:#f0fdf4;color:#16a34a;padding:2px 8px;border-radius:6px;font-size:12px">${r.zone_name}</span>`:'—';
-
-function statusBadge(s){
-  const cls={pending:'badge-pending',confirmed:'badge-confirmed',cancelled:'badge-cancelled'};
-  const txt={pending:'⏳ Kutilmoqda',confirmed:'✅ Tasdiqlangan',cancelled:'❌ Bekor'};
-  return `<span class="badge ${cls[s]||'badge-pending'}">${txt[s]||s}</span>`;
-}
-function actionBtns(id,status){
-  if(status==='cancelled')return '<span style="color:#94a3b8">—</span>';
-  if(status==='confirmed')return `<button class="btn-reject" onclick="updateStatus(${id},'cancelled')">Bekor qilish</button>`;
-  return `<button class="btn-confirm" onclick="updateStatus(${id},'confirmed')">✅ Tasdiqlash</button><button class="btn-reject" onclick="updateStatus(${id},'cancelled')">❌ Rad</button>`;
-}
-function emptyRow(cols,msg,icon='📭'){return `<tr><td colspan="${cols}"><div class="empty-state"><div class="ei">${icon}</div>${msg}</div></td></tr>`;}
-
-function renderPending(){
-  const list=allRes.filter(r=>r.status==='pending');
-  const tb=document.getElementById('pendingTbody');
-  if(!list.length){tb.innerHTML=emptyRow(7,"Kutilayotgan bron yo'q",'✅');return;}
-  tb.innerHTML=list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
-    <td>${r.date}</td><td>${timeOf(r)}</td>
-    <td>👥 ${r.guests} kishi</td><td>${zoneOf(r)}</td>
-    <td>${r.comment||'—'}</td><td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
+// ── NAVIGATION ─────────────────────────────────────────────────
+function go(name, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'))
+  document.getElementById('sec-' + name).classList.add('active')
+  if (btn) btn.classList.add('active')
+  if (name === 'menu') loadMenu()
+  if (name === 'zones') loadZones()
+  if (name === 'tables') loadTables()
+  if (name === 'chat') loadChat()
+  if (name === 'resto') loadResto()
+  if (name === 'premium') loadPremium()
+  if (name === 'location') initMap()
+  if (name === 'analytics') loadAnalytics()
 }
 
-function renderToday(){
-  const today=new Date().toISOString().split('T')[0];
-  const list=allRes.filter(r=>String(r.date).startsWith(today)).sort((a,b)=>a.time>b.time?1:-1);
-  const tb=document.getElementById('todayTbody');
-  if(!list.length){tb.innerHTML=emptyRow(7,"Bugun bron yo'q");return;}
-  tb.innerHTML=list.map(r=>`<tr>
-    <td><b>${nameOf(r)}</b><br><small style="color:#94a3b8">${r.phone||''}</small></td>
-    <td>${timeOf(r)}</td><td>👥 ${r.guests} kishi</td>
-    <td>${zoneOf(r)}</td><td>${r.comment||'—'}</td>
-    <td>${statusBadge(r.status)}</td><td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
+async function loadAll() {
+  await Promise.all([loadReservations(), loadRestoName(), loadChatCount()])
 }
 
-function filterAll(f,btn){curFilter=f;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAll();}
-
-function renderAll(){
-  const list=curFilter==='all'?allRes:allRes.filter(r=>r.status===curFilter);
-  const tb=document.getElementById('allTbody');
-  if(!list.length){tb.innerHTML=emptyRow(8,'Bron topilmadi');return;}
-  tb.innerHTML=list.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(r=>`<tr>
-    <td><b>${nameOf(r)}</b></td><td>${r.date}</td><td>${timeOf(r)}</td>
-    <td>👥 ${r.guests}</td><td>${zoneOf(r)}</td>
-    <td>${r.comment||'—'}</td><td>${statusBadge(r.status)}</td>
-    <td>${actionBtns(r.id,r.status)}</td>
-  </tr>`).join('');
+async function loadRestoName() {
+  if (!restoId) { document.getElementById('noRestoWarn').style.display = 'block'; return }
+  try {
+    const r = await fetch(`${API}/restaurants/${restoId}`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    if (d.name) { document.getElementById('sidebarName').textContent = d.name; document.getElementById('noRestoWarn').style.display = 'none' }
+  } catch(e) {}
 }
 
-async function updateStatus(id,status){
-  try{
-    const r=await fetch(`${API}/owner/reservations/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({status})});
-    if(r.ok){toast(status==='confirmed'?'✅ Tasdiqlandi! Xabar ketdi.':'❌ Bekor qilindi.');loadReservations();}
-    else toast('❌ Xatolik yuz berdi');
-  }catch(e){toast('❌ Server xatoligi');}
+async function loadChatCount() {
+  if (!restoId) return
+  try {
+    const r = await fetch(`${API}/chat/owner/messages`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    const cnt = d.unread_count || 0
+    const badge = document.getElementById('chatBadge')
+    badge.style.display = cnt > 0 ? 'inline-block' : 'none'
+    badge.textContent = cnt
+  } catch(e) {}
 }
 
-// ── ANALITIKA ─────────────────────────────────────────────────
-async function loadAnalytics(){
-  if(!restoId)return;
-
-  try{
-    // API dan analitika olish
-    const r=await fetch(`${API}/owner/analytics`,{headers:{Authorization:`Bearer ${token}`}});
-    const d=await r.json();
-
-    document.getElementById('an-today').textContent=d.today??0;
-    document.getElementById('an-weekly').textContent=d.weekly??0;
-    document.getElementById('an-revenue').textContent=d.revenue?(Number(d.revenue).toLocaleString()+' so\'m'):'0';
-    document.getElementById('an-noshow').textContent=(d.noshowRate??0)+'%';
-
-    // Kunlik grafik
-    buildDailyChart(d.dailyStats||[]);
-
-    // Peak hours grafik
-    buildPeakChart(d.peakHours||[]);
-
-  }catch(e){
-    // API yo'q bo'lsa — mavjud allRes dan hisoblash
-    buildChartsFromLocal();
-  }
-
-  // Holat donut — har doim local dan
-  buildStatusChart();
-
-  // Zona grafigi — local dan
-  buildZoneChart();
+// ── RESERVATIONS ───────────────────────────────────────────────
+async function loadReservations() {
+  if (!restoId) return
+  try {
+    const r = await fetch(`${API}/owner/reservations`, { headers:{ Authorization:`Bearer ${token}` } })
+    allRes = await r.json()
+    if (!Array.isArray(allRes)) allRes = []
+    const today = new Date().toISOString().split('T')[0]
+    const todayRes = allRes.filter(r => String(r.date).startsWith(today))
+    const pending = allRes.filter(r => r.status === 'pending')
+    const confirmed = allRes.filter(r => r.status === 'confirmed')
+    document.getElementById('s-today').textContent = todayRes.length
+    document.getElementById('s-pending').textContent = pending.length
+    document.getElementById('s-confirmed').textContent = confirmed.length
+    document.getElementById('s-total').textContent = allRes.length
+    document.getElementById('pendingCnt').textContent = pending.length
+    renderPending(); renderToday(); renderAll()
+  } catch(e) {}
 }
 
-function buildChartsFromLocal(){
-  // Oxirgi 7 kun bo'yicha
-  const days={};
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);
-    days[d.toISOString().split('T')[0]]=0;
-  }
-  allRes.forEach(r=>{
-    const dt=String(r.date).split('T')[0];
-    if(days[dt]!==undefined)days[dt]++;
-  });
-  buildDailyChart(Object.entries(days).map(([date,count])=>({date,count})));
+const nm = r => (`${r.first_name||''} ${r.last_name||''}`).trim() || "Noma'lum"
+const tm = r => (r.time||'').slice(0,5)
+const zoneInfo = r => {
+  const z = r.zone_name ? `<span style="background:rgba(0,214,143,.12);color:var(--green);padding:2px 8px;border-radius:6px;font-size:11px">${r.zone_name}</span>` : ''
+  const t = r.table_number ? `<span style="background:rgba(77,159,255,.12);color:var(--blue);padding:2px 8px;border-radius:6px;font-size:11px">Stol #${r.table_number}</span>` : ''
+  return z || t ? `${z}${t ? ' '+t : ''}` : '—'
+}
+function stBadge(s) {
+  const m = { pending:'badge-pending ⏳ Kutilmoqda', confirmed:'badge-confirmed ✅ Tasdiqlangan', cancelled:'badge-cancelled ❌ Bekor', completed:'badge-completed 🎉 Tugallangan' }
+  const v = m[s] || 'badge-pending ⏳'
+  const [cls, ...txt] = v.split(' ')
+  return `<span class="badge ${cls}">${txt.join(' ')}</span>`
+}
+function actBtns(id, s) {
+  if (s === 'cancelled' || s === 'completed') return '<span style="color:var(--muted)">—</span>'
+  if (s === 'confirmed') return `<button class="btn btn-no" onclick="updStatus(${id},'cancelled')">Bekor</button>`
+  return `<button class="btn btn-ok" onclick="updStatus(${id},'confirmed')">✅ Tasdiq</button> <button class="btn btn-no" onclick="updStatus(${id},'cancelled')">❌ Rad</button>`
+}
+function emptyRow(cols) { return `<tr><td colspan="${cols}"><div class="empty"><div class="ei">📭</div>Ma'lumot yo'q</div></td></tr>` }
 
-  // Peak hours
-  const hours={};
-  allRes.forEach(r=>{
-    if(r.status==='cancelled')return;
-    const h=(r.time||'').substring(0,5);
-    if(h)hours[h]=(hours[h]||0)+1;
-  });
-  const peak=Object.entries(hours).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([time,count])=>({time,count}));
-  buildPeakChart(peak);
-
-  // Stats
-  document.getElementById('an-today').textContent=allRes.filter(r=>String(r.date).startsWith(new Date().toISOString().split('T')[0])).length;
-  document.getElementById('an-weekly').textContent=allRes.filter(r=>{const d=new Date(r.date);const week=new Date();week.setDate(week.getDate()-7);return d>=week;}).length;
-  document.getElementById('an-revenue').textContent='0 so\'m';
-  const noshow=allRes.filter(r=>r.status==='noshow').length;
-  document.getElementById('an-noshow').textContent=(allRes.length?Math.round(noshow/allRes.length*100):0)+'%';
+function renderPending() {
+  const list = allRes.filter(r => r.status === 'pending')
+  const tb = document.getElementById('pendingBody')
+  if (!list.length) { tb.innerHTML = emptyRow(7); return }
+  tb.innerHTML = list.map(r => `<tr>
+    <td><b>${nm(r)}</b><br><span style="color:var(--muted);font-size:12px">${r.phone||''}</span></td>
+    <td style="font-family:var(--mono)">${r.date}</td>
+    <td style="font-family:var(--mono)">${tm(r)}</td>
+    <td>👥 ${r.guests}</td>
+    <td>${zoneInfo(r)}</td>
+    <td style="max-width:150px;color:var(--muted);font-size:12px">${r.comment||r.special_request||'—'}</td>
+    <td>${actBtns(r.id, r.status)}</td>
+  </tr>`).join('')
 }
 
-function buildDailyChart(data){
-  const ctx=document.getElementById('dailyChart').getContext('2d');
-  if(dailyChartObj)dailyChartObj.destroy();
-
-  const labels=data.map(d=>{
-    const dt=new Date(d.date);
-    return dt.toLocaleDateString('uz-UZ',{month:'short',day:'numeric'});
-  });
-  const values=data.map(d=>parseInt(d.count)||0);
-
-  dailyChartObj=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{
-        label:'Bronlar',
-        data:values,
-        backgroundColor:'rgba(239,68,68,0.7)',
-        borderColor:'#ef4444',
-        borderWidth:1,
-        borderRadius:6
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{display:false}},
-      scales:{
-        y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}},
-        x:{grid:{display:false}}
-      }
-    }
-  });
+function renderToday() {
+  const today = new Date().toISOString().split('T')[0]
+  const list = allRes.filter(r => String(r.date).startsWith(today)).sort((a,b) => a.time > b.time ? 1 : -1)
+  const tb = document.getElementById('todayBody')
+  if (!list.length) { tb.innerHTML = emptyRow(7); return }
+  tb.innerHTML = list.map(r => `<tr>
+    <td><b>${nm(r)}</b></td>
+    <td style="font-family:var(--mono)">${tm(r)}</td>
+    <td>👥 ${r.guests}</td>
+    <td>${zoneInfo(r)}</td>
+    <td style="font-size:12px;color:var(--muted)">${r.special_request||'—'}</td>
+    <td>${stBadge(r.status)}</td>
+    <td>${actBtns(r.id, r.status)}</td>
+  </tr>`).join('')
 }
 
-function buildStatusChart(){
-  const ctx=document.getElementById('statusChart').getContext('2d');
-  if(statusChartObj)statusChartObj.destroy();
-
-  const pending=allRes.filter(r=>r.status==='pending').length;
-  const confirmed=allRes.filter(r=>r.status==='confirmed').length;
-  const cancelled=allRes.filter(r=>r.status==='cancelled').length;
-
-  statusChartObj=new Chart(ctx,{
-    type:'doughnut',
-    data:{
-      labels:['Kutilmoqda','Tasdiqlangan','Bekor qilingan'],
-      datasets:[{
-        data:[pending,confirmed,cancelled],
-        backgroundColor:['#f59e0b','#10b981','#ef4444'],
-        borderWidth:2,
-        borderColor:'#fff'
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{position:'bottom',labels:{font:{size:12},padding:12}}
-      },
-      cutout:'65%'
-    }
-  });
+function filterAll(f, btn) {
+  curFilter = f
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderAll()
 }
 
-function buildPeakChart(data){
-  const ctx=document.getElementById('peakChart').getContext('2d');
-  if(peakChartObj)peakChartObj.destroy();
-
-  if(!data.length){
-    ctx.font='14px sans-serif';
-    ctx.fillStyle='#94a3b8';
-    ctx.textAlign='center';
-    ctx.fillText("Ma'lumot yo'q",ctx.canvas.width/2,ctx.canvas.height/2);
-    return;
-  }
-
-  peakChartObj=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels:data.map(d=>d.time),
-      datasets:[{
-        label:'Bronlar soni',
-        data:data.map(d=>parseInt(d.count)||0),
-        backgroundColor:'rgba(59,130,246,0.7)',
-        borderColor:'#3b82f6',
-        borderWidth:1,
-        borderRadius:6
-      }]
-    },
-    options:{
-      responsive:true,
-      indexAxis:'y',
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(0,0,0,0.05)'}},
-        y:{grid:{display:false}}
-      }
-    }
-  });
+function renderAll() {
+  const list = curFilter === 'all' ? allRes : allRes.filter(r => r.status === curFilter)
+  const tb = document.getElementById('allBody')
+  if (!list.length) { tb.innerHTML = emptyRow(8); return }
+  tb.innerHTML = list.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => `<tr>
+    <td><b>${nm(r)}</b></td>
+    <td style="font-family:var(--mono)">${r.date}</td>
+    <td style="font-family:var(--mono)">${tm(r)}</td>
+    <td>👥 ${r.guests}</td>
+    <td>${zoneInfo(r)}</td>
+    <td style="font-size:12px;color:var(--muted)">${r.pre_order_total ? Number(r.pre_order_total).toLocaleString()+' so\'m' : '—'}</td>
+    <td>${stBadge(r.status)}</td>
+    <td>${actBtns(r.id, r.status)}</td>
+  </tr>`).join('')
 }
 
-function buildZoneChart(){
-  const ctx=document.getElementById('zoneChart').getContext('2d');
-  if(zoneChartObj)zoneChartObj.destroy();
-
-  // Zona bo'yicha bronlarni hisoblash
-  const zoneCount={};
-  allRes.forEach(r=>{
-    const z=r.zone_name||'Zona ko\'rsatilmagan';
-    zoneCount[z]=(zoneCount[z]||0)+1;
-  });
-
-  const labels=Object.keys(zoneCount);
-  const values=Object.values(zoneCount);
-  const colors=['#ef4444','#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899'];
-
-  if(!labels.length){
-    ctx.font='14px sans-serif';
-    ctx.fillStyle='#94a3b8';
-    ctx.textAlign='center';
-    ctx.fillText("Zona ma'lumoti yo'q",ctx.canvas.width/2,ctx.canvas.height/2);
-    return;
-  }
-
-  zoneChartObj=new Chart(ctx,{
-    type:'pie',
-    data:{
-      labels,
-      datasets:[{
-        data:values,
-        backgroundColor:colors.slice(0,labels.length),
-        borderWidth:2,
-        borderColor:'#fff'
-      }]
-    },
-    options:{
-      responsive:true,
-      plugins:{
-        legend:{position:'bottom',labels:{font:{size:12},padding:10}}
-      }
-    }
-  });
+async function updStatus(id, status) {
+  try {
+    const r = await fetch(`${API}/owner/reservations/${id}`, { method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({status}) })
+    if (r.ok) { toast(status==='confirmed' ? '✅ Tasdiqlandi! Xabar ketdi.' : '❌ Bekor qilindi.'); loadReservations() }
+    else toast('❌ Xatolik')
+  } catch(e) { toast('❌ Server xatoligi') }
 }
 
-// ── Menyu ─────────────────────────────────────────────────────
-async function loadMenu(){
-  try{
-    const r=await fetch(`${API}/owner/menu`,{headers:{Authorization:`Bearer ${token}`}});
-    const items=await r.json();
-    const g=document.getElementById('menuGrid');
-    if(!items.length){g.innerHTML="<div class='empty-state'><div class='ei'>🍜</div>Menyu bo'sh. Taom qo'shing!</div>";return;}
-    g.innerHTML=items.map(item=>`
-      <div class="menu-item" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;">
-        ${item.image_url?`<img src="${item.image_url}" style="width:100%;height:160px;object-fit:cover;" onerror="this.style.display='none'"/>`: ''}
-        <div style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div class="menu-name">${item.name}</div>
-            <div class="menu-cat">${item.category||''}</div>
-            <div class="menu-price">${Number(item.price).toLocaleString()} so'm</div>
-            ${item.description?`<div style="font-size:12px;color:#94a3b8;margin-top:2px">${item.description}</div>`:''}
+// ── ANALYTICS ──────────────────────────────────────────────────
+async function loadAnalytics() {
+  if (!restoId) return
+  try {
+    const r = await fetch(`${API}/owner/analytics`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    document.getElementById('an-today').textContent = d.today ?? 0
+    document.getElementById('an-weekly').textContent = d.weekly ?? 0
+    document.getElementById('an-monthly').textContent = d.monthly ?? 0
+    document.getElementById('an-revenue').textContent = d.revenue ? Number(d.revenue).toLocaleString()+" so'm" : '0'
+    buildDailyChart(d.dailyStats || [])
+    buildPeakChart(d.peakHours || [])
+  } catch(e) { buildChartsFromLocal() }
+  buildStatusChart()
+  buildZoneChart()
+}
+
+function buildChartsFromLocal() {
+  const days = {}
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate()-i); days[d.toISOString().split('T')[0]] = 0 }
+  allRes.forEach(r => { const dt = String(r.date).split('T')[0]; if (days[dt] !== undefined) days[dt]++ })
+  buildDailyChart(Object.entries(days).map(([date,count]) => ({date,count})))
+  const hrs = {}
+  allRes.forEach(r => { if (r.status==='cancelled') return; const h = (r.time||'').slice(0,5); if(h) hrs[h]=(hrs[h]||0)+1 })
+  buildPeakChart(Object.entries(hrs).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([time,count])=>({time,count})))
+  document.getElementById('an-today').textContent = allRes.filter(r=>String(r.date).startsWith(new Date().toISOString().split('T')[0])).length
+  document.getElementById('an-weekly').textContent = allRes.filter(r=>new Date(r.date)>=new Date(Date.now()-7*86400000)).length
+  document.getElementById('an-monthly').textContent = allRes.length
+  document.getElementById('an-revenue').textContent = '0'
+}
+
+const chartDefaults = { responsive: true, plugins: { legend: { labels: { color: '#6b6b80', font: { size: 12 } } } } }
+
+function buildDailyChart(data) {
+  const ctx = document.getElementById('dailyChart').getContext('2d')
+  if (chartDaily) chartDaily.destroy()
+  const labels = data.map(d => { const dt = new Date(d.date); return dt.toLocaleDateString('uz-UZ',{month:'short',day:'numeric'}) })
+  chartDaily = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Bronlar', data: data.map(d=>+d.count||0), backgroundColor: 'rgba(255,59,92,0.6)', borderColor: '#ff3b5c', borderWidth: 1, borderRadius: 6 }] },
+    options: { ...chartDefaults, scales: { y: { beginAtZero:true, ticks:{color:'#6b6b80',stepSize:1}, grid:{color:'rgba(255,255,255,.05)'} }, x: { ticks:{color:'#6b6b80'}, grid:{display:false} } } }
+  })
+}
+
+function buildStatusChart() {
+  const ctx = document.getElementById('statusChart').getContext('2d')
+  if (chartStatus) chartStatus.destroy()
+  const pending = allRes.filter(r=>r.status==='pending').length
+  const confirmed = allRes.filter(r=>r.status==='confirmed').length
+  const cancelled = allRes.filter(r=>r.status==='cancelled').length
+  chartStatus = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels:['Kutilmoqda','Tasdiqlangan','Bekor'], datasets: [{ data:[pending,confirmed,cancelled], backgroundColor:['rgba(255,184,0,.7)','rgba(0,214,143,.7)','rgba(255,59,92,.7)'], borderWidth:2, borderColor:['#ffb800','#00d68f','#ff3b5c'] }] },
+    options: { ...chartDefaults, cutout:'65%' }
+  })
+}
+
+function buildPeakChart(data) {
+  const ctx = document.getElementById('peakChart').getContext('2d')
+  if (chartPeak) chartPeak.destroy()
+  if (!data.length) return
+  chartPeak = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: data.map(d=>d.time), datasets: [{ label:'Bronlar', data: data.map(d=>+d.count||0), backgroundColor:'rgba(77,159,255,.6)', borderColor:'#4d9fff', borderWidth:1, borderRadius:6 }] },
+    options: { ...chartDefaults, indexAxis:'y', scales: { x:{beginAtZero:true,ticks:{color:'#6b6b80',stepSize:1},grid:{color:'rgba(255,255,255,.05)'}}, y:{ticks:{color:'#6b6b80'},grid:{display:false}} } }
+  })
+}
+
+function buildZoneChart() {
+  const ctx = document.getElementById('zoneChart').getContext('2d')
+  if (chartZone) chartZone.destroy()
+  const zc = {}
+  allRes.forEach(r => { const z = r.zone_name || "Ko'rsatilmagan"; zc[z] = (zc[z]||0)+1 })
+  if (!Object.keys(zc).length) return
+  chartZone = new Chart(ctx, {
+    type: 'pie',
+    data: { labels: Object.keys(zc), datasets: [{ data: Object.values(zc), backgroundColor:['rgba(255,59,92,.7)','rgba(77,159,255,.7)','rgba(0,214,143,.7)','rgba(255,184,0,.7)','rgba(160,80,255,.7)'], borderWidth:2, borderColor:'#13131a' }] },
+    options: chartDefaults
+  })
+}
+
+// ── MENU ───────────────────────────────────────────────────────
+async function loadMenu() {
+  try {
+    const r = await fetch(`${API}/owner/menu`, { headers:{ Authorization:`Bearer ${token}` } })
+    const items = await r.json()
+    const g = document.getElementById('menuGrid')
+    if (!items.length) { g.innerHTML = '<div class="empty"><div class="ei">🍜</div>Menyu bo\'sh</div>'; return }
+    g.innerHTML = items.map(item => `
+      <div class="menu-item">
+        ${item.image_url ? `<img src="${item.image_url}" class="menu-img" onerror="this.style.display='none'">` : ''}
+        <div class="menu-body">
+          <div class="menu-name">${item.name}</div>
+          <div class="menu-cat">${item.category||''}</div>
+          ${item.description ? `<div style="font-size:12px;color:var(--muted);margin-top:3px">${item.description}</div>` : ''}
+          <div class="menu-foot">
+            <span class="menu-price">${Number(item.price).toLocaleString()} so'm</span>
+            <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}" onclick="toggleMenu(${item.id},${!item.is_available})">
+              ${item.is_available ? '✅ Mavjud' : '❌ Yoq'}
+            </button>
           </div>
-          <button class="toggle-btn ${item.is_available?'toggle-on':'toggle-off'}" onclick="toggleMenu(${item.id},${!item.is_available})">
-            ${item.is_available?'✅ Mavjud':'❌ Mavjud emas'}
-          </button>
         </div>
-      </div>`).join('');
-  }catch(e){}
+      </div>`).join('')
+  } catch(e) {}
 }
 
-function openMenuModal(){document.getElementById('menuModal').classList.add('open');}
-function closeMenuModal(){document.getElementById('menuModal').classList.remove('open');}
+function openMenuModal() { document.getElementById('menuModal').classList.add('open') }
 
-async function saveMenuItem(){
-  const name=document.getElementById('mName').value.trim();
-  const category=document.getElementById('mCat').value;
-  const price=document.getElementById('mPrice').value;
-  const description=document.getElementById('mDesc').value;
-  const image_url=document.getElementById('mImage').value.trim();
-  if(!name||!price){toast('⚠️ Nom va narx kerak');return;}
-  try{
-    const r=await fetch(`${API}/owner/menu`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,category,price:parseInt(price),description,image_url})});
-    if(r.ok){toast("✅ Taom qo'shildi!");closeMenuModal();document.getElementById('mName').value='';document.getElementById('mPrice').value='';document.getElementById('mDesc').value='';document.getElementById('mImage').value='';document.getElementById('mImagePreview').style.display='none';loadMenu();}
-    else toast('❌ Xatolik');
-  }catch(e){toast('❌ Server xatoligi');}
+async function saveMenu() {
+  const name = document.getElementById('mName').value.trim()
+  const price = document.getElementById('mPrice').value
+  if (!name || !price) { toast('⚠️ Nom va narx kerak'); return }
+  try {
+    const r = await fetch(`${API}/owner/menu`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({ name, category_id: null, price:+price, description: document.getElementById('mDesc').value, image_url: document.getElementById('mImg').value }) })
+    if (r.ok) { toast("✅ Taom qo'shildi!"); closeModal('menuModal'); loadMenu() }
+    else { const d=await r.json(); toast('❌ '+(d.error||'Xatolik')) }
+  } catch(e) { toast('❌ Xatolik') }
 }
 
-async function toggleMenu(id,available){
-  try{await fetch(`${API}/owner/menu/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({available})});loadMenu();}catch(e){}
+async function toggleMenu(id, available) {
+  try {
+    await fetch(`${API}/owner/menu/${id}`, { method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({is_available:available}) })
+    loadMenu()
+  } catch(e) {}
 }
 
-// ── Zonalar ───────────────────────────────────────────────────
-async function loadZones(){
-  if(!restoId)return;
-  const grid=document.getElementById('zonesGrid');
-  grid.innerHTML='<div class="empty-state"><div class="ei">⏳</div>Yuklanmoqda...</div>';
-  try{
-    const r=await fetch(`${API}/restaurants/${restoId}/zones`);
-    const zones=await r.json();
-    if(!zones.length){grid.innerHTML='<div class="empty-state"><div class="ei">🏠</div>Hali zona qo\'shilmagan.</div>';return;}
-    grid.innerHTML=zones.map(z=>`
-      <div class="zone-card-item">
-        <div class="zone-card-left">
-          <div class="zone-icon-big">${z.icon||'🪑'}</div>
-          <div class="zone-info">
-            <div class="zone-title">${z.name}</div>
-            <div class="zone-desc">${z.description||''}</div>
-            <div class="zone-cap">👥 Max: ${z.capacity} kishi</div>
-          </div>
+// ── ZONES ──────────────────────────────────────────────────────
+async function loadZones() {
+  try {
+    const r = await fetch(`${API}/owner/zones`, { headers:{ Authorization:`Bearer ${token}` } })
+    const zones = await r.json()
+    const g = document.getElementById('zonesGrid')
+    if (!zones.length) { g.innerHTML = '<div class="empty"><div class="ei">🏠</div>Zona yo\'q</div>'; return }
+    g.innerHTML = zones.map(z => `
+      <div class="zone-card">
+        <div>
+          <div class="zone-icon">${z.icon||'🪑'}</div>
+          <div class="zone-name">${z.name}</div>
+          <div class="zone-desc">${z.description||''}</div>
+          <div class="zone-cap">👥 max ${z.capacity} kishi • ${z.table_count||0} stol</div>
         </div>
         <div class="zone-actions">
-          <button class="zone-toggle-btn ${z.is_available?'toggle-on':'toggle-off'}" onclick="toggleZone(${z.id},${!z.is_available})">${z.is_available?'✅ Faol':'❌ Nofaol'}</button>
-          <button class="zone-delete-btn" onclick="deleteZone(${z.id},'${z.name}')">🗑 O'chirish</button>
+          <button class="toggle-btn ${z.is_available?'toggle-on':'toggle-off'}" onclick="toggleZone(${z.id},${!z.is_available})">${z.is_available?'✅':'❌'}</button>
+          <button class="btn btn-no" onclick="delZone(${z.id},'${z.name}')">🗑</button>
         </div>
-      </div>`).join('');
-  }catch(e){grid.innerHTML='<div class="empty-state"><div class="ei">❌</div>Xatolik</div>';}
+      </div>`).join('')
+  } catch(e) {}
 }
 
-function selectIcon(icon,el){selectedZoneIcon=icon;document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');}
-
-function openZoneModal(){document.getElementById('zName').value='';document.getElementById('zDesc').value='';document.getElementById('zCapacity').value='10';selectedZoneIcon='🪑';document.querySelectorAll('.icon-opt').forEach(o=>o.classList.remove('selected'));document.querySelector('.icon-opt').classList.add('selected');document.getElementById('zoneModal').classList.add('open');}
-function closeZoneModal(){document.getElementById('zoneModal').classList.remove('open');}
-
-async function saveZone(){
-  const name=document.getElementById('zName').value.trim();
-  if(!name){toast('⚠️ Zona nomini kiriting');return;}
-  try{
-    const r=await fetch(`${API}/owner/zones`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,description:document.getElementById('zDesc').value,capacity:parseInt(document.getElementById('zCapacity').value)||10,icon:selectedZoneIcon})});
-    if(r.ok){toast(`✅ "${name}" qo'shildi!`);closeZoneModal();loadZones();}
-    else{const d=await r.json();toast('❌ '+(d.error||'Xatolik'));}
-  }catch(e){toast('❌ Server xatoligi');}
+function openZoneModal() {
+  document.getElementById('zName').value = ''; document.getElementById('zDesc').value = ''; document.getElementById('zCap').value = '10'
+  selZoneIcon = '🪑'
+  document.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('sel'))
+  document.querySelector('.icon-opt').classList.add('sel')
+  document.getElementById('zoneModal').classList.add('open')
 }
 
-async function toggleZone(id,available){
-  try{await fetch(`${API}/owner/zones/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({is_available:available})});loadZones();toast(available?'✅ Faollashtirildi':'❌ O\'chirildi');}catch(e){toast('❌ Xatolik');}
+function selIcon(icon, el) {
+  selZoneIcon = icon
+  document.querySelectorAll('.icon-opt').forEach(o => o.classList.remove('sel'))
+  el.classList.add('sel')
 }
 
-async function deleteZone(id,name){
-  if(!confirm(`"${name}" zonasini o'chirasizmi?`))return;
-  try{const r=await fetch(`${API}/owner/zones/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast(`🗑 "${name}" o'chirildi`);loadZones();}else toast('❌ O\'chirib bo\'lmadi');}catch(e){toast('❌ Xatolik');}
+async function saveZone() {
+  const name = document.getElementById('zName').value.trim()
+  if (!name) { toast('⚠️ Zona nomi kerak'); return }
+  try {
+    const r = await fetch(`${API}/owner/zones`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({ name, description: document.getElementById('zDesc').value, capacity:+document.getElementById('zCap').value||10, icon: selZoneIcon }) })
+    if (r.ok) { toast(`✅ "${name}" qo'shildi!`); closeModal('zoneModal'); loadZones() }
+    else { const d=await r.json(); toast('❌ '+(d.error||'Xatolik')) }
+  } catch(e) { toast('❌ Xatolik') }
 }
 
-// ── Restoran ──────────────────────────────────────────────────
-async function loadRestaurant(){
-  if(!restoId)return;
-  try{
-    const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});
-    const d=await r.json();
-    if(d){
-      document.getElementById('restoName').value=d.name||'';
-      document.getElementById('restoAddress').value=d.address||'';
-      document.getElementById('restoPhone').value=d.phone||'';
-      document.getElementById('restoPriceCategory').value=d.price_category||'$$';
-      document.getElementById('restoCapacity').value=d.capacity||50;
-      document.getElementById('restoCuisine').value=Array.isArray(d.cuisine)?d.cuisine.join(', '):(d.cuisine||'');
-      document.getElementById('restoImage').value=d.image_url||'';
-      document.getElementById('restoDesc').value=d.description||'';
-      document.getElementById('restoHours').value=d.working_hours||'10:00 — 22:00';
-      document.getElementById('restoSaveBtn').textContent='💾 Yangilash';
+async function toggleZone(id, avail) {
+  try { await fetch(`${API}/owner/zones/${id}`, { method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({is_available:avail}) }); loadZones() } catch(e) {}
+}
+
+async function delZone(id, name) {
+  if (!confirm(`"${name}" o'chirasizmi?`)) return
+  try { const r = await fetch(`${API}/owner/zones/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`} }); if(r.ok){toast(`🗑 O'chirildi`);loadZones()} } catch(e) {}
+}
+
+// ── TABLES ─────────────────────────────────────────────────────
+async function loadTables() {
+  try {
+    const r = await fetch(`${API}/owner/tables`, { headers:{ Authorization:`Bearer ${token}` } })
+    const tables = await r.json()
+    const tb = document.getElementById('tablesBody')
+    if (!tables.length) { tb.innerHTML = '<tr><td colspan="5"><div class="empty"><div class="ei">🪑</div>Stol yo\'q</div></td></tr>'; return }
+    tb.innerHTML = tables.map(t => `<tr>
+      <td><b>#${t.table_number}</b></td>
+      <td>${t.zone_name||'—'}</td>
+      <td>👥 ${t.capacity} kishi</td>
+      <td><span class="badge ${t.is_available?'badge-confirmed':'badge-cancelled'}">${t.is_available?'✅ Faol':'❌ Nofaol'}</span></td>
+      <td>
+        <button class="btn btn-ok" onclick="toggleTable(${t.id},${!t.is_available})" style="margin-right:6px">${t.is_available?'Bloklash':'Ochish'}</button>
+        <button class="btn btn-no" onclick="delTable(${t.id})">🗑</button>
+      </td>
+    </tr>`).join('')
+  } catch(e) {}
+}
+
+function openTableModal() {
+  document.getElementById('tNum').value = ''; document.getElementById('tCap').value = '4'
+  loadZonesForSelect()
+  document.getElementById('tableModal').classList.add('open')
+}
+
+async function loadZonesForSelect() {
+  try {
+    const r = await fetch(`${API}/owner/zones`, { headers:{ Authorization:`Bearer ${token}` } })
+    const zones = await r.json()
+    const sel = document.getElementById('tZone')
+    sel.innerHTML = '<option value="">— Zona tanlang —</option>' + zones.map(z => `<option value="${z.id}">${z.icon||''} ${z.name}</option>`).join('')
+  } catch(e) {}
+}
+
+async function saveTable() {
+  const num = document.getElementById('tNum').value.trim()
+  if (!num) { toast('⚠️ Stol raqami kerak'); return }
+  try {
+    const r = await fetch(`${API}/owner/tables`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body: JSON.stringify({ table_number:num, zone_id:document.getElementById('tZone').value||null, capacity:+document.getElementById('tCap').value||4 }) })
+    if (r.ok) { toast(`✅ Stol #${num} qo'shildi!`); closeModal('tableModal'); loadTables() }
+    else { const d=await r.json(); toast('❌ '+(d.error||'Xatolik')) }
+  } catch(e) { toast('❌ Xatolik') }
+}
+
+async function toggleTable(id, avail) {
+  try { await fetch(`${API}/owner/tables/${id}`, { method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({is_available:avail}) }); loadTables() } catch(e) {}
+}
+
+async function delTable(id) {
+  if (!confirm("Stolni o'chirasizmi?")) return
+  try { const r = await fetch(`${API}/owner/tables/${id}`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`} }); if(r.ok){toast("🗑 O'chirildi");loadTables()} } catch(e) {}
+}
+
+// ── CHAT ───────────────────────────────────────────────────────
+async function loadChat() {
+  try {
+    const r = await fetch(`${API}/chat/owner/messages`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    const el = document.getElementById('chatList')
+    if (!d.messages?.length) { el.innerHTML = '<div class="empty"><div class="ei">💬</div>Xabar yo\'q</div>'; return }
+    // Group by reservation
+    const grouped = {}
+    d.messages.forEach(m => { if(!grouped[m.reservation_id]) grouped[m.reservation_id]=[]; grouped[m.reservation_id].push(m) })
+    el.innerHTML = Object.entries(grouped).map(([resId, msgs]) => {
+      const last = msgs[0]
+      const unread = msgs.filter(m => m.sender_type==='user' && !m.is_read).length
+      return `<div class="card" style="margin-bottom:12px;cursor:pointer" onclick="openChatThread(${resId})">
+        <div style="padding:16px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <b>${last.first_name||'Mijoz'}</b>
+            <span style="font-size:12px;color:var(--muted);margin-left:8px">Bron #${resId} • ${last.date||''} ${(last.time||'').slice(0,5)}</span>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px">${last.message}</div>
+          </div>
+          ${unread ? `<span class="chat-unread">${unread}</span>` : ''}
+        </div>
+      </div>`
+    }).join('')
+  } catch(e) {}
+}
+
+async function openChatThread(resId) {
+  const msgs = await (await fetch(`${API}/chat/${resId}/messages`, { headers:{ Authorization:`Bearer ${token}` } })).json()
+  // Simple inline view
+  const reply = prompt('Javob yozing:')
+  if (!reply) return
+  await fetch(`${API}/chat/${resId}/messages/owner`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({message:reply}) })
+  toast('✅ Xabar yuborildi!')
+  loadChat()
+}
+
+// ── RESTORAN ───────────────────────────────────────────────────
+async function loadResto() {
+  if (!restoId) return
+  try {
+    const r = await fetch(`${API}/owner/restaurant`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    if (d) {
+      document.getElementById('rName').value = d.name||''
+      document.getElementById('rAddr').value = d.address||''
+      document.getElementById('rPhone').value = d.phone||''
+      document.getElementById('rEmail').value = d.email||''
+      document.getElementById('rPrice').value = d.price_category||'$$'
+      document.getElementById('rCapacity').value = d.capacity||50
+      document.getElementById('rCuisine').value = Array.isArray(d.cuisine) ? d.cuisine.join(', ') : (d.cuisine||'')
+      document.getElementById('rHours').value = d.working_hours||'10:00 — 22:00'
+      document.getElementById('rImage').value = d.image_url||''
+      document.getElementById('rDesc').value = d.description||''
+      document.getElementById('rSaveBtn').textContent = '💾 Yangilash'
     }
-  }catch(e){}
+  } catch(e) {}
 }
 
-async function saveRestaurant(){
-  const name=document.getElementById('restoName').value.trim();
-  const address=document.getElementById('restoAddress').value.trim();
-  if(!name||!address){toast('⚠️ Nom va manzil kiritish shart!');return;}
-  const body={name,address,phone:document.getElementById('restoPhone').value,price_category:document.getElementById('restoPriceCategory').value,capacity:parseInt(document.getElementById('restoCapacity').value)||50,cuisine:document.getElementById('restoCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),image_url:document.getElementById('restoImage').value,description:document.getElementById('restoDesc').value,working_hours:document.getElementById('restoHours').value};
-  const msg=document.getElementById('restoMsg');
-  try{
-    let r;
-    if(restoId){r=await fetch(`${API}/owner/restaurant`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}
-    else{r=await fetch(`${API}/owner/restaurants`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});}
-    const d=await r.json();
-    if(r.ok){if(!restoId)restoId=d.id;msg.innerHTML='<span style="color:#059669">✅ Saqlandi!</span>';document.getElementById('sidebarName').textContent=name;document.getElementById('noRestoWarning').style.display='none';toast('✅ Saqlandi!');}
-    else{msg.innerHTML=`<span style="color:#dc2626">❌ ${d.error||'Xatolik'}</span>`;}
-  }catch(e){msg.innerHTML='<span style="color:#dc2626">❌ Server xatoligi</span>';}
+async function saveResto() {
+  const name = document.getElementById('rName').value.trim()
+  const address = document.getElementById('rAddr').value.trim()
+  if (!name || !address) { toast('⚠️ Nom va manzil kerak!'); return }
+  const body = {
+    name, address,
+    phone: document.getElementById('rPhone').value,
+    email: document.getElementById('rEmail').value,
+    price_category: document.getElementById('rPrice').value,
+    capacity: +document.getElementById('rCapacity').value||50,
+    cuisine: document.getElementById('rCuisine').value.split(',').map(s=>s.trim()).filter(Boolean),
+    working_hours: document.getElementById('rHours').value,
+    image_url: document.getElementById('rImage').value,
+    description: document.getElementById('rDesc').value
+  }
+  const msg = document.getElementById('rMsg')
+  try {
+    const url = restoId ? `${API}/owner/restaurant` : `${API}/owner/restaurants`
+    const method = restoId ? 'PUT' : 'POST'
+    const r = await fetch(url, { method, headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify(body) })
+    const d = await r.json()
+    if (r.ok) {
+      if (!restoId) restoId = d.id
+      msg.innerHTML = '<span style="color:var(--green)">✅ Saqlandi!</span>'
+      document.getElementById('sidebarName').textContent = name
+      document.getElementById('noRestoWarn').style.display = 'none'
+      toast('✅ Saqlandi!')
+    } else { msg.innerHTML = `<span style="color:var(--red)">❌ ${d.error||'Xatolik'}</span>` }
+  } catch(e) { msg.innerHTML = '<span style="color:var(--red)">❌ Server xatoligi</span>' }
 }
 
-// ── Lokatsiya ─────────────────────────────────────────────────
-async function initLocationMap(){
-  await new Promise(r=>setTimeout(r,150));
-  if(locMap){locMap.invalidateSize();return;}
-  let startLat=41.2995,startLng=69.2401,hasSaved=false;
-  if(restoId){try{const r=await fetch(`${API}/owner/restaurant`,{headers:{Authorization:`Bearer ${token}`}});const d=await r.json();if(d&&d.latitude&&d.longitude){startLat=parseFloat(d.latitude);startLng=parseFloat(d.longitude);hasSaved=true;}}catch(e){}}
-  locMap=L.map('locationMap').setView([startLat,startLng],13);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(locMap);
-  if(hasSaved){setPin(startLat,startLng);document.getElementById('locStatusSaved').style.display='block';}
-  locMap.on('click',function(e){setPin(e.latlng.lat,e.latlng.lng);});
+// ── MAP ────────────────────────────────────────────────────────
+async function initMap() {
+  await new Promise(r => setTimeout(r, 150))
+  if (mapInst) { mapInst.invalidateSize(); return }
+  let lat = 41.2995, lng = 69.2401
+  if (restoId) {
+    try {
+      const r = await fetch(`${API}/owner/restaurant`, { headers:{ Authorization:`Bearer ${token}` } })
+      const d = await r.json()
+      if (d?.latitude) { lat = +d.latitude; lng = +d.longitude }
+    } catch(e) {}
+  }
+  mapInst = L.map('mapEl').setView([lat, lng], 13)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap' }).addTo(mapInst)
+  if (restoId) setPin(lat, lng)
+  mapInst.on('click', e => setPin(e.latlng.lat, e.latlng.lng))
 }
 
-function setPin(lat,lng){
-  locLat=parseFloat(lat.toFixed(6));locLng=parseFloat(lng.toFixed(6));
-  if(locMarker)locMap.removeLayer(locMarker);
-  locMarker=L.marker([locLat,locLng],{icon:L.divIcon({html:`<div style="background:#ef4444;width:22px;height:22px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.4)"></div>`,className:'',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(locMap).bindPopup(`📍 ${locLat}, ${locLng}`).openPopup();
-  document.getElementById('locLat').textContent=locLat;
-  document.getElementById('locLng').textContent=locLng;
-  document.getElementById('locSaveBtn').disabled=false;
-  document.getElementById('locGmapsLink').innerHTML=`<a href="https://maps.google.com/?q=${locLat},${locLng}" target="_blank" style="color:#3b82f6">Ko'rish →</a>`;
+function setPin(lat, lng) {
+  locLat = +lat.toFixed(6); locLng = +lng.toFixed(6)
+  if (mapMarker) mapInst.removeLayer(mapMarker)
+  mapMarker = L.marker([locLat,locLng], { icon: L.divIcon({ html: '<div style="background:#ff3b5c;width:20px;height:20px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,.5)"></div>', className:'', iconSize:[20,20], iconAnchor:[10,10] }) }).addTo(mapInst).bindPopup(`📍 ${locLat}, ${locLng}`).openPopup()
+  document.getElementById('locLat').textContent = locLat
+  document.getElementById('locLng').textContent = locLng
+  document.getElementById('locSaveBtn').disabled = false
+  document.getElementById('gmLink').innerHTML = `<a href="https://maps.google.com/?q=${locLat},${locLng}" target="_blank" style="color:var(--blue)">Ko'rish →</a>`
 }
 
-function useMyLocation(){
-  if(!navigator.geolocation){toast("⚠️ Geolokatsiya qo'llab-quvvatlanmaydi");return;}
-  toast('📡 Aniqlanmoqda...');
-  navigator.geolocation.getCurrentPosition(pos=>{locMap.setView([pos.coords.latitude,pos.coords.longitude],16);setPin(pos.coords.latitude,pos.coords.longitude);toast('✅ Aniqlandi!');},()=>toast('⚠️ Xatolik.'));
+function useMyLoc() {
+  if (!navigator.geolocation) { toast('⚠️ Geolokatsiya qo\'llab-quvvatlanmaydi'); return }
+  navigator.geolocation.getCurrentPosition(p => { mapInst.setView([p.coords.latitude,p.coords.longitude],16); setPin(p.coords.latitude,p.coords.longitude); toast('✅ Aniqlandi!') }, () => toast('⚠️ Xatolik'))
 }
 
-function clearLocation(){
-  if(locMarker){locMap.removeLayer(locMarker);locMarker=null;}locLat=null;locLng=null;
-  document.getElementById('locLat').innerHTML='<span style="color:#94a3b8;font-style:italic">Belgilanmagan</span>';
-  document.getElementById('locLng').innerHTML='<span style="color:#94a3b8;font-style:italic">Belgilanmagan</span>';
-  document.getElementById('locGmapsLink').innerHTML='—';
-  document.getElementById('locSaveBtn').disabled=true;
-  document.getElementById('locStatusSaved').style.display='none';
+function clearLoc() {
+  if (mapMarker) { mapInst.removeLayer(mapMarker); mapMarker = null }
+  locLat = locLng = null
+  document.getElementById('locLat').textContent = '—'
+  document.getElementById('locLng').textContent = '—'
+  document.getElementById('gmLink').innerHTML = '—'
+  document.getElementById('locSaveBtn').disabled = true
 }
 
-async function saveLocation(){
-  if(!locLat||!locLng){toast("⚠️ Joyni belgilang");return;}
-  if(!restoId){toast("⚠️ Avval restoran saqlang");return;}
-  const btn=document.getElementById('locSaveBtn');btn.textContent='Saqlanmoqda...';btn.disabled=true;
-  try{
-    const r=await fetch(`${API}/owner/restaurant/location`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({latitude:locLat,longitude:locLng})});
-    if(r.ok){toast('✅ Lokatsiya saqlandi!');document.getElementById('locStatusSaved').style.display='block';document.getElementById('locMsg').innerHTML='<span style="color:#059669">✅ Saqlandi!</span>';}
-    else{const d=await r.json();toast('❌ '+(d.error||'Xatolik'));}
-  }catch(e){toast('❌ Server xatoligi');}
-  finally{btn.textContent='💾 Lokatsiyani saqlash';btn.disabled=false;}
+async function saveLoc() {
+  if (!locLat || !locLng) { toast('⚠️ Joyni belgilang'); return }
+  if (!restoId) { toast('⚠️ Avval restoran saqlang'); return }
+  const btn = document.getElementById('locSaveBtn')
+  btn.textContent = 'Saqlanmoqda...'; btn.disabled = true
+  try {
+    const r = await fetch(`${API}/owner/restaurant/location`, { method:'PUT', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({latitude:locLat,longitude:locLng}) })
+    if (r.ok) { toast('✅ Lokatsiya saqlandi!'); document.getElementById('locMsg').innerHTML = '<span style="color:var(--green)">✅ Saqlandi!</span>' }
+    else toast('❌ Xatolik')
+  } catch(e) { toast('❌ Xatolik') }
+  finally { btn.textContent = '💾 Saqlash'; btn.disabled = false }
 }
 
-// ── Premium ───────────────────────────────────────────────────
-async function loadPremium(){
-  if(!restoId)return;
-  try{
-    const r=await fetch(`${API}/owner/premium`,{headers:{Authorization:`Bearer ${token}`}});
-    const d=await r.json();
-    const el=document.getElementById('premiumStatus');
-    if(d.is_premium&&d.subscription){const exp=new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ');el.innerHTML=`<div style="background:#d1fae5;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#059669">💎 Premium faol!</b><p style="color:#065f46;font-size:14px;margin-top:4px;">Muddati: ${exp}</p><button onclick="cancelPremium()" style="margin-top:10px;background:#fee2e2;color:#dc2626;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;">Bekor qilish</button></div>`;}
-    else{el.innerHTML='<div style="background:#fff3cd;border-radius:12px;padding:16px;margin-bottom:16px;"><b style="color:#856404">⚠️ Premium faol emas</b></div>';}
-  }catch(e){}
+// ── PREMIUM ────────────────────────────────────────────────────
+async function loadPremium() {
+  if (!restoId) return
+  try {
+    const r = await fetch(`${API}/owner/premium`, { headers:{ Authorization:`Bearer ${token}` } })
+    const d = await r.json()
+    const el = document.getElementById('premStatus')
+    if (d.is_premium && d.subscription) {
+      const exp = new Date(d.subscription.expires_at).toLocaleDateString('uz-UZ')
+      el.innerHTML = `<div style="background:rgba(77,159,255,.1);border:1px solid rgba(77,159,255,.3);border-radius:12px;padding:16px;margin-bottom:16px"><b style="color:var(--blue)">💎 Premium faol!</b><p style="color:var(--muted);font-size:13px;margin-top:4px">Muddati: ${exp}</p><button class="btn btn-no" onclick="cancelPrem()" style="margin-top:10px">Bekor qilish</button></div>`
+    } else {
+      el.innerHTML = '<div style="background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.2);border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--yellow)">⚠️ Premium faol emas</div>'
+    }
+  } catch(e) {}
 }
 
-async function activatePremium(plan){try{const r=await fetch(`${API}/owner/premium/activate`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({plan})});if(r.ok){toast('💎 Premium faollashtirildi!');loadPremium();}else toast('❌ Xatolik');}catch(e){toast('❌ Server xatoligi');}}
-async function cancelPremium(){if(!confirm('Premiumni bekor qilasizmi?'))return;try{const r=await fetch(`${API}/owner/premium`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});if(r.ok){toast('Premium bekor qilindi');loadPremium();}}catch(e){}}
+async function activatePrem(plan) {
+  try {
+    const r = await fetch(`${API}/owner/premium/activate`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({plan}) })
+    if (r.ok) { toast('💎 Premium faollashtirildi!'); loadPremium() }
+    else toast('❌ Xatolik')
+  } catch(e) { toast('❌ Xatolik') }
+}
 
-setInterval(()=>{if(token&&restoId)loadReservations();},30000);
+async function cancelPrem() {
+  if (!confirm('Premiumni bekor qilasizmi?')) return
+  try { const r = await fetch(`${API}/owner/premium`, { method:'DELETE', headers:{Authorization:`Bearer ${token}`} }); if(r.ok){toast('Premium bekor qilindi');loadPremium()} } catch(e) {}
+}
+
+// ── MODALS ─────────────────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).classList.remove('open') }
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', function(e){if(e.target===this)this.classList.remove('open')}))
+
+// ── AUTO REFRESH ───────────────────────────────────────────────
+setInterval(() => { if (token && restoId) loadReservations() }, 30000)
 </script>
 </body>
 </html>
