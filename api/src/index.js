@@ -7,7 +7,7 @@ const http = require('http')
 const { Server } = require('socket.io')
 
 const { checkEnvVars, securityHeaders, xssProtection, apiRateLimiter, authRateLimiter } = require('./middleware/security')
-const logger = require('./utils/logger')
+const logger = require('./routes/utils/logger')
 const { expireReservations } = require('./services/bookingService')
 
 checkEnvVars()
