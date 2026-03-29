@@ -3,14 +3,14 @@
  * auth / restaurants / reservations / owner / payments / chat / reviews / admin
  */
 const router = require('express').Router()
-const db = require('../config/db')
+const db = require('../db')
 const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const { userAuth, ownerAuth, adminAuth, createToken } = require('../middleware/auth')
 const { validateReservation, validateOwnerRegister, validateMenuItem, validateRestaurant } = require('../middleware/security')
 const { createReservation, findAlternativeTimes } = require('../services/bookingService')
 const notify = require('../services/notificationService')
-const logger = require('../utils/logger')
+const logger = require('../logger')
 
 // ════════════════════════════════════════════════════════════════
 // AUTH
