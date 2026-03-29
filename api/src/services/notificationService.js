@@ -1,5 +1,4 @@
-const logger = require('../utils/logger')
-
+const logger = require('../logger')
 async function sendTelegram(telegramId, text, keyboard = null) {
   try {
     const token = process.env.BOT_TOKEN
