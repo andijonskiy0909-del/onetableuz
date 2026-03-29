@@ -1,13 +1,11 @@
 {
   "name": "onetable-backend",
   "version": "2.0.0",
-  "description": "OneTable Restaurant Reservation Platform - Backend API",
+  "description": "OneTable Restaurant Reservation Platform",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "migrate": "node src/migrate.js",
-    "seed": "node src/seed.js"
+    "dev": "nodemon src/app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
