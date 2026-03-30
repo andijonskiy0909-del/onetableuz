@@ -1,6 +1,5 @@
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api')
-const express = require('express')
 const fetch = require('node-fetch')
 
 const BOT_TOKEN = process.env.BOT_TOKEN
@@ -9,23 +8,11 @@ const WEBAPP_URL = process.env.WEBAPP_URL || 'https://onetableuz.vercel.app'
 const API_URL = process.env.API_URL || 'https://onetableuz-production.up.railway.app/api'
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: false })
-const app = express()
-app.use(express.json())
 
-// Webhook
+// Webhook sozlash
 bot.setWebHook(`${WEBHOOK_URL}/webhook/${BOT_TOKEN}`)
   .then(() => console.log('✅ Webhook sozlandi'))
   .catch(e => console.error('Webhook xatoligi:', e.message))
-
-app.post(`/webhook/${BOT_TOKEN}`, (req, res) => {
-  bot.processUpdate(req.body)
-  res.sendStatus(200)
-})
-
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'onetable-bot' }))
-
-const PORT = process.env.PORT || 3001
-app.listen(PORT, () => console.log(`✅ Bot server ${PORT} portda | Webhook mode`))
 
 // ── i18n ──────────────────────────────────────────────────────
 const i18n = {
@@ -238,14 +225,15 @@ async function handleAI(uid, chatId, message) {
 
     let ctx = ''
     try {
-      const r = await fetch(`${API_URL}/restaurants`); const d = await r.json()
-      if (Array.isArray(d)) ctx = d.slice(0,5).map(r=>`- ${r.name} (${r.cuisine?.join(', ')}, ${r.price_category}, ${r.address})`).join('\n')
+      const r = await fetch(`${API_URL}/restaurants`)
+      const d = await r.json()
+      if (Array.isArray(d)) ctx = d.slice(0, 5).map(r => `- ${r.name} (${r.cuisine?.join(', ')}, ${r.price_category}, ${r.address})`).join('\n')
     } catch(e) {}
 
     const prompts = {
-      uz: `Sen OneTable AI yordamchisisisan. Toshkentdagi restoran bron platformasi.\n${ctx?`Restoranlar:\n${ctx}`:''}\nQisqa javob ber. O'zbek tilida.`,
-      ru: `Ты AI-ассистент OneTable. Рестораны Ташкента.\n${ctx?`Рестораны:\n${ctx}`:''}\nКратко по-русски.`,
-      en: `You are OneTable AI assistant.\n${ctx?`Restaurants:\n${ctx}`:''}\nBe brief.`
+      uz: `Sen OneTable AI yordamchisisisan. Toshkentdagi restoran bron platformasi.\n${ctx ? `Restoranlar:\n${ctx}` : ''}\nQisqa javob ber. O'zbek tilida.`,
+      ru: `Ты AI-ассистент OneTable. Рестораны Ташкента.\n${ctx ? `Рестораны:\n${ctx}` : ''}\nКратко по-русски.`,
+      en: `You are OneTable AI assistant.\n${ctx ? `Restaurants:\n${ctx}` : ''}\nBe brief.`
     }
 
     const gr = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -253,7 +241,7 @@ async function handleAI(uid, chatId, message) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'system', content: prompts[lang]||prompts.uz }, ...state.aiHistory[uid]],
+        messages: [{ role: 'system', content: prompts[lang] || prompts.uz }, ...state.aiHistory[uid]],
         max_tokens: 500, temperature: 0.7
       })
     })
@@ -279,25 +267,37 @@ async function saveReview(uid, chatId, photoUrl) {
     const r = await fetch(`${API_URL}/reviews`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ telegram_id: uid, reservation_id: rs.reservationId, restaurant_id: rs.restaurantId, rating: rs.rating, comment: rs.comment||null, photo_url: photoUrl||null })
+      body: JSON.stringify({
+        telegram_id: uid,
+        reservation_id: rs.reservationId,
+        restaurant_id: rs.restaurantId,
+        rating: rs.rating,
+        comment: rs.comment || null,
+        photo_url: photoUrl || null
+      })
     })
     bot.sendMessage(chatId, r.ok ? T(uid, 'review_saved') : '❌ Saqlashda xatolik')
-  } catch(e) { bot.sendMessage(chatId, '❌ Xatolik') }
-  finally { delete state.reviews[uid] }
+  } catch(e) {
+    bot.sendMessage(chatId, '❌ Xatolik')
+  } finally {
+    delete state.reviews[uid]
+  }
 }
 
-// ── Review so'rash (cron tomonidan chaqiriladi) ───────────────
+// ── Review so'rash ────────────────────────────────────────────
 async function askForReview(telegramId, reservationId, restaurantId, restaurantName) {
   try {
     const uid = telegramId
     const lang = state.langs[uid] || 'uz'
     state.reviews[uid] = { step: 'rating', reservationId: String(reservationId), restaurantId: String(restaurantId), restaurantName, rating: null, comment: null }
-    const stars = [1,2,3,4,5].map(n => ({ text: '⭐'.repeat(n), callback_data: `review_rate_${n}_${reservationId}_${restaurantId}` }))
+    const stars = [1, 2, 3, 4, 5].map(n => ({ text: '⭐'.repeat(n), callback_data: `review_rate_${n}_${reservationId}_${restaurantId}` }))
     await bot.sendMessage(telegramId, i18n[lang].review_ask(restaurantName), {
       parse_mode: 'HTML',
-      reply_markup: { inline_keyboard: [stars.slice(0,3), [...stars.slice(3), { text: i18n[lang].review_cancel, callback_data: 'review_cancel' }]] }
+      reply_markup: { inline_keyboard: [stars.slice(0, 3), [...stars.slice(3), { text: i18n[lang].review_cancel, callback_data: 'review_cancel' }]] }
     })
-  } catch(e) { console.error('askForReview error:', e.message) }
+  } catch(e) {
+    console.error('askForReview error:', e.message)
+  }
 }
 
 // ── Cron: Review so'rash ──────────────────────────────────────
@@ -313,10 +313,17 @@ async function checkReviews() {
         await new Promise(r => setTimeout(r, 1000))
       }
     }
-  } catch(e) { console.error('Review cron error:', e.message) }
+  } catch(e) {
+    console.error('Review cron error:', e.message)
+  }
 }
 
 setInterval(checkReviews, 30 * 60 * 1000)
 setTimeout(checkReviews, 15000)
 
-module.exports = { bot, askForReview }
+// ── Webhook handler (API server tomonidan chaqiriladi) ────────
+function processUpdate(update) {
+  bot.processUpdate(update)
+}
+
+module.exports = { bot, askForReview, processUpdate }
