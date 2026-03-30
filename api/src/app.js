@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const path = require('path')
 const http = require('http')
+const fs = require('fs')
 const { Server } = require('socket.io')
 
 const { checkEnvVars, securityHeaders, xssProtection, apiRateLimiter, authRateLimiter } = require('./middleware/security')
@@ -52,11 +53,16 @@ app.post('/webhook/:token', (req, res) => {
   res.sendStatus(200)
 })
 
-// ── Dashboard static ──────────────────────────────────────────
-app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
+// ── Dashboard ─────────────────────────────────────────────────
 app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, '../webapp/dashboard.html'))
+  const filePath = path.join(__dirname, '../webapp/dashboard.html')
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath)
+  } else {
+    res.status(404).send('Dashboard topilmadi: ' + filePath)
+  }
 })
+app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
 
 // ── Routes ────────────────────────────────────────────────────
 const routes = require('./routes/index')
@@ -89,7 +95,6 @@ server.listen(PORT, async () => {
   logger.info(`🚀 Server ${PORT} portda ishlayapti`)
 
   try {
-    const fs = require('fs')
     const schemaPath = path.join(__dirname, '../schema.sql')
     if (fs.existsSync(schemaPath)) {
       const schema = fs.readFileSync(schemaPath, 'utf8')
@@ -100,6 +105,8 @@ server.listen(PORT, async () => {
     await db.query(`
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP DEFAULT (NOW() + INTERVAL '30 minutes');
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS table_id INTEGER;
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS zone_id INTEGER;
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS email VARCHAR(255);
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS gallery TEXT[] DEFAULT '{}';
