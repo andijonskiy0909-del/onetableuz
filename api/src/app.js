@@ -7,10 +7,7 @@ const http = require('http')
 const { Server } = require('socket.io')
 
 const { checkEnvVars, securityHeaders, xssProtection, apiRateLimiter, authRateLimiter } = require('./middleware/security')
-
-// ✅ TO'G'RI YO'L — avval './routes/utils/logger' edi, bu noto'g'ri edi
 const logger = require('./logger')
-
 const { expireReservations } = require('./services/bookingService')
 
 checkEnvVars()
@@ -43,6 +40,17 @@ app.use(securityHeaders)
 app.use(xssProtection)
 app.use(apiRateLimiter)
 app.set('trust proxy', 1)
+
+// ── Bot webhook ───────────────────────────────────────────────
+app.post('/webhook/:token', (req, res) => {
+  try {
+    const { processUpdate } = require('../../bot/index.js')
+    processUpdate(req.body)
+  } catch(e) {
+    logger.error('Webhook error: ' + e.message)
+  }
+  res.sendStatus(200)
+})
 
 // ── Dashboard static ──────────────────────────────────────────
 app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
@@ -89,9 +97,9 @@ server.listen(PORT, async () => {
       logger.info('✅ DB schema qo\'llanildi')
     }
 
-    // Extra patches
     await db.query(`
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP DEFAULT (NOW() + INTERVAL '30 minutes');
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS email VARCHAR(255);
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS gallery TEXT[] DEFAULT '{}';
@@ -103,7 +111,6 @@ server.listen(PORT, async () => {
     logger.error('DB setup error: ' + e.message)
   }
 
-  // Cron: har 5 daqiqada muddati o'tgan bronlarni bekor qilish
   setInterval(expireReservations, 5 * 60 * 1000)
   logger.info('✅ Cron jobs ishga tushdi')
 
