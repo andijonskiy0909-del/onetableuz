@@ -54,7 +54,7 @@ app.post('/webhook/:token', (req, res) => {
 
 // ── Dashboard static ──────────────────────────────────────────
 app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
-app.get('/dashboard*', (req, res) => {
+app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../webapp/dashboard.html'))
 })
 
