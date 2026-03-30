@@ -106,6 +106,14 @@ server.listen(PORT, async () => {
   // Cron: har 5 daqiqada muddati o'tgan bronlarni bekor qilish
   setInterval(expireReservations, 5 * 60 * 1000)
   logger.info('✅ Cron jobs ishga tushdi')
+
+  // ── Bot ──────────────────────────────────────────────────────
+  try {
+    require('../../bot/index.js')
+    logger.info('✅ Bot ishga tushdi')
+  } catch (e) {
+    logger.error('Bot xatosi: ' + e.message)
+  }
 })
 
 module.exports = { app, io }
