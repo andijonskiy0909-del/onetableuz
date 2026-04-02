@@ -102,9 +102,9 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .btn-ok:hover{background:var(--green);color:var(--bg);}
 .btn-no{background:rgba(255,59,92,0.15);color:var(--red);}
 .btn-no:hover{background:var(--red);color:white;}
-.btn-primary{background:var(--red);color:white;padding:10px 20px;border-radius:10px;font-size:14px;}
+.btn-primary{background:var(--red);color:white;padding:10px 20px;border-radius:10px;font-size:14px;border:none;font-family:var(--font);cursor:pointer;transition:opacity .2s;}
 .btn-primary:hover{opacity:.9;}
-.btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:14px;}
+.btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:10px;font-size:14px;font-family:var(--font);cursor:pointer;transition:all .15s;}
 .btn-sec:hover{border-color:var(--red);color:var(--red);}
 
 /* ── FILTER TABS ─────────────────────────── */
@@ -952,7 +952,6 @@ async function loadChat() {
     const d = await r.json()
     const el = document.getElementById('chatList')
     if (!d.messages?.length) { el.innerHTML = '<div class="empty"><div class="ei">💬</div>Xabar yo\'q</div>'; return }
-    // Group by reservation
     const grouped = {}
     d.messages.forEach(m => { if(!grouped[m.reservation_id]) grouped[m.reservation_id]=[]; grouped[m.reservation_id].push(m) })
     el.innerHTML = Object.entries(grouped).map(([resId, msgs]) => {
@@ -974,7 +973,6 @@ async function loadChat() {
 
 async function openChatThread(resId) {
   const msgs = await (await fetch(`${API}/chat/${resId}/messages`, { headers:{ Authorization:`Bearer ${token}` } })).json()
-  // Simple inline view
   const reply = prompt('Javob yozing:')
   if (!reply) return
   await fetch(`${API}/chat/${resId}/messages/owner`, { method:'POST', headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`}, body: JSON.stringify({message:reply}) })
