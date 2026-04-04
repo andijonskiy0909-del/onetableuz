@@ -1,12 +1,31 @@
-/**
- * OneTable — Owner Routes
- * Secure with proper auth and validation
- */
 const router = require('express').Router()
 const pool = require('../db')
 const bcrypt = require('bcryptjs')
 const { ownerAuth, createToken } = require('../middleware/auth')
-const { validateOwnerRegister, validateRestaurantInput, validateMenuItemInput } = require('../middleware/security')
+
+// ── Inline validators (middleware/security dan olib tashlandi) ─
+const validateOwnerRegister = (req, res, next) => {
+  const { email, password, full_name } = req.body
+  if (!email || !password || !full_name)
+    return res.status(400).json({ error: "email, password, full_name majburiy" })
+  if (password.length < 6)
+    return res.status(400).json({ error: "Parol kamida 6 ta belgi" })
+  next()
+}
+
+const validateRestaurantInput = (req, res, next) => {
+  const { name, address } = req.body
+  if (!name || !address)
+    return res.status(400).json({ error: "name va address majburiy" })
+  next()
+}
+
+const validateMenuItemInput = (req, res, next) => {
+  const { name, price } = req.body
+  if (!name || !price)
+    return res.status(400).json({ error: "name va price majburiy" })
+  next()
+}
 
 // ── Ro'yxatdan o'tish ─────────────────────────────────────────
 router.post('/register', validateOwnerRegister, async (req, res) => {
@@ -19,7 +38,7 @@ router.post('/register', validateOwnerRegister, async (req, res) => {
     if (existing.rows.length)
       return res.status(400).json({ error: "Bu email allaqachon ro'yxatdan o'tgan" })
 
-    const hash = await bcrypt.hash(password, 12) // 12 rounds — xavfsizroq
+    const hash = await bcrypt.hash(password, 12)
     const result = await pool.query(
       `INSERT INTO restaurant_owners (email, password_hash, full_name, phone, role)
        VALUES ($1, $2, $3, $4, 'owner') RETURNING id, email, full_name, phone, role, restaurant_id`,
@@ -46,16 +65,15 @@ router.post('/login', async (req, res) => {
       [email.toLowerCase()]
     )
     const owner = result.rows[0]
-    if (!owner) return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri' })
+    if (!owner) return res.status(401).json({ error: "Email yoki parol noto'g'ri" })
 
     const valid = await bcrypt.compare(password, owner.password_hash)
-    if (!valid) return res.status(401).json({ error: 'Email yoki parol noto\'g\'ri' })
+    if (!valid) return res.status(401).json({ error: "Email yoki parol noto'g'ri" })
 
     const token = createToken({
       id: owner.id, role: owner.role, restaurant_id: owner.restaurant_id
     })
 
-    // Parolni response da qaytarmaslik
     const { password_hash, ...safeOwner } = owner
     res.json({ token, owner: safeOwner })
   } catch(err) {
@@ -124,7 +142,7 @@ router.put('/restaurant/location', ownerAuth, async (req, res) => {
   try {
     const { latitude, longitude } = req.body
     if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude))
-      return res.status(400).json({ error: 'latitude va longitude noto\'g\'ri' })
+      return res.status(400).json({ error: "latitude va longitude noto'g'ri" })
     await pool.query(
       'UPDATE restaurants SET latitude=$1, longitude=$2 WHERE id=$3',
       [latitude, longitude, req.owner.restaurant_id]
@@ -169,10 +187,10 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
     const { status } = req.body
     const validStatuses = ['confirmed', 'cancelled', 'completed']
     if (!validStatuses.includes(status))
-      return res.status(400).json({ error: 'Noto\'g\'ri status' })
+      return res.status(400).json({ error: "Noto'g'ri status" })
 
     const id = parseInt(req.params.id)
-    if (isNaN(id)) return res.status(400).json({ error: 'ID noto\'g\'ri' })
+    if (isNaN(id)) return res.status(400).json({ error: "ID noto'g'ri" })
 
     const result = await pool.query(
       `UPDATE reservations SET status=$1
@@ -183,7 +201,6 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
 
     const r = result.rows[0]
 
-    // Telegram xabar
     const userRes = await pool.query('SELECT telegram_id FROM users WHERE id=$1', [r.user_id])
     const telegramId = userRes.rows[0]?.telegram_id
     if (telegramId) {
@@ -192,7 +209,7 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
       const text = status === 'confirmed'
         ? `✅ <b>Broningiz tasdiqlandi!</b>\n📅 ${dateStr} — ⏰ ${timeStr}\n👥 ${r.guests} kishi`
         : status === 'completed'
-        ? `🎉 <b>Tashrifingiz uchun rahmat!</b>\n🍽 Restoran haqida fikr qoldiring.`
+        ? `🎉 <b>Tashrifingiz uchun rahmat!</b>`
         : `❌ <b>Broningiz rad etildi.</b>\n📅 ${dateStr} — ⏰ ${timeStr}`
 
       await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
@@ -202,7 +219,6 @@ router.put('/reservations/:id', ownerAuth, async (req, res) => {
       }).catch(() => {})
     }
 
-    // Socket.io
     const io = req.app.get('io')
     if (io) io.to(`restaurant_${req.owner.restaurant_id}`).emit('reservation_updated', { id, status })
 
@@ -265,14 +281,14 @@ router.post('/menu', ownerAuth, validateMenuItemInput, async (req, res) => {
 
 router.put('/menu/:id', ownerAuth, async (req, res) => {
   try {
-    const { name, description, price, available, image_url } = req.body
+    const { name, description, price, is_available, image_url } = req.body
     const id = parseInt(req.params.id)
-    if (isNaN(id)) return res.status(400).json({ error: 'ID noto\'g\'ri' })
+    if (isNaN(id)) return res.status(400).json({ error: "ID noto'g'ri" })
 
     const result = await pool.query(
       `UPDATE menu_items SET name=$1, description=$2, price=$3, is_available=$4, image_url=$5
        WHERE id=$6 AND restaurant_id=$7 RETURNING *`,
-      [name, description, price, available, image_url, id, req.owner.restaurant_id]
+      [name, description, price, is_available, image_url, id, req.owner.restaurant_id]
     )
     if (!result.rows.length) return res.status(404).json({ error: 'Taom topilmadi' })
     res.json(result.rows[0])
@@ -282,8 +298,52 @@ router.put('/menu/:id', ownerAuth, async (req, res) => {
 router.delete('/menu/:id', ownerAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id)
-    if (isNaN(id)) return res.status(400).json({ error: 'ID noto\'g\'ri' })
+    if (isNaN(id)) return res.status(400).json({ error: "ID noto'g'ri" })
     await pool.query('DELETE FROM menu_items WHERE id=$1 AND restaurant_id=$2', [id, req.owner.restaurant_id])
+    res.json({ success: true })
+  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
+})
+
+// ── Stollar ───────────────────────────────────────────────────
+router.get('/tables', ownerAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT t.*, z.name as zone_name FROM tables t
+       LEFT JOIN zones z ON t.zone_id = z.id
+       WHERE t.restaurant_id=$1 ORDER BY t.table_number`,
+      [req.owner.restaurant_id]
+    )
+    res.json(result.rows)
+  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
+})
+
+router.post('/tables', ownerAuth, async (req, res) => {
+  try {
+    const { table_number, zone_id, capacity } = req.body
+    if (!table_number) return res.status(400).json({ error: 'Stol raqami kerak' })
+    const result = await pool.query(
+      `INSERT INTO tables (restaurant_id, table_number, zone_id, capacity, is_available)
+       VALUES ($1,$2,$3,$4,true) RETURNING *`,
+      [req.owner.restaurant_id, table_number, zone_id || null, capacity || 4]
+    )
+    res.status(201).json(result.rows[0])
+  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
+})
+
+router.put('/tables/:id', ownerAuth, async (req, res) => {
+  try {
+    const { is_available } = req.body
+    const result = await pool.query(
+      `UPDATE tables SET is_available=$1 WHERE id=$2 AND restaurant_id=$3 RETURNING *`,
+      [is_available, req.params.id, req.owner.restaurant_id]
+    )
+    res.json(result.rows[0])
+  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
+})
+
+router.delete('/tables/:id', ownerAuth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM tables WHERE id=$1 AND restaurant_id=$2', [req.params.id, req.owner.restaurant_id])
     res.json({ success: true })
   } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
 })
@@ -330,32 +390,6 @@ router.delete('/zones/:id', ownerAuth, async (req, res) => {
   } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
 })
 
-// ── Bo'sh vaqtlar ─────────────────────────────────────────────
-router.post('/availability/block', ownerAuth, async (req, res) => {
-  try {
-    const { date, time, reason } = req.body
-    if (!date || !time) return res.status(400).json({ error: 'date va time kerak' })
-    await pool.query(
-      `INSERT INTO availability (restaurant_id, date, time, is_blocked, reason)
-       VALUES ($1,$2,$3,true,$4)
-       ON CONFLICT (restaurant_id, date, time) DO UPDATE SET is_blocked=true, reason=$4`,
-      [req.owner.restaurant_id, date, time, reason]
-    )
-    res.json({ success: true })
-  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
-})
-
-router.delete('/availability/block', ownerAuth, async (req, res) => {
-  try {
-    const { date, time } = req.body
-    await pool.query(
-      `UPDATE availability SET is_blocked=false WHERE restaurant_id=$1 AND date=$2 AND time=$3`,
-      [req.owner.restaurant_id, date, time]
-    )
-    res.json({ success: true })
-  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
-})
-
 // ── Premium ───────────────────────────────────────────────────
 router.get('/premium', ownerAuth, async (req, res) => {
   try {
@@ -389,6 +423,22 @@ router.delete('/premium', ownerAuth, async (req, res) => {
     await pool.query(`UPDATE premium_subscriptions SET status='cancelled' WHERE restaurant_id=$1`, [req.owner.restaurant_id])
     await pool.query('UPDATE restaurants SET is_premium=false WHERE id=$1', [req.owner.restaurant_id])
     res.json({ success: true })
+  } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
+})
+
+// ── Chat ──────────────────────────────────────────────────────
+router.get('/chat/owner/messages', ownerAuth, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT m.*, u.first_name, r.date, r.time
+      FROM messages m
+      JOIN reservations r ON m.reservation_id = r.id
+      JOIN users u ON r.user_id = u.id
+      WHERE r.restaurant_id = $1
+      ORDER BY m.created_at DESC
+    `, [req.owner.restaurant_id])
+    const unread_count = result.rows.filter(m => m.sender_type === 'user' && !m.is_read).length
+    res.json({ messages: result.rows, unread_count })
   } catch(err) { res.status(500).json({ error: 'Server xatoligi' }) }
 })
 
