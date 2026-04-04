@@ -80,18 +80,18 @@ function T(uid, key, ...args) {
   return typeof v === 'function' ? v(...args) : (v || key)
 }
 
-fufunction mainKeyboard(uid) {
+function mainKeyboard(uid) {
+  const DASH = 'https://cooperative-insight-production-11df.up.railway.app/dashboard'
   return {
     inline_keyboard: [
       [{ text: T(uid, 'btn_open'), web_app: { url: WEBAPP_URL } }],
-      [{ text: T(uid, 'btn_bookings'), web_app: { url: `${WEBAPP_URL}?page=bookings` } }],
+      [{ text: T(uid, 'btn_bookings'), web_app: { url: WEBAPP_URL + '?page=bookings' } }],
       [{ text: T(uid, 'btn_ai'), callback_data: 'open_ai' }],
-      [{ text: '🏪 Restoran egasi (Dashboard)', url: 'https://cooperative-insight-production-11df.up.railway.app/dashboard' }],
+      [{ text: '🏪 Restoran egasi (Dashboard)', url: DASH }],
       [{ text: '🇺🇿', callback_data: 'lang_uz' }, { text: '🇷🇺', callback_data: 'lang_ru' }, { text: '🇬🇧', callback_data: 'lang_en' }]
     ]
   }
 }
-
 // ── /start ────────────────────────────────────────────────────
 bot.onText(/\/start/, (msg) => {
   const uid = msg.from.id
