@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 const BOT_TOKEN = process.env.BOT_TOKEN
 const WEBHOOK_URL = process.env.WEBHOOK_URL || 'https://onetableuz-bot.up.railway.app'
 const WEBAPP_URL = process.env.WEBAPP_URL || 'https://onetableuz.vercel.app'
-const API_URL = process.env.API_URL || 'https://onetableuz-production.up.railway.app/api'
+const API_URL = process.env.API_URL || 'https://cooperative-insight-production-11df.up.railway.app/api'
 const bot = new TelegramBot(BOT_TOKEN, { polling: false })
 
 // Webhook sozlash
