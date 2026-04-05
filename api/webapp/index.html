@@ -18,27 +18,19 @@
   --yellow: #f59e0b;
 }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--light); color:var(--dark); }
-
-/* Header */
 .header { background:var(--dark); color:white; padding:14px 16px; position:sticky; top:0; z-index:100; }
 .header-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .header-logo { font-size:18px; font-weight:700; display:flex; align-items:center; gap:6px; }
 .lang-switcher { display:flex; gap:4px; }
 .lang-btn { padding:4px 10px; border-radius:16px; border:1px solid rgba(255,255,255,0.25); background:transparent; color:rgba(255,255,255,0.7); font-size:11px; font-weight:600; cursor:pointer; transition:all .15s; }
 .lang-btn.active { background:var(--red); border-color:var(--red); color:white; }
-
-/* Search */
 .search-wrap { padding:12px 16px 8px; }
 .search-wrap input { width:100%; padding:10px 16px 10px 40px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; outline:none; background:white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 14px center; transition:border-color .2s; }
 .search-wrap input:focus { border-color:var(--red); }
-
-/* Filters */
 .filters { display:flex; gap:8px; padding:0 16px 10px; overflow-x:auto; scrollbar-width:none; }
 .filters::-webkit-scrollbar { display:none; }
 .filter-btn { padding:6px 14px; border:1.5px solid var(--border); border-radius:20px; background:white; font-size:13px; cursor:pointer; white-space:nowrap; font-weight:500; transition:all .15s; flex-shrink:0; }
 .filter-btn.active { background:var(--red); color:white; border-color:var(--red); }
-
-/* Restaurant cards */
 .restaurants { padding:0 16px; display:flex; flex-direction:column; gap:14px; padding-bottom:80px; }
 .card { background:white; border-radius:18px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.07); position:relative; }
 .card-img-wrap { position:relative; height:180px; overflow:hidden; }
@@ -55,21 +47,15 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .btn-view:active { background:#e2e8f0; }
 .btn-reserve { flex:2; background:var(--red); color:white; border:none; padding:10px; border-radius:12px; font-size:14px; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:6px; transition:opacity .15s; }
 .btn-reserve:active { opacity:0.85; }
-
-/* Bottom nav */
 .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; border-top:1px solid var(--border); display:flex; padding:6px 0 max(6px,env(safe-area-inset-bottom)); z-index:100; }
 .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 4px; }
 .nav-item .nav-icon { font-size:22px; }
 .nav-item .nav-label { font-size:10px; color:var(--gray); font-weight:500; }
 .nav-item.active .nav-label { color:var(--red); font-weight:700; }
 .nav-item.active .nav-icon { filter:drop-shadow(0 0 4px rgba(239,68,68,0.4)); }
-
-/* Pages */
 .page { display:none; min-height:100vh; padding:16px; padding-bottom:80px; }
 .page.active { display:block; }
 .page-title { font-size:20px; font-weight:700; margin-bottom:16px; }
-
-/* Bookings */
 .booking-card { background:white; border-radius:16px; padding:16px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
 .booking-resto { font-size:16px; font-weight:700; margin-bottom:6px; }
 .booking-info { font-size:13px; color:var(--gray); margin-bottom:4px; display:flex; align-items:center; gap:6px; }
@@ -80,38 +66,27 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .status-cancelled { background:#fee2e2; color:#dc2626; }
 .zone-badge { background:#f0fdf4; color:#16a34a; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:500; }
 .preorder-badge { background:#eff6ff; color:#3b82f6; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:500; }
-.booking-footer { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
 .btn-cancel-res { background:none; border:1.5px solid #fca5a5; color:var(--red); padding:7px 14px; border-radius:10px; font-size:13px; cursor:pointer; font-weight:500; }
-
-/* Profile */
 .profile-card { background:white; border-radius:16px; padding:24px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
 .profile-avatar { width:72px; height:72px; background:linear-gradient(135deg,var(--red),#f97316); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:32px; margin:0 auto 12px; }
 .profile-name { font-size:20px; font-weight:700; margin-bottom:4px; }
 .profile-username { color:var(--gray); font-size:14px; margin-bottom:20px; }
 .profile-btn { width:100%; background:var(--light); border:1.5px solid var(--border); padding:12px; border-radius:12px; font-size:14px; cursor:pointer; font-weight:600; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; }
-
-/* Modal */
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:200; justify-content:flex-end; flex-direction:column; }
 .modal-overlay.open { display:flex; }
 .modal-sheet { background:white; border-radius:24px 24px 0 0; padding:20px 20px max(20px,env(safe-area-inset-bottom)); max-height:94vh; overflow-y:auto; }
 .modal-handle { width:40px; height:4px; background:#e2e8f0; border-radius:2px; margin:0 auto 16px; }
 .modal-title { font-size:18px; font-weight:700; margin-bottom:16px; }
-
-/* Steps */
 .steps { display:flex; margin-bottom:20px; border-radius:12px; overflow:hidden; border:1.5px solid var(--border); }
 .step-tab { flex:1; padding:9px 4px; text-align:center; font-size:12px; font-weight:600; color:var(--gray); background:white; transition:all .2s; }
 .step-tab.active { background:var(--red); color:white; }
 .step-tab.done { background:#fef2f2; color:var(--red); }
 .step-panel { display:none; }
 .step-panel.active { display:block; }
-
-/* Form */
 .fg { margin-bottom:14px; }
 .fg label { font-size:13px; color:var(--gray); margin-bottom:5px; display:block; font-weight:500; }
 .fg input, .fg select { width:100%; padding:11px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; outline:none; background:white; }
 .fg input:focus, .fg select:focus { border-color:var(--red); }
-
-/* Zones grid */
 .zones-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:6px; }
 .zone-card { border:2px solid var(--border); border-radius:14px; padding:14px 10px; cursor:pointer; text-align:center; transition:all .15s; }
 .zone-card:active, .zone-card.selected { border-color:var(--red); background:#fff5f5; }
@@ -119,8 +94,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .zone-card .zn { font-size:14px; font-weight:600; }
 .zone-card .zd { font-size:12px; color:var(--gray); margin-top:2px; }
 .zone-card .zc { font-size:11px; color:#94a3b8; margin-top:4px; }
-
-/* Time slots */
 .time-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:6px; }
 .slot { padding:9px 4px; border:1.5px solid var(--border); border-radius:10px; font-size:13px; text-align:center; cursor:pointer; background:white; font-weight:500; transition:all .15s; }
 .slot:active:not(.busy) { transform:scale(0.95); }
@@ -128,8 +101,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .slot.busy { background:#f8fafc; color:#cbd5e1; cursor:not-allowed; text-decoration:line-through; }
 .slots-hint { font-size:12px; color:#94a3b8; margin-top:8px; display:flex; gap:12px; }
 .sh-dot { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:4px; vertical-align:middle; }
-
-/* Menu items */
 .menu-cat-title { font-size:12px; font-weight:700; color:var(--gray); text-transform:uppercase; letter-spacing:.5px; margin:14px 0 8px; }
 .menu-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9; }
 .menu-row:last-child { border-bottom:none; }
@@ -142,29 +113,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .order-total { background:linear-gradient(135deg,#fff5f5,#fef2f2); border:1.5px solid #fecaca; border-radius:12px; padding:14px 16px; margin-top:12px; display:flex; justify-content:space-between; align-items:center; }
 .ot-label { font-size:14px; color:var(--gray); font-weight:500; }
 .ot-amount { font-size:18px; font-weight:800; color:var(--red); }
-
-/* Buttons */
 .btn-main { width:100%; background:var(--red); color:white; border:none; padding:14px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity .2s; }
 .btn-main:disabled { background:#e2e8f0; color:#94a3b8; cursor:not-allowed; }
 .btn-main:active:not(:disabled) { opacity:0.85; }
 .btn-sec { width:100%; background:var(--light); color:var(--gray); border:1.5px solid var(--border); padding:12px; border-radius:14px; font-size:14px; cursor:pointer; margin-top:8px; font-weight:600; }
-
-/* Spinner */
 .spin { display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,.4); border-top-color:white; border-radius:50%; animation:rot .6s linear infinite; }
 @keyframes rot { to { transform:rotate(360deg); } }
-
-/* Toast */
 .toast { position:fixed; top:72px; left:50%; transform:translateX(-50%); background:rgba(26,26,46,0.95); backdrop-filter:blur(8px); color:white; padding:10px 20px; border-radius:12px; font-size:14px; z-index:999; opacity:0; transition:opacity .25s; pointer-events:none; white-space:nowrap; max-width:85vw; text-overflow:ellipsis; overflow:hidden; }
 .toast.show { opacity:1; }
-
-/* Empty state */
 .empty { text-align:center; padding:50px 20px; color:#94a3b8; }
 .empty .ei { font-size:52px; margin-bottom:12px; }
 .empty p { font-size:15px; }
-
-/* Loading */
 .loading-wrap { text-align:center; padding:40px; color:var(--gray); }
-
 @media (prefers-color-scheme: dark) {
   body { background:#0f172a; color:#f1f5f9; }
   .card, .booking-card, .profile-card { background:#1e293b; }
@@ -192,7 +152,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 
 <div class="toast" id="toast"></div>
 
-<!-- Bosh sahifa -->
 <div id="homePage" class="page active" style="padding:12px 0 80px;">
   <div class="search-wrap">
     <input type="text" id="searchInput" oninput="filterRestaurants()" placeholder="Restoran qidiring...">
@@ -212,19 +171,16 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
   </div>
 </div>
 
-<!-- Bronlarim -->
 <div id="bookingsPage" class="page">
   <div class="page-title">📅 <span id="bookingsTitle">Bronlarim</span></div>
   <div id="bookingsList"><div class="loading-wrap">⏳ Yuklanmoqda...</div></div>
 </div>
 
-<!-- Profil -->
 <div id="profilePage" class="page">
   <div class="page-title">👤 <span id="profileTitle">Profil</span></div>
   <div id="profileInfo"></div>
 </div>
 
-<!-- Bottom Nav -->
 <div class="bottom-nav">
   <div class="nav-item active" id="nav-home" onclick="showPage('home')">
     <span class="nav-icon">🏠</span>
@@ -240,28 +196,18 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
   </div>
 </div>
 
-<!-- Bron Modal -->
 <div class="modal-overlay" id="reserveModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalTitle">Bron qilish</div>
-
     <div class="steps">
       <div class="step-tab active" id="st1">1. Zona</div>
       <div class="step-tab" id="st2">2. Vaqt</div>
       <div class="step-tab" id="st3">3. Zakaz</div>
     </div>
-
-    <!-- Step 1 -->
     <div class="step-panel active" id="sp1">
-      <div class="fg">
-        <label>📅 Sana</label>
-        <input type="date" id="resDate">
-      </div>
-      <div class="fg">
-        <label>👥 Mehmonlar soni</label>
-        <select id="resGuests"></select>
-      </div>
+      <div class="fg"><label>📅 Sana</label><input type="date" id="resDate"></div>
+      <div class="fg"><label>👥 Mehmonlar soni</label><select id="resGuests"></select></div>
       <div class="fg">
         <label>🏠 Zona tanlang</label>
         <div class="zones-grid" id="zonesGrid">
@@ -271,8 +217,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
       <button class="btn-main" id="btnS1" onclick="goStep2()" disabled>Davom etish →</button>
       <button class="btn-sec" onclick="closeModal()">Bekor qilish</button>
     </div>
-
-    <!-- Step 2 -->
     <div class="step-panel" id="sp2">
       <div class="fg">
         <label>⏰ Vaqt tanlang</label>
@@ -284,15 +228,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
           <span><span class="sh-dot" style="background:#e2e8f0"></span>Band</span>
         </div>
       </div>
-      <div class="fg">
-        <label>💬 Izoh (ixtiyoriy)</label>
-        <input type="text" id="resComment" placeholder="Tug'ilgan kun, maxsus xohish...">
-      </div>
+      <div class="fg"><label>💬 Izoh (ixtiyoriy)</label><input type="text" id="resComment" placeholder="Tug'ilgan kun, maxsus xohish..."></div>
       <button class="btn-main" id="btnS2" onclick="goStep3()" disabled>Davom etish →</button>
       <button class="btn-sec" onclick="goStep(1)">← Orqaga</button>
     </div>
-
-    <!-- Step 3 -->
     <div class="step-panel" id="sp3">
       <p style="font-size:13px;color:#94a3b8;margin-bottom:12px;">Ixtiyoriy: oldindan taom buyurtma qiling</p>
       <div id="menuList"><div class="loading-wrap">🍜 Menyu yuklanmoqda...</div></div>
@@ -322,17 +261,17 @@ const i18n = {
     all:'Hammasi', european:'Evropa', asian:'Osiyo',
     search_ph:'Restoran qidiring...',
     loading:'Yuklanmoqda...', error:'Xatolik', not_found:'Restoran topilmadi',
-    no_bookings:'Hali bronlar yo\'q', my_bookings:'Bronlarim',
+    no_bookings:"Hali bronlar yo'q", my_bookings:'Bronlarim',
     profile:'Profil', home:'Bosh sahifa', bookings:'Bronlarim',
-    reserve:'Bron', view:'Ko\'rish',
+    reserve:'Bron', view:"Ko'rish",
     person:n=>`${n} kishi`,
     success:'🎉 Bron muvaffaqiyatli qilindi!',
     err_login:'❌ Botni qayta oching!',
     err_server:'❌ Server xatoligi!', err_busy:'❌ Bu vaqt band!',
     cancel_confirm:'Bronni bekor qilasizmi?',
-    cancelled:'🗑 Bron bekor qilindi', cancel_fail:'❌ Bekor qilib bo\'lmadi',
+    cancelled:"🗑 Bron bekor qilindi", cancel_fail:"❌ Bekor qilib bo'lmadi",
     st_confirmed:'✅ Tasdiqlangan', st_pending:'⏳ Kutilmoqda', st_cancelled:'❌ Bekor',
-    cancel_btn:'Bekor qilish', view_bookings:'📅 Bronlarimni ko\'rish',
+    cancel_btn:'Bekor qilish', view_bookings:"📅 Bronlarimni ko'rish",
     sending:'Yuborilmoqda...',
   },
   ru: {
@@ -407,20 +346,32 @@ function showToast(msg,ms=2800){
 // ── Auth ─────────────────────────────────────────────────────
 async function autoLogin(){
   try{
-    const user=tg.initDataUnsafe?.user; if(!user) return;
-    const r=await fetch(`${API}/auth/telegram`,{method:'POST',
+    const user=tg.initDataUnsafe?.user;
+    if(!user) return;
+    const r=await fetch(`${API}/auth/telegram`,{
+      method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({telegram_id:user.id,username:user.username,first_name:user.first_name,last_name:user.last_name})});
+      body:JSON.stringify({
+        telegram_id:user.id,
+        username:user.username,
+        first_name:user.first_name,
+        last_name:user.last_name
+      })
+    });
     const d=await r.json();
-    if(d.token){authToken=d.token;localStorage.setItem('token',d.token);}
-  }catch(e){}
+    if(d.token){
+      authToken=d.token;
+      localStorage.setItem('token',d.token);
+    }
+  }catch(e){console.error('Auth error:',e);}
 }
 
 // ── Restoranlar ──────────────────────────────────────────────
 async function loadRestaurants(){
   try{
     const r=await fetch(`${API}/restaurants`);
-    allRestaurants=await r.json();
+    const data=await r.json();
+    allRestaurants=Array.isArray(data)?data:[];
     renderRestaurants(allRestaurants);
   }catch(e){
     document.getElementById('restaurantList').innerHTML=`<div class="empty"><div class="ei">😕</div><p>${T('error')}</p></div>`;
@@ -435,7 +386,7 @@ function renderRestaurants(list){
   }
   c.innerHTML=list.map(r=>`
     <div class="card">
-      <div class="card-img-wrap" onclick="location.href='restaurant.html?id=${r.id}'">
+      <div class="card-img-wrap">
         <img src="${r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&q=80'}" alt="${r.name}"
              onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500'">
         ${r.is_premium?'<div class="card-premium">💎 Premium</div>':''}
@@ -451,9 +402,7 @@ function renderRestaurants(list){
           ${r.address||''}
         </div>
         <div class="card-actions">
-          <button class="btn-view" onclick="location.href='restaurant.html?id=${r.id}'">
-            👁 ${T('view')}
-          </button>
+          <button class="btn-view">👁 ${T('view')}</button>
           <button class="btn-reserve" onclick="openReserve(${r.id},'${r.name.replace(/'/g,"\\'")}')">
             📅 ${T('reserve')}
           </button>
@@ -470,7 +419,7 @@ function setFilter(f,btn){
 
 function filterRestaurants(){
   const q=document.getElementById('searchInput').value.toLowerCase();
-  let f=allRestaurants;
+  let f=Array.isArray(allRestaurants)?allRestaurants:[];
   if(currentFilter!=='all') f=f.filter(r=>(r.cuisine&&r.cuisine.includes(currentFilter))||r.price_category===currentFilter);
   if(q) f=f.filter(r=>r.name.toLowerCase().includes(q)||(r.address||'').toLowerCase().includes(q));
   renderRestaurants(f);
@@ -511,7 +460,6 @@ function goStep3(){
   goStep(3); loadMenu();
 }
 
-// ── Zonalar ──────────────────────────────────────────────────
 async function loadZones(){
   const grid=document.getElementById('zonesGrid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:16px;color:#94a3b8">⏳ Yuklanmoqda...</div>';
@@ -547,7 +495,6 @@ function selectZone(id,name,el){
   document.getElementById('btnS1').disabled=false;
 }
 
-// ── Vaqt slotlari ────────────────────────────────────────────
 async function loadTimeSlots(){
   const date=document.getElementById('resDate').value; if(!date) return;
   selTime=null;
@@ -578,7 +525,6 @@ function selectSlot(time,el){
   document.getElementById('btnS2').disabled=false;
 }
 
-// ── Menyu ────────────────────────────────────────────────────
 async function loadMenu(){
   const c=document.getElementById('menuList');
   c.innerHTML='<div class="loading-wrap">🍜 Menyu yuklanmoqda...</div>';
@@ -586,19 +532,19 @@ async function loadMenu(){
     const r=await fetch(`${API}/restaurants/${selRestoId}/menu`);
     menuItems=await r.json();
     if(!menuItems.length){
-      c.innerHTML='<div class="empty"><div class="ei">🍽</div><p>Menyu hali qo\'shilmagan</p></div>';
+      c.innerHTML="<div class='empty'><div class='ei'>🍽</div><p>Menyu hali qo'shilmagan</p></div>";
       document.getElementById('orderTotal').style.display='none';
       return;
     }
     renderMenu();
   }catch(e){
-    c.innerHTML='<div class="empty"><div class="ei">😕</div><p>Menyu yuklanmadi</p></div>';
+    c.innerHTML="<div class='empty'><div class='ei'>😕</div><p>Menyu yuklanmadi</p></div>";
   }
 }
 
 function renderMenu(){
   const cats={};
-  menuItems.forEach(item=>{const cat=item.category||'Boshqa';if(!cats[cat])cats[cat]=[];cats[cat].push(item);});
+  menuItems.forEach(item=>{const cat=item.category||'Asosiy taomlar';if(!cats[cat])cats[cat]=[];cats[cat].push(item);});
   document.getElementById('menuList').innerHTML=Object.entries(cats).map(([cat,items])=>`
     <div class="menu-cat-title">${cat}</div>
     ${items.map(item=>`
@@ -627,13 +573,20 @@ function updateTotal(){
     return s+(item?item.price*q:0);
   },0);
   const el=document.getElementById('orderTotal');
-  if(total>0){el.style.display='flex';document.getElementById('totalAmount').textContent=total.toLocaleString()+' so\'m';}
+  if(total>0){el.style.display='flex';document.getElementById('totalAmount').textContent=total.toLocaleString()+" so'm";}
   else el.style.display='none';
 }
 
 // ── Submit ────────────────────────────────────────────────────
 async function submitReservation(){
-  if(!authToken){showToast(T('err_login'));return;}
+  // Token yo'q bo'lsa qayta urinish
+  if(!authToken){
+    await autoLogin();
+    if(!authToken){
+      showToast(T('err_login'));
+      return;
+    }
+  }
   const date=document.getElementById('resDate').value;
   const guests=document.getElementById('resGuests').value;
   const comment=document.getElementById('resComment').value;
@@ -645,25 +598,31 @@ async function submitReservation(){
     return {id:parseInt(id),name:item?.name,qty,price:item?.price};
   });
   try{
-    const r=await fetch(`${API}/reservations`,{method:'POST',
+    const r=await fetch(`${API}/reservations`,{
+      method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${authToken}`},
       body:JSON.stringify({
         restaurant_id:selRestoId,
         zone_id:selZoneId==='default'?null:selZoneId,
         date,time:selTime,
         guests:parseInt(guests),
-        comment,pre_order:preOrderList
-      })});
+        comment,
+        pre_order:preOrderList
+      })
+    });
     const d=await r.json();
     if(d.id||r.ok){
-      closeModal(); showToast(T('success'));
+      closeModal();
+      showToast(T('success'));
       setTimeout(()=>showPage('bookings'),900);
     }else{
-      btn.disabled=false; btn.innerHTML='✅ Bron qilish';
+      btn.disabled=false;
+      btn.innerHTML='✅ Bron qilish';
       showToast('❌ '+(d.error||T('err_server')));
     }
   }catch(e){
-    btn.disabled=false; btn.innerHTML='✅ Bron qilish';
+    btn.disabled=false;
+    btn.innerHTML='✅ Bron qilish';
     showToast(T('err_server'));
   }
 }
@@ -693,7 +652,7 @@ async function loadBookings(){
         ${b.address?`<div class="booking-info">📍 ${b.address}</div>`:''}
         ${b.comment?`<div class="booking-info">💬 ${b.comment}</div>`:''}
         <div class="booking-badges">
-          <span class="status-badge ${stCls[s]||'status-pending'}">${T('st_'+s)}</span>
+          <span class="status-badge ${stCls[s]||'status-pending'}">${T('st_'+s)||s}</span>
           ${b.zone_name?`<span class="zone-badge">🏠 ${b.zone_name}</span>`:''}
           ${b.pre_order&&b.pre_order.length?`<span class="preorder-badge">🍽 ${b.pre_order.length} ta taom</span>`:''}
         </div>
@@ -720,14 +679,14 @@ function fmtDate(s){
   return d.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 
-// ── Profil ────────────────────────────────────────────────────
 function showPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(page==='home'){document.getElementById('homePage').classList.add('active');document.getElementById('nav-home').classList.add('active');}
   if(page==='bookings'){document.getElementById('bookingsPage').classList.add('active');document.getElementById('nav-bookings').classList.add('active');loadBookings();}
   if(page==='profile'){
-    document.getElementById('profilePage').classList.add('active');document.getElementById('nav-profile').classList.add('active');
+    document.getElementById('profilePage').classList.add('active');
+    document.getElementById('nav-profile').classList.add('active');
     const user=tg.initDataUnsafe?.user;
     const el=document.getElementById('profileInfo');
     if(user){
@@ -738,7 +697,7 @@ function showPage(page){
           <div class="profile-username">@${user.username||'telegram_user'}</div>
           <button class="profile-btn" onclick="showPage('bookings')">📅 ${T('view_bookings')}</button>
         </div>`;
-    } else {
+    }else{
       el.innerHTML=`<div class="empty"><div class="ei">🔐</div><p>${T('err_login')}</p></div>`;
     }
   }
@@ -751,8 +710,7 @@ if(tgLang&&!localStorage.getItem('lang')){
   if(tgLang.startsWith('ru'))setLang('ru');
   else if(tgLang.startsWith('en'))setLang('en');
 }
-autoLogin();
-loadRestaurants();
+autoLogin().then(()=>loadRestaurants());
 </script>
 </body>
 </html>
