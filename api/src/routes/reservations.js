@@ -1,60 +1,21 @@
 /**
- * OneTable — Advanced Booking Engine
- * Conflict handling, table assignment, alternative suggestions
+ * OneTable — Reservations
+ * No-show bo'lgan foydalanuvchilar keyingi bronda depozit to'laydi
  */
 const router = require('express').Router()
 const pool = require('../db')
 const { userAuth } = require('../middleware/auth')
-const { validateReservation } = require('../middleware/security')
 
-// ── Yordamchi: Bo'sh stolni topish ───────────────────────────
-async function findAvailableTable(client, restaurantId, zoneId, date, time, guests) {
-  // 1. Shu vaqtda band bo'lgan stollarni topish
-  const bookedTables = await client.query(`
-    SELECT DISTINCT table_id FROM reservations
-    WHERE restaurant_id = $1 AND date = $2 AND time = $3
-      AND status NOT IN ('cancelled')
-      AND table_id IS NOT NULL
-  `, [restaurantId, date, time])
+const DEPOSIT_AMOUNT = 50000 // so'm
 
-  const bookedIds = bookedTables.rows.map(r => r.table_id)
-
-  // 2. Bo'sh va yetarli sig'imli stol topish
-  let query = `
-    SELECT t.* FROM tables t
-    WHERE t.restaurant_id = $1
-      AND t.is_available = true
-      AND t.capacity >= $2
-  `
-  const params = [restaurantId, guests]
-
-  if (zoneId) {
-    params.push(zoneId)
-    query += ` AND t.zone_id = $${params.length}`
-  }
-
-  if (bookedIds.length) {
-    query += ` AND t.id NOT IN (${bookedIds.join(',')})`
-  }
-
-  query += ' ORDER BY t.capacity ASC LIMIT 1'
-
-  const result = await client.query(query, params)
-  return result.rows[0] || null
-}
-
-// ── Yordamchi: Eng yaqin bo'sh vaqtlarni topish ───────────────
-async function findAlternativeTimes(restaurantId, date, time, guests) {
-  // Shu kunda band vaqtlarni olish
+// ── Yordamchi: Bo'sh vaqtlarni topish ────────────────────────
+async function findAlternativeTimes(restaurantId, date, time) {
   const bookedTimes = await pool.query(`
     SELECT DISTINCT time FROM reservations
-    WHERE restaurant_id = $1 AND date = $2
-      AND status NOT IN ('cancelled')
+    WHERE restaurant_id = $1 AND date = $2 AND status NOT IN ('cancelled')
   `, [restaurantId, date])
 
   const booked = bookedTimes.rows.map(r => String(r.time).slice(0, 5))
-
-  // Restoran ish vaqti slotlari
   const allSlots = []
   for (let h = 10; h <= 21; h++) {
     allSlots.push(`${String(h).padStart(2, '0')}:00`)
@@ -62,12 +23,11 @@ async function findAlternativeTimes(restaurantId, date, time, guests) {
   }
   allSlots.push('22:00')
 
-  // Bo'sh vaqtlar
   const freeSlots = allSlots.filter(s => !booked.includes(s))
+  const [hh, mm] = time.split(':').map(Number)
+  const timeMinutes = hh * 60 + mm
 
-  // Tanlangan vaqtga eng yaqin 3 ta slot
-  const timeMinutes = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1])
-  const sorted = freeSlots
+  return freeSlots
     .map(s => {
       const [h, m] = s.split(':').map(Number)
       return { time: s, diff: Math.abs(h * 60 + m - timeMinutes) }
@@ -75,76 +35,89 @@ async function findAlternativeTimes(restaurantId, date, time, guests) {
     .sort((a, b) => a.diff - b.diff)
     .slice(0, 3)
     .map(s => s.time)
-
-  return sorted
 }
 
-// ── POST /api/reservations — Bron yaratish ────────────────────
-router.post('/', userAuth, validateReservation, async (req, res) => {
-  const client = await pool.connect()
+// ── Telegram xabar ───────────────────────────────────────────
+async function sendTelegramMsg(telegramId, text) {
   try {
-    await client.query('BEGIN')
+    const token = process.env.BOT_TOKEN
+    if (!token || !telegramId) return
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: telegramId, text, parse_mode: 'HTML' })
+    })
+  } catch(e) {
+    console.error('Telegram xato:', e.message)
+  }
+}
 
+// ── POST /api/reservations — Bron yaratish ───────────────────
+router.post('/', userAuth, async (req, res) => {
+  try {
     const {
       restaurant_id, date, time, guests,
-      comment, zone_id, pre_order,
-      special_request, food_ready_time
+      comment, special_request,
+      zone_id, pre_order
     } = req.body
 
-    // Restoran mavjudligini tekshirish
-    const resto = await client.query(
-      `SELECT id, name, capacity FROM restaurants
-       WHERE id = $1 AND status = 'approved'`,
-      [restaurant_id]
-    )
-    if (!resto.rows.length) {
-      await client.query('ROLLBACK')
-      return res.status(404).json({ error: 'Restoran topilmadi' })
+    if (!restaurant_id || !date || !time || !guests) {
+      return res.status(400).json({ error: "Barcha maydonlarni to'ldiring" })
     }
 
-    const { name: restaurantName } = resto.rows[0]
+    // Restoran tekshirish
+    const resto = await pool.query(
+      `SELECT id, name, capacity FROM restaurants WHERE id = $1 AND status = 'approved'`,
+      [restaurant_id]
+    )
+    if (!resto.rows.length) return res.status(404).json({ error: 'Restoran topilmadi' })
+    const { name: restaurantName, capacity } = resto.rows[0]
 
-    // Bloklangan vaqt tekshirish
-    const blocked = await client.query(`
+    // Bloklangan vaqt
+    const blocked = await pool.query(`
       SELECT id FROM availability
       WHERE restaurant_id = $1 AND date = $2 AND time = $3 AND is_blocked = true
     `, [restaurant_id, date, time])
 
     if (blocked.rows.length) {
-      await client.query('ROLLBACK')
-      const alternatives = await findAlternativeTimes(restaurant_id, date, time, guests)
-      return res.status(400).json({
-        error: 'Bu vaqt bloklangan',
-        alternatives
-      })
+      const alternatives = await findAlternativeTimes(restaurant_id, date, time)
+      return res.status(400).json({ error: 'Bu vaqt bloklangan', alternatives })
     }
 
-    // Bo'sh stol topish
-    const availableTable = await findAvailableTable(
-      client, restaurant_id, zone_id, date, time, guests
-    )
+    // Sig'im tekshirish
+    const conflict = await pool.query(`
+      SELECT COUNT(*) FROM reservations
+      WHERE restaurant_id = $1 AND date = $2 AND time = $3
+        AND status NOT IN ('cancelled')
+    `, [restaurant_id, date, time])
 
-    if (!availableTable) {
-      await client.query('ROLLBACK')
-      // Muqobil vaqtlarni taklif qilish
-      const alternatives = await findAlternativeTimes(restaurant_id, date, time, guests)
+    if (parseInt(conflict.rows[0].count) >= capacity) {
+      const alternatives = await findAlternativeTimes(restaurant_id, date, time)
       return res.status(400).json({
-        error: 'Bu vaqtda bo\'sh joy mavjud emas',
+        error: 'Bu vaqtda joy mavjud emas',
         alternatives,
         message: alternatives.length
-          ? `Quyidagi vaqtlarda joy bor: ${alternatives.join(', ')}`
-          : 'Bu kunda joy yo\'q. Boshqa kun tanlang.'
+          ? `Bo'sh vaqtlar: ${alternatives.join(', ')}`
+          : "Bu kunda joy yo'q. Boshqa kun tanlang."
       })
     }
+
+    // No-show tekshirish
+    const noShowRes = await pool.query(
+      `SELECT COUNT(*) FROM reservations WHERE user_id = $1 AND status = 'noshow'`,
+      [req.user.id]
+    )
+    const noShow = parseInt(noShowRes.rows[0].count) > 0
+    const requiresDeposit = noShow
+    const paymentStatus = noShow ? 'unpaid' : 'not_required'
 
     // Pre-order hisoblash
     let preOrderTotal = 0
     const preOrderList = pre_order || []
     if (preOrderList.length) {
-      // Menu narxlarini DB dan olish
       const itemIds = preOrderList.map(i => i.id).filter(Boolean)
       if (itemIds.length) {
-        const menuItems = await client.query(
+        const menuItems = await pool.query(
           `SELECT id, price FROM menu_items WHERE id = ANY($1) AND restaurant_id = $2`,
           [itemIds, restaurant_id]
         )
@@ -156,33 +129,30 @@ router.post('/', userAuth, validateReservation, async (req, res) => {
       }
     }
 
-    // Bron yaratish — TRANSACTION ichida
-    const result = await client.query(`
+    // Bron yaratish
+    const result = await pool.query(`
       INSERT INTO reservations (
-        user_id, restaurant_id, zone_id, table_id,
-        date, time, guests, comment,
-        special_request, food_ready_time,
-        pre_order, pre_order_total, status, payment_status
+        user_id, restaurant_id, zone_id, date, time, guests,
+        comment, special_request, pre_order, pre_order_total,
+        status, requires_deposit, payment_status
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'pending','unpaid')
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
+        CASE WHEN $11 THEN 'waiting_payment' ELSE 'pending' END,
+        $11, $12)
       RETURNING *
     `, [
-      req.user.id, restaurant_id,
-      zone_id || null, availableTable.id,
-      date, time, guests, comment,
-      special_request || null,
-      food_ready_time || null,
-      JSON.stringify(preOrderList),
-      preOrderTotal
+      req.user.id, restaurant_id, zone_id || null,
+      date, time, guests,
+      comment || null, special_request || null,
+      JSON.stringify(preOrderList), preOrderTotal,
+      requiresDeposit, paymentStatus
     ])
 
-    await client.query('COMMIT')
     const booking = result.rows[0]
 
     // Foydalanuvchi ma'lumotlari
     const userResult = await pool.query(
-      'SELECT telegram_id, first_name FROM users WHERE id = $1',
-      [req.user.id]
+      'SELECT telegram_id, first_name FROM users WHERE id = $1', [req.user.id]
     )
     const user = userResult.rows[0]
 
@@ -193,36 +163,44 @@ router.post('/', userAuth, validateReservation, async (req, res) => {
       zoneName = zoneRes.rows[0]?.name || ''
     }
 
-    // Foydalanuvchiga Telegram xabar
+    // Telegram xabar (foydalanuvchiga)
     if (user?.telegram_id) {
-      const text =
-        `🎉 <b>Bron qabul qilindi!</b>\n\n` +
-        `🍽 <b>${restaurantName}</b>\n` +
-        `📅 Sana: ${date}\n` +
-        `⏰ Vaqt: ${time}\n` +
-        `👥 Mehmonlar: ${guests} kishi\n` +
-        `🪑 Stol: #${availableTable.table_number}\n` +
-        `${zoneName ? `🏠 Zona: ${zoneName}\n` : ''}` +
-        `${special_request ? `⭐ Maxsus: ${special_request}\n` : ''}` +
-        `${comment ? `💬 Izoh: ${comment}\n` : ''}` +
-        `${preOrderTotal ? `🍜 Pre-order: ${preOrderTotal.toLocaleString()} so'm\n` : ''}` +
-        `\n⏳ Restoran tasdiqlaguncha kuting.`
+      let text
+      if (requiresDeposit) {
+        text =
+          `⚠️ <b>Depozit talab qilinadi!</b>\n\n` +
+          `🍽 <b>${restaurantName}</b>\n` +
+          `📅 ${date} — ⏰ ${time}\n` +
+          `👥 ${guests} kishi\n\n` +
+          `❗ Avvalgi broningizda kelmadingiz.\n` +
+          `💳 <b>${DEPOSIT_AMOUNT.toLocaleString()} so'm</b> depozit to'lang.`
+      } else {
+        text =
+          `🎉 <b>Bron qabul qilindi!</b>\n\n` +
+          `🍽 <b>${restaurantName}</b>\n` +
+          `📅 ${date} — ⏰ ${time}\n` +
+          `👥 ${guests} kishi\n` +
+          `${zoneName ? `🏠 Zona: ${zoneName}\n` : ''}` +
+          `${comment ? `💬 ${comment}\n` : ''}` +
+          `${special_request ? `⭐ ${special_request}\n` : ''}` +
+          `${preOrderTotal ? `🍜 Pre-order: ${preOrderTotal.toLocaleString()} so'm\n` : ''}` +
+          `\n⏳ Restoran tasdiqlaguncha kuting.`
+      }
       sendTelegramMsg(user.telegram_id, text).catch(() => {})
     }
 
     // Restoran egasiga xabar
     const ownerResult = await pool.query(
-      'SELECT telegram_id FROM restaurant_owners WHERE restaurant_id = $1',
-      [restaurant_id]
+      'SELECT telegram_id FROM restaurant_owners WHERE restaurant_id = $1', [restaurant_id]
     )
     if (ownerResult.rows[0]?.telegram_id) {
       const ownerText =
         `🔔 <b>Yangi bron!</b>\n\n` +
-        `👤 Mijoz: ${user?.first_name || 'Noma\'lum'}\n` +
+        `👤 ${user?.first_name || "Noma'lum"}\n` +
         `📅 ${date} — ⏰ ${time}\n` +
-        `👥 ${guests} kishi | 🪑 Stol #${availableTable.table_number}\n` +
+        `👥 ${guests} kishi\n` +
         `${zoneName ? `🏠 ${zoneName}\n` : ''}` +
-        `${special_request ? `⭐ Maxsus so'rov: ${special_request}\n` : ''}` +
+        `${special_request ? `⭐ ${special_request}\n` : ''}` +
         `${preOrderTotal ? `🍜 Pre-order: ${preOrderTotal.toLocaleString()} so'm\n` : ''}`
       sendTelegramMsg(ownerResult.rows[0].telegram_id, ownerText).catch(() => {})
     }
@@ -233,107 +211,82 @@ router.post('/', userAuth, validateReservation, async (req, res) => {
       io.to(`restaurant_${restaurant_id}`).emit('new_reservation', {
         id: booking.id,
         guest_name: user?.first_name || "Noma'lum",
-        date, time, guests, comment,
-        zone_name: zoneName,
-        table_number: availableTable.table_number,
-        special_request,
-        pre_order_total: preOrderTotal,
+        date, time, guests, comment, zone_name: zoneName,
+        special_request, pre_order_total: preOrderTotal,
         status: 'pending'
       })
     }
 
     res.status(201).json({
       ...booking,
-      table_number: availableTable.table_number,
       zone_name: zoneName,
-      restaurant_name: restaurantName
+      restaurant_name: restaurantName,
+      requires_deposit: requiresDeposit,
+      deposit_amount: requiresDeposit ? DEPOSIT_AMOUNT : 0,
+      message: requiresDeposit
+        ? `Depozit to'lash kerak: ${DEPOSIT_AMOUNT.toLocaleString()} so'm`
+        : 'Bron qabul qilindi'
     })
 
-  } catch (err) {
-    await client.query('ROLLBACK')
+  } catch(err) {
     console.error('Bron xatoligi:', err.message)
-
-    // Unique constraint — double booking
-    if (err.code === '23505') {
-      const alternatives = await findAlternativeTimes(
-        req.body.restaurant_id, req.body.date, req.body.time, req.body.guests
-      )
-      return res.status(400).json({
-        error: 'Bu stol allaqachon band',
-        alternatives
-      })
-    }
     res.status(500).json({ error: 'Server xatoligi' })
-  } finally {
-    client.release()
   }
 })
 
-// ── GET /api/reservations/my ──────────────────────────────────
+// ── GET /api/reservations/my ─────────────────────────────────
 router.get('/my', userAuth, async (req, res) => {
   try {
-    const { page = 1, limit = 20 } = req.query
-    const offset = (page - 1) * limit
-
     const result = await pool.query(`
       SELECT r.*,
              res.name AS restaurant_name,
              res.address, res.image_url,
-             z.name AS zone_name,
-             t.table_number
+             z.name AS zone_name
       FROM reservations r
       JOIN restaurants res ON r.restaurant_id = res.id
       LEFT JOIN zones z ON r.zone_id = z.id
-      LEFT JOIN tables t ON r.table_id = t.id
       WHERE r.user_id = $1
       ORDER BY r.date DESC, r.time DESC
-      LIMIT $2 OFFSET $3
-    `, [req.user.id, limit, offset])
-
+    `, [req.user.id])
     res.json(result.rows)
-  } catch (err) {
+  } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
 })
 
-// ── GET /api/reservations/check — Bo'sh joyni tekshirish ──────
+// ── GET /api/reservations/check ──────────────────────────────
 router.get('/check', async (req, res) => {
   try {
-    const { restaurant_id, date, time, guests, zone_id } = req.query
-
+    const { restaurant_id, date, time, guests } = req.query
     if (!restaurant_id || !date || !time || !guests) {
       return res.status(400).json({ error: 'Parametrlar yetishmayapti' })
     }
 
-    const client = await pool.connect()
-    try {
-      const table = await findAvailableTable(
-        client, restaurant_id, zone_id, date, time, guests
-      )
+    const conflict = await pool.query(`
+      SELECT COUNT(*) FROM reservations
+      WHERE restaurant_id = $1 AND date = $2 AND time = $3
+        AND status NOT IN ('cancelled')
+    `, [restaurant_id, date, time])
 
-      if (table) {
-        return res.json({ available: true, table_number: table.table_number })
-      }
+    const resto = await pool.query('SELECT capacity FROM restaurants WHERE id=$1', [restaurant_id])
+    const capacity = resto.rows[0]?.capacity || 50
 
-      const alternatives = await findAlternativeTimes(restaurant_id, date, time, guests)
-      res.json({
-        available: false,
-        message: 'Bu vaqtda joy yo\'q',
-        alternatives
-      })
-    } finally {
-      client.release()
+    if (parseInt(conflict.rows[0].count) >= capacity) {
+      const alternatives = await findAlternativeTimes(restaurant_id, date, time)
+      return res.json({ available: false, alternatives })
     }
-  } catch (err) {
+
+    res.json({ available: true })
+  } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
 })
 
-// ── DELETE /api/reservations/:id — Bekor qilish ───────────────
+// ── DELETE /api/reservations/:id ─────────────────────────────
 router.delete('/:id', userAuth, async (req, res) => {
   try {
     const id = parseInt(req.params.id)
-    if (isNaN(id)) return res.status(400).json({ error: 'ID noto\'g\'ri' })
+    if (isNaN(id)) return res.status(400).json({ error: "ID noto'g'ri" })
 
     const check = await pool.query(`
       SELECT r.*, res.name AS restaurant_name
@@ -350,18 +303,13 @@ router.delete('/:id', userAuth, async (req, res) => {
 
     const bookingDate = new Date(`${String(booking.date).split('T')[0]}T${booking.time}`)
     if (bookingDate < new Date())
-      return res.status(400).json({ error: 'O\'tgan bronni bekor qilib bo\'lmaydi' })
+      return res.status(400).json({ error: "O'tgan bronni bekor qilib bo'lmaydi" })
 
-    await pool.query(
-      'UPDATE reservations SET status = $1 WHERE id = $2',
-      ['cancelled', id]
-    )
+    await pool.query('UPDATE reservations SET status=$1 WHERE id=$2', ['cancelled', id])
 
-    // Socket.io
     const io = req.app.get('io')
     if (io) io.to(`restaurant_${booking.restaurant_id}`).emit('reservation_cancelled', { id })
 
-    // Telegram
     const userResult = await pool.query('SELECT telegram_id FROM users WHERE id=$1', [req.user.id])
     if (userResult.rows[0]?.telegram_id) {
       sendTelegramMsg(userResult.rows[0].telegram_id,
@@ -370,12 +318,35 @@ router.delete('/:id', userAuth, async (req, res) => {
     }
 
     res.json({ success: true })
-  } catch (err) {
+  } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
 })
 
-// ── O'tgan bronlar (review uchun) ─────────────────────────────
+// ── PUT /api/reservations/:id/noshow ─────────────────────────
+router.put('/:id/noshow', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `UPDATE reservations SET status = 'noshow' WHERE id = $1 RETURNING *`,
+      [req.params.id]
+    )
+    if (!result.rows.length) return res.status(404).json({ error: 'Topilmadi' })
+
+    const booking = result.rows[0]
+    const userResult = await pool.query('SELECT telegram_id FROM users WHERE id=$1', [booking.user_id])
+    if (userResult.rows[0]?.telegram_id) {
+      sendTelegramMsg(userResult.rows[0].telegram_id,
+        `⚠️ <b>Eslatma!</b>\n\nSiz bugungi broningizga kelmagandingiz.\n\n` +
+        `Keyingi bronda <b>${DEPOSIT_AMOUNT.toLocaleString()} so'm</b> depozit talab qilinadi.`
+      ).catch(() => {})
+    }
+    res.json({ success: true })
+  } catch(err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
+})
+
+// ── GET /api/reservations/past-unreviewed ────────────────────
 router.get('/past-unreviewed', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -393,29 +364,19 @@ router.get('/past-unreviewed', async (req, res) => {
       LIMIT 20
     `)
     res.json(result.rows)
-  } catch (err) {
+  } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
 })
 
+// ── PUT /api/reservations/:id/review-asked ───────────────────
 router.put('/:id/review-asked', async (req, res) => {
   try {
     await pool.query('UPDATE reservations SET review_asked=true WHERE id=$1', [req.params.id])
     res.json({ success: true })
-  } catch (err) {
+  } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
 })
-
-// ── Telegram yuborish ─────────────────────────────────────────
-async function sendTelegramMsg(telegramId, text) {
-  const token = process.env.BOT_TOKEN
-  if (!token || !telegramId) return
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: telegramId, text, parse_mode: 'HTML' })
-  })
-}
 
 module.exports = router
