@@ -1,3 +1,17 @@
+// ── GET /api/restaurants — Barcha restoranlar ─────────────────
+router.get('/', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * FROM restaurants
+      WHERE status = 'approved'
+      ORDER BY is_premium DESC, rating DESC
+    `)
+    res.json(result.rows)
+  } catch(err) {
+    res.status(500).json({ error: 'Server xatoligi' })
+  }
+})
+
 /**
  * OneTable — Reservations
  * No-show bo'lgan foydalanuvchilar keyingi bronda depozit to'laydi
