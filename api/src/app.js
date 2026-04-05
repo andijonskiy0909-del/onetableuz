@@ -64,6 +64,14 @@ app.get('/dashboard', (req, res) => {
 })
 app.use('/dashboard', express.static(path.join(__dirname, '../webapp')))
 
+// ── WebApp (Telegram Mini App) ────────────────────────────────
+app.use('/app', express.static(path.join(__dirname, '../webapp')))
+app.get('/app*', (req, res) => {
+  const filePath = path.join(__dirname, '../webapp/index.html')
+  if (fs.existsSync(filePath)) res.sendFile(filePath)
+  else res.status(404).send('WebApp topilmadi')
+})
+
 // ── Routes ────────────────────────────────────────────────────
 const routes = require('./routes/index')
 app.use('/api/auth', authRateLimiter)
@@ -107,10 +115,19 @@ server.listen(PORT, async () => {
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP DEFAULT (NOW() + INTERVAL '30 minutes');
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS table_id INTEGER;
       ALTER TABLE reservations ADD COLUMN IF NOT EXISTS zone_id INTEGER;
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS requires_deposit BOOLEAN DEFAULT false;
+      ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'not_required';
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS email VARCHAR(255);
       ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS gallery TEXT[] DEFAULT '{}';
       ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+      ALTER TABLE menu_items ADD COLUMN IF NOT EXISTS category VARCHAR(255);
+      ALTER TABLE reviews ADD COLUMN IF NOT EXISTS photo_url TEXT;
+      ALTER TABLE reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT NOW();
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS full_name VARCHAR(255);
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'owner';
+      ALTER TABLE restaurant_owners ADD COLUMN IF NOT EXISTS telegram_id BIGINT;
     `).catch(() => {})
 
     logger.info('✅ DB patch qo\'llanildi')
