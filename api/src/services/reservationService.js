@@ -1,5 +1,4 @@
-// src/services/reservationService.js — FIXED: to'g'ri capacity check
-'use strict';
+
 
 const { pool, withTransaction } = require('../config/db');
 const { env } = require('../config/env');
