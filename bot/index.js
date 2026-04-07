@@ -1,4 +1,4 @@
-[07.04.2026 22:39] Мухаммадали: require('dotenv').config()
+require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api')
 const fetch = require('node-fetch')
 
