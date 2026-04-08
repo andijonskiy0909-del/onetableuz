@@ -1,31 +1,30 @@
- /**
+/**
  * OneTable — Restaurants
- * Public va owner routes
  */
 const router = require('express').Router()
 const pool = require('../db')
 
-// ── GET /api/restaurants — Barcha restoranlar ─────────────────
+// ── GET /api/restaurants ──────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
     const { cuisine, price, search } = req.query
-    let query = SELECT * FROM restaurants WHERE status = 'approved'
+    let query = `SELECT * FROM restaurants WHERE status = 'approved'`
     const params = []
 
     if (search) {
-      params.push(%${search}%)
-      query +=  AND (name ILIKE $${params.length} OR address ILIKE $${params.length})
+      params.push(`%${search}%`)
+      query += ` AND (name ILIKE $${params.length} OR address ILIKE $${params.length})`
     }
     if (cuisine) {
       params.push(cuisine)
-      query +=  AND $${params.length} = ANY(cuisine)
+      query += ` AND $${params.length} = ANY(cuisine)`
     }
     if (price) {
       params.push(price)
-      query +=  AND price_category = $${params.length}
+      query += ` AND price_category = $${params.length}`
     }
 
-    query +=  ORDER BY is_premium DESC, rating DESC
+    query += ` ORDER BY is_premium DESC, rating DESC`
     const result = await pool.query(query, params)
     res.json(result.rows)
   } catch(err) {
@@ -34,7 +33,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// ── GET /api/restaurants/:id — Bitta restoran ─────────────────
+// ── GET /api/restaurants/:id ──────────────────────────────────
 router.get('/:id', async (req, res) => {
   try {
     const result = await pool.query(
@@ -130,7 +129,8 @@ router.get('/:id/reviews', async (req, res) => {
         COUNT(*) FILTER (WHERE rating = 1) as one_star
       FROM reviews WHERE restaurant_id = $1
     `, [req.params.id])
-[07.04.2026 22:37] Мухаммадали: res.json({ reviews: result.rows, stats: stats.rows[0] })
+
+    res.json({ reviews: result.rows, stats: stats.rows[0] })
   } catch(err) {
     res.status(500).json({ error: 'Server xatoligi' })
   }
