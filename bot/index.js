@@ -6,16 +6,17 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 const WEBHOOK_URL = process.env.WEBHOOK_URL || 'https://onetableuz-bot.up.railway.app'
 const WEBAPP_URL = process.env.WEBAPP_URL || 'https://cooperative-insight-production-11df.up.railway.app/app'
 const API_URL = process.env.API_URL || 'https://cooperative-insight-production-11df.up.railway.app/api'
+
 const bot = new TelegramBot(BOT_TOKEN, { polling: false })
 
 bot.setWebHook(`${WEBHOOK_URL}/webhook/${BOT_TOKEN}`)
   .then(() => console.log('✅ Webhook sozlandi'))
   .catch(e => console.error('Webhook xatoligi:', e.message))
 
+// ── i18n ──────────────────────────────────────────────────────
 const i18n = {
   uz: {
-    welcome: n => `Salom, ${n}! 👋\n\nOneTable — Shaxringizdagi eng yaxshi restoranlarni bron qiling. ✨
-Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
+    welcome: n => `Salom, ${n}! 👋\n\nOneTable — Toshkentdagi eng yaxshi restoranlarni bron qiling. ✨\n\n🍽 Restoranlar ro'yxatini ko'rish\n📅 Bronlarimni ko'rish\n🤖 AI Yordamchi`,
     btn_open: '🍽 Restoranlarni ochish',
     btn_bookings: '📅 Bronlarim',
     btn_ai: '🤖 AI Yordamchi',
@@ -31,6 +32,7 @@ Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
     ai_error: "❌ Xatolik. Qayta urinib ko'ring.",
     ai_exit: '👋 AI rejimdan chiqdingiz.',
     review_star: n => '⭐'.repeat(n) + ` (${n}/5)`,
+    no_bookings: "Hali bronlaringiz yo'q.",
   },
   ru: {
     welcome: n => `Привет, ${n}! 👋\n\nOneTable — Бронируйте лучшие рестораны Ташкента. ✨`,
@@ -49,6 +51,7 @@ Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
     ai_error: '❌ Ошибка. Попробуйте снова.',
     ai_exit: '👋 Вы вышли из режима AI.',
     review_star: n => '⭐'.repeat(n) + ` (${n}/5)`,
+    no_bookings: 'У вас пока нет бронирований.',
   },
   en: {
     welcome: n => `Hello, ${n}! 👋\n\nOneTable — Book the best restaurants in Tashkent. ✨`,
@@ -67,6 +70,7 @@ Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
     ai_error: '❌ Error. Please try again.',
     ai_exit: '👋 You exited AI mode.',
     review_star: n => '⭐'.repeat(n) + ` (${n}/5)`,
+    no_bookings: 'You have no bookings yet.',
   }
 }
 
@@ -86,11 +90,16 @@ function mainKeyboard(uid) {
       [{ text: T(uid, 'btn_bookings'), web_app: { url: WEBAPP_URL + '?page=bookings' } }],
       [{ text: T(uid, 'btn_ai'), callback_data: 'open_ai' }],
       [{ text: '🏪 Restoran egasi (Dashboard)', url: DASH }],
-      [{ text: '🇺🇿', callback_data: 'lang_uz' }, { text: '🇷🇺', callback_data: 'lang_ru' }, { text: '🇬🇧', callback_data: 'lang_en' }]
+      [
+        { text: '🇺🇿', callback_data: 'lang_uz' },
+        { text: '🇷🇺', callback_data: 'lang_ru' },
+        { text: '🇬🇧', callback_data: 'lang_en' }
+      ]
     ]
   }
 }
 
+// ── /start ────────────────────────────────────────────────────
 bot.onText(/\/start/, (msg) => {
   const uid = msg.from.id
   state.ai[uid] = false
@@ -100,7 +109,8 @@ bot.onText(/\/start/, (msg) => {
     state.langs[uid] = lc.startsWith('ru') ? 'ru' : lc.startsWith('en') ? 'en' : 'uz'
   }
   bot.sendMessage(msg.chat.id, T(uid, 'welcome', msg.from.first_name || 'Foydalanuvchi'), {
-    parse_mode: 'HTML', reply_markup: mainKeyboard(uid)
+    parse_mode: 'HTML',
+    reply_markup: mainKeyboard(uid)
   })
 })
 
@@ -117,10 +127,16 @@ bot.onText(/\/ai/, msg => {
 
 bot.onText(/\/mybookings/, msg => {
   bot.sendMessage(msg.chat.id, T(msg.from.id, 'btn_bookings'), {
-    reply_markup: { inline_keyboard: [[{ text: T(msg.from.id, 'btn_bookings'), web_app: { url: `${WEBAPP_URL}?page=bookings` } }]] }
+    reply_markup: {
+      inline_keyboard: [[{
+        text: T(msg.from.id, 'btn_bookings'),
+        web_app: { url: `${WEBAPP_URL}?page=bookings` }
+      }]]
+    }
   })
 })
 
+// ── Callback ──────────────────────────────────────────────────
 bot.on('callback_query', async (q) => {
   const uid = q.from.id
   const chatId = q.message.chat.id
@@ -130,9 +146,11 @@ bot.on('callback_query', async (q) => {
     state.langs[uid] = data.replace('lang_', '')
     await bot.answerCallbackQuery(q.id)
     bot.editMessageText(T(uid, 'welcome', q.from.first_name || ''), {
-      chat_id: chatId, message_id: q.message.message_id,
-      parse_mode: 'HTML', reply_markup: mainKeyboard(uid)
-    })
+      chat_id: chatId,
+      message_id: q.message.message_id,
+      parse_mode: 'HTML',
+      reply_markup: mainKeyboard(uid)
+    }).catch(() => {})
     return
   }
 
@@ -156,11 +174,17 @@ bot.on('callback_query', async (q) => {
 
   if (data.startsWith('review_rate_')) {
     const parts = data.split('_')
-    const rating = parts[2]
+    const rating = +parts[2]
     const resId = parts[3]
     const restId = parts[4]
-    await bot.answerCallbackQuery(q.id, { text: T(uid, 'review_star', +rating) })
-    state.reviews[uid] = { step: 'comment', reservationId: resId, restaurantId: restId, rating: +rating, comment: null }
+    await bot.answerCallbackQuery(q.id, { text: T(uid, 'review_star', rating) })
+    state.reviews[uid] = {
+      step: 'comment',
+      reservationId: resId,
+      restaurantId: restId,
+      rating,
+      comment: null
+    }
     bot.sendMessage(chatId, T(uid, 'review_comment'), {
       reply_markup: { inline_keyboard: [[{ text: T(uid, 'review_skip'), callback_data: 'review_skip_comment' }]] }
     })
@@ -169,7 +193,10 @@ bot.on('callback_query', async (q) => {
 
   if (data === 'review_skip_comment') {
     await bot.answerCallbackQuery(q.id)
-    if (state.reviews[uid]) { state.reviews[uid].step = 'photo'; state.reviews[uid].comment = '' }
+    if (state.reviews[uid]) {
+      state.reviews[uid].step = 'photo'
+      state.reviews[uid].comment = ''
+    }
     bot.sendMessage(chatId, T(uid, 'review_photo'), {
       reply_markup: { inline_keyboard: [[{ text: T(uid, 'review_skip'), callback_data: 'review_skip_photo' }]] }
     })
@@ -187,12 +214,15 @@ bot.on('callback_query', async (q) => {
     delete state.reviews[uid]
     return
   }
+
+  await bot.answerCallbackQuery(q.id)
 })
 
+// ── Message handler ───────────────────────────────────────────
 bot.on('message', async (msg) => {
   const uid = msg.from.id
   const chatId = msg.chat.id
-  if (msg.text && msg.text.startsWith('/')) return
+  if (msg.text?.startsWith('/')) return
 
   if (state.ai[uid] && msg.text) {
     await handleAI(uid, chatId, msg.text)
@@ -220,42 +250,55 @@ bot.on('message', async (msg) => {
   }
 })
 
+// ── AI ────────────────────────────────────────────────────────
 async function handleAI(uid, chatId, message) {
   const lang = state.langs[uid] || 'uz'
   const typing = await bot.sendMessage(chatId, T(uid, 'ai_typing'))
   try {
     if (!state.aiHistory[uid]) state.aiHistory[uid] = []
     state.aiHistory[uid].push({ role: 'user', content: message })
-    if (state.aiHistory[uid].length > 10) state.aiHistory[uid] = state.aiHistory[uid].slice(-10)
+    if (state.aiHistory[uid].length > 10) {
+      state.aiHistory[uid] = state.aiHistory[uid].slice(-10)
+    }
 
     let ctx = ''
     try {
       const r = await fetch(`${API_URL}/restaurants`)
       const d = await r.json()
       if (Array.isArray(d)) {
-        ctx = d.slice(0, 5).map(r => `- ${r.name} (${r.cuisine ? r.cuisine.join(', ') : ''}, ${r.price_category}, ${r.address})`).join('\n')
+        ctx = d.slice(0, 5).map(r =>
+          `- ${r.name} (${r.cuisine?.join(', ') || ''}, ${r.price_category || ''}, ${r.address || ''})`
+        ).join('\n')
       }
     } catch(e) {}
 
     const prompts = {
       uz: `Sen OneTable AI yordamchisisisan. Toshkentdagi restoran bron platformasi.\n${ctx ? `Restoranlar:\n${ctx}` : ''}\nQisqa javob ber. O'zbek tilida.`,
       ru: `Ты AI-ассистент OneTable. Рестораны Ташкента.\n${ctx ? `Рестораны:\n${ctx}` : ''}\nКратко по-русски.`,
-      en: `You are OneTable AI assistant.\n${ctx ? `Restaurants:\n${ctx}` : ''}\nBe brief.`
+      en: `You are OneTable AI assistant. Restaurant booking platform in Tashkent.\n${ctx ? `Restaurants:\n${ctx}` : ''}\nBe brief.`
     }
 
     const gr = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+      },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'system', content: prompts[lang] || prompts.uz }, ...state.aiHistory[uid]],
+        messages: [
+          { role: 'system', content: prompts[lang] || prompts.uz },
+          ...state.aiHistory[uid]
+        ],
         max_tokens: 500,
         temperature: 0.7
       })
     })
+
     const d = await gr.json()
-    const reply = d.choices && d.choices[0] && d.choices[0].message && d.choices[0].message.content
+    const reply = d.choices?.[0]?.message?.content
     if (!reply) throw new Error('No reply')
+
     state.aiHistory[uid].push({ role: 'assistant', content: reply })
     await bot.deleteMessage(chatId, typing.message_id).catch(() => {})
     bot.sendMessage(chatId, reply, {
@@ -268,6 +311,7 @@ async function handleAI(uid, chatId, message) {
   }
 }
 
+// ── Review saqlash ────────────────────────────────────────────
 async function saveReview(uid, chatId, photoUrl) {
   const rs = state.reviews[uid]
   if (!rs) return
@@ -292,6 +336,7 @@ async function saveReview(uid, chatId, photoUrl) {
   }
 }
 
+// ── Review so'rash ────────────────────────────────────────────
 async function askForReview(telegramId, reservationId, restaurantId, restaurantName) {
   try {
     const uid = telegramId
@@ -322,16 +367,18 @@ async function askForReview(telegramId, reservationId, restaurantId, restaurantN
   }
 }
 
+// ── Cron: Review so'rash ──────────────────────────────────────
 async function checkReviews() {
   try {
     const r = await fetch(`${API_URL}/reservations/past-unreviewed`)
     if (!r.ok) return
     const list = await r.json()
+    if (!Array.isArray(list)) return
     for (const item of list) {
       if (item.telegram_id) {
         await askForReview(item.telegram_id, item.id, item.restaurant_id, item.restaurant_name)
         await fetch(`${API_URL}/reservations/${item.id}/review-asked`, { method: 'PUT' })
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise(r => setTimeout(r, 1000))
       }
     }
   } catch(e) {
@@ -342,6 +389,7 @@ async function checkReviews() {
 setInterval(checkReviews, 30 * 60 * 1000)
 setTimeout(checkReviews, 15000)
 
+// ── Webhook handler ───────────────────────────────────────────
 function processUpdate(update) {
   bot.processUpdate(update)
 }
