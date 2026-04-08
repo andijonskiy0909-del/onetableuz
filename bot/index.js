@@ -14,8 +14,8 @@ bot.setWebHook(`${WEBHOOK_URL}/webhook/${BOT_TOKEN}`)
 
 const i18n = {
   uz: {
-    welcome: n => `Salom, ${n}! 👋\n\nOneTable — SHaxringizdagi eng yaxshi restoranlarni bron qiling. ✨
-    Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
+    welcome: n => `Salom, ${n}! 👋\n\nOneTable — Shaxringizdagi eng yaxshi restoranlarni bron qiling. ✨
+Did, qulaylik va tezlik — barchasi OneTable’da. 🍷`,
     btn_open: '🍽 Restoranlarni ochish',
     btn_bookings: '📅 Bronlarim',
     btn_ai: '🤖 AI Yordamchi',
