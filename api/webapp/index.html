@@ -5,222 +5,258 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#FAF7F2">
 <title>OneTable — Toshkent restoranlari</title>
-
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================
-   ONETABLE — EDITORIAL WARM HOSPITALITY
-   Fraunces (display serif) + Manrope (body sans)
-   ============================================================ */
+/* =========================================================
+   ONETABLE — ULTRA PREMIUM EDITORIAL WARM HOSPITALITY
+   Fraunces (display) + Manrope (body)
+   ========================================================= */
 
 :root {
-  /* Warm cream editorial — light */
   --bg: #FAF7F2;
   --bg-elevated: #FFFFFF;
   --bg-subtle: #F2ECE0;
-  --bg-overlay: rgba(28, 25, 23, 0.55);
+  --bg-overlay: rgba(20, 16, 12, 0.62);
 
   --ink: #1C1917;
   --ink-soft: #44403C;
   --ink-muted: #8B8178;
-  --ink-faint: #B8AFA4;
+  --ink-faint: #C4B9AD;
 
-  --line: #E7E0D2;
+  --line: #E8E0D0;
   --line-soft: #F0EADC;
 
-  --accent: #7B2D26;           /* deep burgundy */
-  --accent-hover: #652019;
-  --accent-soft: #F5E6E4;
-  --accent-ink: #FFFFFF;
+  --accent: #7B2D26;
+  --accent-hover: #642019;
+  --accent-soft: #F6E8E6;
+  --accent-glow: rgba(123, 45, 38, 0.18);
 
-  --gold: #B8813A;             /* warm saffron */
-  --gold-soft: #FBF2E3;
+  --gold: #B07B2A;
+  --gold-soft: #FBF3E4;
+  --gold-bright: #E0A83E;
 
-  --success: #4A6741;
-  --success-soft: #E8EDE4;
+  --success: #3D6B38;
+  --success-soft: #E6EEE4;
+  --success-pulse: rgba(61, 107, 56, 0.3);
   --danger: #9B2C2C;
   --danger-soft: #FBEAEA;
 
-  --radius-xs: 6px;
-  --radius-sm: 10px;
-  --radius: 18px;
-  --radius-lg: 26px;
-  --radius-xl: 32px;
+  --reel-bg: #0A0906;
 
-  --shadow-xs: 0 1px 2px rgba(60, 40, 20, 0.04);
-  --shadow-sm: 0 2px 8px -2px rgba(60, 40, 20, 0.06), 0 1px 3px rgba(60, 40, 20, 0.04);
-  --shadow: 0 8px 30px -8px rgba(60, 40, 20, 0.10), 0 3px 10px -3px rgba(60, 40, 20, 0.05);
-  --shadow-lg: 0 30px 80px -20px rgba(60, 40, 20, 0.18), 0 10px 30px -10px rgba(60, 40, 20, 0.08);
+  --r-xs: 6px;
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-full: 100px;
 
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow-xs: 0 1px 3px rgba(40, 25, 10, 0.05);
+  --shadow-sm: 0 2px 10px -3px rgba(40, 25, 10, 0.08), 0 1px 3px rgba(40, 25, 10, 0.04);
+  --shadow-md: 0 8px 30px -8px rgba(40, 25, 10, 0.12), 0 3px 10px rgba(40, 25, 10, 0.05);
+  --shadow-lg: 0 24px 60px -16px rgba(40, 25, 10, 0.22), 0 8px 24px rgba(40, 25, 10, 0.08);
+  --shadow-xl: 0 40px 100px -20px rgba(40, 25, 10, 0.30);
 
+  --fd: 'Fraunces', Georgia, serif;
+  --fb: 'Manrope', -apple-system, sans-serif;
+
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
 
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 72px;
 }
 
 [data-theme="dark"] {
-  --bg: #12100E;
-  --bg-elevated: #1C1917;
-  --bg-subtle: #26211C;
-  --bg-overlay: rgba(0, 0, 0, 0.75);
+  --bg: #100D0A;
+  --bg-elevated: #1A1612;
+  --bg-subtle: #231E18;
+  --bg-overlay: rgba(0, 0, 0, 0.78);
 
-  --ink: #FAF7F2;
-  --ink-soft: #E7E0D2;
-  --ink-muted: #A8A29E;
-  --ink-faint: #6B625A;
+  --ink: #F5F0E8;
+  --ink-soft: #D8D0C4;
+  --ink-muted: #9A9188;
+  --ink-faint: #5A5248;
 
-  --line: #2A241E;
-  --line-soft: #1F1A15;
+  --line: #2A231B;
+  --line-soft: #1E1914;
 
-  --accent: #D4836A;
-  --accent-hover: #E89579;
-  --accent-soft: #3A2520;
+  --accent: #D4866E;
+  --accent-hover: #E09A82;
+  --accent-soft: #3A2218;
+  --accent-glow: rgba(212, 134, 110, 0.2);
 
-  --gold: #E0A968;
-  --gold-soft: #2B2115;
+  --gold: #D4A045;
+  --gold-soft: #2A1E08;
+  --gold-bright: #EDBA5A;
 
-  --success: #7BA16B;
-  --success-soft: #1F2A18;
-  --danger: #D47373;
-  --danger-soft: #2A1818;
+  --success: #6FA860;
+  --success-soft: #182A16;
+  --success-pulse: rgba(111, 168, 96, 0.3);
+  --danger: #D47070;
+  --danger-soft: #2A1212;
 }
 
-/* ---------- Reset ---------- */
+/* ---------- RESET ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overscroll-behavior-y: none; }
+html { height: 100%; scroll-behavior: smooth; }
 body {
-  font-family: var(--font-body);
+  font-family: var(--fb);
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--ink);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
-  font-feature-settings: 'cv11', 'ss01';
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
-input, textarea, select { font-family: inherit; font-size: inherit; color: inherit; }
+input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 
-/* Subtle grain for warmth */
-body::before {
+/* Grain texture */
+body::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 9999;
-  opacity: 0.035;
+  z-index: 9998;
+  opacity: 0.028;
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px;
 }
-[data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.04; }
+[data-theme="dark"] body::after { mix-blend-mode: screen; opacity: 0.035; }
 
-/* ---------- Typography ---------- */
-.display {
-  font-family: var(--font-display);
-  font-optical-sizing: auto;
-  font-variation-settings: "opsz" 144, "SOFT" 50;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-}
-.display-italic {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-variation-settings: "opsz" 144, "SOFT" 100;
-}
-
-/* ---------- App shell ---------- */
+/* =========================================================
+   LAYOUT — APP SHELL
+   ========================================================= */
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
   min-height: 100dvh;
-  padding-bottom: calc(76px + var(--safe-bottom));
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-b));
+  position: relative;
 }
 
-/* ---------- Page system ---------- */
-.page { display: none; animation: fadeUp 0.5s var(--ease) both; }
+/* Scrollable page wrapper */
+.page {
+  display: none;
+  min-height: calc(100dvh - var(--tabbar-h) - var(--safe-b));
+}
 .page.active { display: block; }
+
+/* Reels page — no scroll on wrapper, handled by reel container */
+#page-reels { overflow: hidden; padding-bottom: 0 !important; }
+#app:has(#page-reels.active) { padding-bottom: 0; }
+
+/* Stagger entrance */
+.fadein { animation: fadeUp 0.55s var(--ease) both; }
+.stagger > *  { animation: fadeUp 0.5s var(--ease) both; }
+.stagger > *:nth-child(1){ animation-delay: 0.04s; }
+.stagger > *:nth-child(2){ animation-delay: 0.09s; }
+.stagger > *:nth-child(3){ animation-delay: 0.14s; }
+.stagger > *:nth-child(4){ animation-delay: 0.19s; }
+.stagger > *:nth-child(5){ animation-delay: 0.24s; }
+.stagger > *:nth-child(6){ animation-delay: 0.29s; }
+.stagger > *:nth-child(7){ animation-delay: 0.34s; }
+.stagger > *:nth-child(8){ animation-delay: 0.39s; }
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ---------- Top bar ---------- */
+/* =========================================================
+   TOPBAR
+   ========================================================= */
 .topbar {
-  padding: calc(var(--safe-top) + 20px) 20px 8px;
+  padding: calc(var(--safe-t) + 22px) 22px 10px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
 .greeting { flex: 1; min-width: 0; }
-.greeting .eyebrow {
-  font-size: 11px;
-  letter-spacing: 0.18em;
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-muted);
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-weight: 700;
+  margin-bottom: 5px;
 }
-.greeting h1 {
-  font-family: var(--font-display);
+.greet-title {
+  font-family: var(--fd);
+  font-size: 30px;
   font-weight: 400;
-  font-size: 28px;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   color: var(--ink);
   font-variation-settings: "opsz" 144, "SOFT" 50;
 }
-.greeting h1 em {
+.greet-title em {
   font-style: italic;
   font-weight: 300;
   color: var(--accent);
 }
-.lang-btn {
+
+/* Lang / avatar button group */
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.icon-btn {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   background: var(--bg-elevated);
   border: 1px solid var(--line);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s var(--ease-spring);
+  transition: all 0.2s var(--spring);
+  box-shadow: var(--shadow-xs);
+  position: relative;
+  overflow: hidden;
 }
-.lang-btn:active { transform: scale(0.92); }
+.icon-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  opacity: 0;
+  transition: opacity 0.15s;
+  border-radius: inherit;
+}
+.icon-btn:active::after { opacity: 0.07; }
+.icon-btn:active { transform: scale(0.92); }
 
-/* ---------- Search ---------- */
-.search-wrap { padding: 16px 20px 8px; }
+/* =========================================================
+   SEARCH
+   ========================================================= */
+.search-wrap { padding: 14px 22px 6px; }
 .search {
   display: flex;
   align-items: center;
   gap: 12px;
   background: var(--bg-elevated);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
   padding: 14px 18px;
   box-shadow: var(--shadow-xs);
-  transition: all 0.2s var(--ease);
+  transition: all 0.25s var(--ease);
 }
 .search:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-glow);
 }
 .search svg { flex-shrink: 0; color: var(--ink-muted); }
 .search input {
@@ -233,12 +269,30 @@ body::before {
   min-width: 0;
 }
 .search input::placeholder { color: var(--ink-muted); font-weight: 400; }
+.search-clear {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  color: var(--ink-muted);
+  font-size: 16px;
+  font-weight: 600;
+}
+.search.has-value .search-clear { opacity: 1; pointer-events: auto; }
 
-/* ---------- Chip row ---------- */
+/* =========================================================
+   CHIP ROW
+   ========================================================= */
 .chip-row {
   display: flex;
   gap: 8px;
-  padding: 12px 20px 4px;
+  padding: 12px 22px 6px;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -246,88 +300,114 @@ body::before {
 .chip-row::-webkit-scrollbar { display: none; }
 .chip {
   flex-shrink: 0;
-  padding: 10px 18px;
-  border-radius: 100px;
+  padding: 9px 18px;
+  border-radius: var(--r-full);
   background: var(--bg-elevated);
-  border: 1px solid var(--line);
-  font-size: 13px;
-  font-weight: 600;
+  border: 1.5px solid var(--line);
+  font-size: 12.5px;
+  font-weight: 700;
   color: var(--ink-soft);
   white-space: nowrap;
+  letter-spacing: 0.01em;
   transition: all 0.25s var(--ease);
+  position: relative;
+  overflow: hidden;
 }
-.chip:active { transform: scale(0.94); }
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.chip span { position: relative; z-index: 1; }
+.chip:active { transform: scale(0.93); }
 .chip.active {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--bg);
 }
 
-/* ---------- Section ---------- */
-.section { padding: 24px 20px 8px; }
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+.section { padding: 20px 22px 6px; }
 .section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 .section-title {
-  font-family: var(--font-display);
-  font-size: 22px;
+  font-family: var(--fd);
+  font-size: 23px;
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   color: var(--ink);
   font-variation-settings: "opsz" 144, "SOFT" 50;
+  line-height: 1.1;
 }
 .section-title em {
   font-style: italic;
   font-weight: 300;
   color: var(--accent);
 }
-.section-link {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-muted);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.section-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
 }
 
-/* ---------- Restaurant card ---------- */
-.card-list { display: flex; flex-direction: column; gap: 18px; }
+/* =========================================================
+   RESTAURANT CARD — ULTRA PREMIUM
+   ========================================================= */
+.card-list { display: flex; flex-direction: column; gap: 20px; }
+
 .rest-card {
   background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: var(--r-xl);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s var(--ease);
+  transition: all 0.35s var(--ease);
   position: relative;
+  will-change: transform;
 }
-.rest-card:active { transform: scale(0.985); box-shadow: var(--shadow); }
+.rest-card:active { transform: scale(0.983); box-shadow: var(--shadow-md); }
 
-.rest-card .image {
+/* Image */
+.rest-card .c-image {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: 16/9;
   background: var(--bg-subtle);
   overflow: hidden;
 }
-.rest-card .image img {
+.rest-card .c-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s var(--ease);
+  transition: transform 0.7s var(--ease);
 }
-.rest-card:active .image img { transform: scale(1.04); }
+.rest-card:active .c-image img { transform: scale(1.05); }
 
-.rest-card .image::after {
+/* Gradient overlays */
+.rest-card .c-image::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 50%);
+  background: linear-gradient(
+    160deg,
+    rgba(0,0,0,0) 40%,
+    rgba(0,0,0,0.45) 100%
+  );
+  z-index: 1;
   pointer-events: none;
 }
 
-.rest-card .badges {
+/* Top badges */
+.c-badges {
   position: absolute;
   top: 14px;
   left: 14px;
@@ -341,579 +421,555 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
-  border-radius: 100px;
-  font-size: 11px;
+  padding: 5px 11px;
+  border-radius: var(--r-full);
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border: 1px solid rgba(255,255,255,0.2);
 }
 .badge-open {
-  background: rgba(255,255,255,0.92);
-  color: var(--success);
+  background: rgba(15,30,15,0.55);
+  color: #7ECD72;
 }
-.badge-open::before {
-  content: '';
+.badge-open .dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: var(--success);
-  box-shadow: 0 0 0 2px rgba(74, 103, 65, 0.25);
-  animation: pulse 2s infinite;
+  background: #7ECD72;
+  box-shadow: 0 0 0 2px rgba(126,205,114,0.3);
+  animation: pulseGreen 2s ease-in-out infinite;
+  flex-shrink: 0;
 }
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+@keyframes pulseGreen {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(126,205,114,0.3); }
+  50%       { box-shadow: 0 0 0 5px rgba(126,205,114,0); }
 }
 .badge-closed {
-  background: rgba(255,255,255,0.92);
-  color: var(--danger);
+  background: rgba(30,10,10,0.55);
+  color: #F07070;
 }
-.badge-closed::before {
-  content: '';
+.badge-closed .dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: var(--danger);
+  background: #F07070;
+  flex-shrink: 0;
 }
-.badge-verified {
-  background: rgba(255,255,255,0.92);
-  color: var(--accent);
+.badge-premium {
+  background: linear-gradient(135deg, rgba(176,123,42,0.85), rgba(224,168,62,0.85));
+  color: #FFF8E6;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-.rest-card .body {
-  padding: 18px 20px 20px;
+/* Favorite button on card */
+.fav-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 2;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--spring);
+  color: rgba(255,255,255,0.8);
 }
-.rest-card .title-row {
+.fav-btn:active { transform: scale(0.84); }
+.fav-btn.active { background: rgba(220,60,60,0.85); border-color: transparent; color: #fff; }
+.fav-btn svg { width: 17px; height: 17px; }
+
+/* Card body */
+.c-body { padding: 18px 20px 20px; }
+.c-title-row {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
+  gap: 10px;
+  margin-bottom: 5px;
 }
-.rest-card .name {
-  font-family: var(--font-display);
+.c-name {
+  font-family: var(--fd);
   font-size: 22px;
   font-weight: 500;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
   color: var(--ink);
   font-variation-settings: "opsz" 144, "SOFT" 30;
   flex: 1;
   min-width: 0;
 }
-.rest-card .rating {
+.c-rating {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--ink);
+  padding: 4px 10px;
+  background: var(--gold-soft);
+  border-radius: var(--r-full);
+  border: 1px solid rgba(176,123,42,0.2);
 }
-.rest-card .rating svg { color: var(--gold); }
+.c-rating svg { color: var(--gold-bright); }
 
-.rest-card .meta {
+.c-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12.5px;
   color: var(--ink-muted);
   font-weight: 500;
-  margin-top: 4px;
+  margin-top: 3px;
 }
-.rest-card .meta .dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: 0.5; }
-.rest-card .price { font-weight: 700; color: var(--ink-soft); letter-spacing: 0.05em; }
-.rest-card .price .inactive { color: var(--ink-faint); }
+.c-meta .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-faint); }
+.c-price { font-weight: 700; color: var(--ink-soft); letter-spacing: 0.05em; }
+.c-price .dim { color: var(--ink-faint); }
+.c-dist {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  background: var(--bg-subtle);
+  border-radius: var(--r-full);
+  color: var(--ink-muted);
+}
 
-.rest-card .foot {
+.c-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--line-soft);
+  gap: 12px;
 }
-.rest-card .cuisines {
+.c-cuisines {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
   flex: 1;
+  min-width: 0;
 }
 .cuisine-tag {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink-soft);
   padding: 4px 10px;
   background: var(--bg-subtle);
-  border-radius: 100px;
+  border-radius: var(--r-full);
   letter-spacing: 0.02em;
+  white-space: nowrap;
 }
+
 .book-btn {
   flex-shrink: 0;
-  padding: 10px 18px;
+  padding: 11px 20px;
   background: var(--ink);
   color: var(--bg);
-  border-radius: 100px;
+  border-radius: var(--r-full);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  transition: all 0.2s var(--ease-spring);
+  transition: all 0.22s var(--spring);
+  position: relative;
+  overflow: hidden;
+}
+.book-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
 .book-btn:active { transform: scale(0.92); }
+.book-btn:active::after { opacity: 0.12; }
 
-/* ---------- Skeleton ---------- */
-.skeleton {
-  background: linear-gradient(90deg, var(--bg-subtle) 0%, var(--line-soft) 50%, var(--bg-subtle) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
-  border-radius: var(--radius);
-}
+/* =========================================================
+   SKELETON LOADERS
+   ========================================================= */
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-subtle) 0%,
+    var(--line-soft) 45%,
+    var(--bg-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--r-md);
 }
 .sk-card {
-  height: 300px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--r-xl);
+  overflow: hidden;
 }
+.sk-img { aspect-ratio: 16/9; }
+.sk-body { padding: 18px 20px 20px; }
+.sk-line { height: 14px; border-radius: 6px; margin-bottom: 10px; }
+.sk-line.w-70 { width: 70%; }
+.sk-line.w-50 { width: 50%; }
+.sk-line.w-90 { width: 90%; }
 
-/* ---------- Empty state ---------- */
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
 .empty {
-  padding: 60px 32px;
+  padding: 56px 36px;
   text-align: center;
 }
-.empty .icon {
-  width: 72px;
-  height: 72px;
+.empty-icon {
+  width: 76px; height: 76px;
   border-radius: 50%;
   background: var(--bg-subtle);
+  border: 1px solid var(--line);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 20px;
+  margin: 0 auto 22px;
   color: var(--ink-muted);
+  font-size: 30px;
 }
 .empty h3 {
-  font-family: var(--font-display);
+  font-family: var(--fd);
   font-size: 22px;
   font-weight: 400;
   font-style: italic;
   margin-bottom: 8px;
-  color: var(--ink);
+  font-variation-settings: "opsz" 144, "SOFT" 80;
 }
 .empty p {
   font-size: 14px;
   color: var(--ink-muted);
-  max-width: 280px;
+  line-height: 1.6;
+  max-width: 260px;
   margin: 0 auto;
 }
 
-/* ---------- Booking modal (bottom sheet) ---------- */
-.sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-overlay);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 100;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.35s var(--ease);
-}
-.sheet-backdrop.open { opacity: 1; pointer-events: auto; }
-
-.sheet {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  max-height: 92vh;
-  background: var(--bg);
-  border-top-left-radius: var(--radius-xl);
-  border-top-right-radius: var(--radius-xl);
-  z-index: 101;
-  transform: translateY(100%);
-  transition: transform 0.45s var(--ease);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 -20px 60px -20px rgba(0,0,0,0.3);
-  padding-bottom: var(--safe-bottom);
-}
-.sheet.open { transform: translateY(0); }
-.sheet .handle {
-  width: 40px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--line);
-  margin: 12px auto 8px;
-  flex-shrink: 0;
-}
-.sheet .sheet-head {
-  padding: 8px 24px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-shrink: 0;
-}
-.sheet .sheet-title {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  font-variation-settings: "opsz" 144, "SOFT" 50;
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.sheet-close {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--bg-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.2s var(--ease-spring);
-}
-.sheet-close:active { transform: scale(0.9); }
-
-.sheet-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 8px 24px 24px;
-  -webkit-overflow-scrolling: touch;
-}
-.sheet-foot {
-  padding: 16px 24px calc(16px + var(--safe-bottom));
-  background: var(--bg);
-  border-top: 1px solid var(--line);
-  flex-shrink: 0;
+/* =========================================================
+   ===== REELS PAGE — FULL-SCREEN VERTICAL FEED =====
+   ========================================================= */
+#page-reels {
+  height: calc(100dvh - var(--tabbar-h) - var(--safe-b));
+  background: var(--reel-bg);
 }
 
-/* ---------- Steps indicator ---------- */
-.steps {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-.step-dot {
-  flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  background: var(--line);
-  transition: background 0.3s var(--ease);
-}
-.step-dot.done { background: var(--accent); }
-.step-dot.active { background: var(--ink); }
-
-/* ---------- Form elements ---------- */
-.label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 10px;
-  display: block;
-}
-.field-group { margin-bottom: 22px; }
-
-.zone-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.zone-opt {
-  padding: 16px;
-  background: var(--bg-elevated);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius);
-  text-align: left;
-  transition: all 0.2s var(--ease);
-}
-.zone-opt:active { transform: scale(0.97); }
-.zone-opt.selected {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--bg);
-}
-.zone-opt .zone-name {
-  font-weight: 700;
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-.zone-opt .zone-cap {
-  font-size: 11px;
-  opacity: 0.65;
-  font-weight: 500;
-}
-
-.date-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
+.reels-container {
+  height: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
   scrollbar-width: none;
-  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
-.date-row::-webkit-scrollbar { display: none; }
-.date-opt {
-  flex-shrink: 0;
-  min-width: 64px;
-  padding: 12px 8px;
-  background: var(--bg-elevated);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-sm);
-  text-align: center;
-  transition: all 0.2s var(--ease);
-}
-.date-opt:active { transform: scale(0.94); }
-.date-opt.selected {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
-}
-.date-opt .dow {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-.date-opt .day {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 400;
-  margin-top: 2px;
-  font-variation-settings: "opsz" 144;
-}
+.reels-container::-webkit-scrollbar { display: none; }
 
-.guests-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  background: var(--bg-elevated);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius);
-}
-.guests-count {
-  font-family: var(--font-display);
-  font-size: 28px;
-  font-weight: 400;
-  font-variation-settings: "opsz" 144;
-}
-.guests-count small {
-  font-family: var(--font-body);
-  font-size: 13px;
-  color: var(--ink-muted);
-  font-weight: 500;
-  margin-left: 6px;
-}
-.guests-btns { display: flex; gap: 10px; }
-.guests-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  background: var(--bg-subtle);
+.reel-item {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  overflow: hidden;
+  background: #0A0906;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 600;
-  transition: all 0.15s var(--ease-spring);
-}
-.guests-btn:active { transform: scale(0.88); }
-.guests-btn:disabled { opacity: 0.3; }
-
-/* Time grid */
-.time-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-.time-opt {
-  padding: 14px 8px;
-  background: var(--bg-elevated);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  transition: all 0.2s var(--ease);
-  font-variant-numeric: tabular-nums;
-}
-.time-opt:active:not(:disabled) { transform: scale(0.94); }
-.time-opt.selected {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
-}
-.time-opt:disabled {
-  opacity: 0.3;
-  text-decoration: line-through;
-  cursor: not-allowed;
 }
 
-/* Menu preorder */
-.menu-item {
+/* Video / image layer */
+.reel-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0A0906;
+}
+video.reel-media { object-position: center; }
+
+/* Gradient overlay */
+.reel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.35) 0%,
+    rgba(0,0,0,0) 30%,
+    rgba(0,0,0,0) 45%,
+    rgba(0,0,0,0.55) 75%,
+    rgba(0,0,0,0.85) 100%
+  );
+  z-index: 1;
+}
+
+/* Top bar on reel */
+.reel-topbar {
+  position: absolute;
+  top: calc(var(--safe-t) + 16px);
+  left: 0; right: 0;
   display: flex;
-  gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--line-soft);
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
 }
-.menu-item:last-child { border-bottom: none; }
-.menu-item .mi-info { flex: 1; min-width: 0; }
-.menu-item .mi-name {
+.reel-topbar-title {
+  font-family: var(--fd);
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.9);
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.01em;
+}
+
+/* Bottom info on reel */
+.reel-info {
+  position: absolute;
+  bottom: 20px;
+  left: 18px;
+  right: 80px;
+  z-index: 2;
+}
+.reel-name {
+  font-family: var(--fd);
+  font-size: 26px;
   font-weight: 600;
-  font-size: 14px;
-  margin-bottom: 2px;
-}
-.menu-item .mi-desc {
-  font-size: 12px;
-  color: var(--ink-muted);
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   margin-bottom: 6px;
+  font-variation-settings: "opsz" 144, "SOFT" 20;
+  text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+}
+.reel-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.reel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  letter-spacing: 0.03em;
+}
+.reel-badge .rdot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #7ECD72;
+  box-shadow: 0 0 0 2px rgba(126,205,114,0.4);
+  animation: pulseGreen 2s ease-in-out infinite;
+}
+.reel-caption {
+  font-size: 13px;
+  color: rgba(255,255,255,0.72);
+  line-height: 1.5;
+  font-weight: 400;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.menu-item .mi-price {
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-.menu-item .mi-ctrl {
-  display: flex;
+
+/* Reel book button */
+.reel-book-btn {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  margin-top: 14px;
+  padding: 12px 22px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--r-full);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: none;
+  box-shadow: 0 4px 20px rgba(123,45,38,0.5);
+  transition: all 0.2s var(--spring);
 }
-.mi-btn {
-  width: 32px; height: 32px;
+.reel-book-btn:active { transform: scale(0.93); }
+
+/* Right action bar */
+.reel-actions {
+  position: absolute;
+  bottom: 28px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+.reel-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.reel-action-btn {
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: var(--bg-subtle);
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.18);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  transition: transform 0.15s var(--ease-spring);
-}
-.mi-btn:active { transform: scale(0.88); }
-.mi-btn.plus { background: var(--ink); color: var(--bg); }
-.mi-qty {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Primary button ---------- */
-.btn-primary {
-  width: 100%;
-  padding: 17px 24px;
-  background: var(--ink);
-  color: var(--bg);
-  border-radius: var(--radius);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.2s var(--ease-spring);
-  box-shadow: var(--shadow);
-}
-.btn-primary:active:not(:disabled) { transform: scale(0.98); }
-.btn-primary:disabled { opacity: 0.4; }
-.btn-secondary {
-  width: 100%;
-  padding: 15px 24px;
-  background: transparent;
-  color: var(--ink);
-  border: 1.5px solid var(--line);
-  border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.2s var(--ease);
-}
-.btn-secondary:active { background: var(--bg-subtle); }
-
-.total-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 14px 18px;
-  background: var(--bg-subtle);
-  border-radius: var(--radius);
-}
-.total-row .lbl { font-size: 12px; color: var(--ink-muted); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
-.total-row .val {
-  font-family: var(--font-display);
+  color: #fff;
   font-size: 22px;
-  font-weight: 400;
-  font-variation-settings: "opsz" 144;
-  color: var(--ink);
+  transition: all 0.18s var(--spring);
+}
+.reel-action-btn:active { transform: scale(0.86); background: rgba(255,255,255,0.22); }
+.reel-action-btn.liked { background: rgba(220,60,60,0.7); border-color: transparent; }
+.reel-action-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.04em;
 }
 
-/* ---------- Bookings page ---------- */
+/* Reel restaurant avatar */
+.reel-avatar {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  object-fit: cover;
+  background: var(--bg-subtle);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+/* Progress bar (swipe indicator) */
+.reel-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+  z-index: 4;
+}
+.reel-progress-fill {
+  height: 100%;
+  background: rgba(255,255,255,0.55);
+  width: 0%;
+  transition: width 0.3s linear;
+}
+
+/* Reels loading overlay */
+.reels-loading {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: rgba(255,255,255,0.4);
+}
+.reels-loading .spin {
+  width: 32px; height: 32px;
+  border: 2.5px solid rgba(255,255,255,0.15);
+  border-top-color: rgba(255,255,255,0.6);
+}
+
+/* =========================================================
+   BOOKINGS PAGE
+   ========================================================= */
 .booking-card {
   background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: var(--r-xl);
   padding: 20px;
   margin-bottom: 14px;
   box-shadow: var(--shadow-sm);
+  transition: all 0.2s var(--ease);
+  position: relative;
+  overflow: hidden;
 }
-.booking-card .bk-head {
+.booking-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  border-radius: 4px 0 0 4px;
+}
+.booking-card.status-confirmed::before { background: var(--success); }
+.booking-card.status-pending::before { background: var(--gold); }
+.booking-card.status-cancelled::before { background: var(--danger); }
+.booking-card.status-completed::before { background: var(--ink-faint); }
+
+.bk-head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 14px;
   gap: 12px;
+  padding-left: 8px;
 }
-.booking-card .bk-name {
-  font-family: var(--font-display);
+.bk-name {
+  font-family: var(--fd);
   font-size: 20px;
   font-weight: 500;
   letter-spacing: -0.015em;
+  line-height: 1.15;
   flex: 1;
+  font-variation-settings: "opsz" 144, "SOFT" 40;
 }
 .bk-status {
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: 5px 10px;
-  border-radius: 100px;
+  padding: 5px 12px;
+  border-radius: var(--r-full);
   flex-shrink: 0;
 }
-.bk-status.pending { background: var(--gold-soft); color: var(--gold); }
+.bk-status.pending   { background: var(--gold-soft); color: var(--gold); }
 .bk-status.confirmed { background: var(--success-soft); color: var(--success); }
-.bk-status.cancelled, .bk-status.noshow { background: var(--danger-soft); color: var(--danger); }
+.bk-status.cancelled,.bk-status.noshow { background: var(--danger-soft); color: var(--danger); }
 .bk-status.completed { background: var(--bg-subtle); color: var(--ink-muted); }
 
 .bk-details {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  padding-top: 14px;
+  padding: 14px 8px 0;
   border-top: 1px solid var(--line-soft);
 }
 .bk-detail .bk-lbl {
-  font-size: 10px;
+  font-size: 9.5px;
   color: var(--ink-muted);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   margin-bottom: 4px;
 }
 .bk-detail .bk-val {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -924,45 +980,52 @@ body::before {
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid var(--line-soft);
+  padding-left: 8px;
 }
-.bk-action {
+.bk-cancel-btn {
   flex: 1;
   padding: 10px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  border-radius: var(--r-full);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  border: 1px solid var(--line);
-  background: var(--bg-elevated);
+  border: 1.5px solid var(--danger-soft);
+  color: var(--danger);
+  background: transparent;
   transition: all 0.15s var(--ease);
 }
-.bk-action:active { transform: scale(0.96); }
-.bk-action.danger { color: var(--danger); border-color: var(--danger-soft); }
+.bk-cancel-btn:active { background: var(--danger-soft); }
 
-/* ---------- Profile page ---------- */
+/* =========================================================
+   FAVORITES PAGE
+   ========================================================= */
+/* reuses card styles */
+
+/* =========================================================
+   PROFILE PAGE
+   ========================================================= */
 .profile-head {
+  padding: calc(var(--safe-t) + 36px) 22px 24px;
   text-align: center;
-  padding: 32px 20px 28px;
 }
 .profile-avatar {
-  width: 96px;
-  height: 96px;
+  width: 96px; height: 96px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
+  background: linear-gradient(145deg, var(--accent) 0%, var(--gold) 100%);
   margin: 0 auto 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-size: 36px;
+  font-family: var(--fd);
+  font-size: 38px;
   font-weight: 400;
-  color: white;
-  box-shadow: var(--shadow-lg);
+  color: #fff;
+  box-shadow: 0 12px 40px -8px var(--accent-glow), 0 4px 16px rgba(0,0,0,0.12);
   font-variation-settings: "opsz" 144;
 }
 .profile-name {
-  font-family: var(--font-display);
+  font-family: var(--fd);
   font-size: 26px;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -979,54 +1042,66 @@ body::before {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
-  padding: 0 20px 24px;
+  padding: 0 22px 26px;
 }
 .profile-stat {
   background: var(--bg-elevated);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 16px 12px;
+  border-radius: var(--r-lg);
+  padding: 18px 12px 14px;
   text-align: center;
+  box-shadow: var(--shadow-xs);
 }
-.profile-stat .num {
-  font-family: var(--font-display);
-  font-size: 28px;
+.profile-stat .pnum {
+  font-family: var(--fd);
+  font-size: 30px;
   font-weight: 400;
   color: var(--ink);
   font-variation-settings: "opsz" 144;
+  line-height: 1;
+  margin-bottom: 6px;
 }
-.profile-stat .lbl {
-  font-size: 10px;
+.profile-stat .plbl {
+  font-size: 9.5px;
   color: var(--ink-muted);
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-top: 2px;
+}
+
+.profile-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  padding: 0 22px;
+  margin-bottom: 10px;
 }
 
 .profile-menu {
-  padding: 0 20px;
+  padding: 0 22px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-xs);
 }
 .menu-row {
   display: flex;
   align-items: center;
   gap: 14px;
   padding: 16px 18px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--line);
-  transition: background 0.15s var(--ease);
+  transition: background 0.12s;
+  cursor: pointer;
 }
-.menu-row:first-child { border-radius: var(--radius) var(--radius) 0 0; }
-.menu-row:last-child { border-radius: 0 0 var(--radius) var(--radius); border-top: none; }
-.menu-row:only-child { border-radius: var(--radius); }
-.menu-row:not(:first-child):not(:last-child) { border-top: none; border-radius: 0; }
+.menu-row + .menu-row { border-top: 1px solid var(--line-soft); }
 .menu-row:active { background: var(--bg-subtle); }
-.menu-row .mr-icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
+.mr-icon {
+  width: 38px; height: 38px;
+  border-radius: 12px;
   background: var(--bg-subtle);
   display: flex;
   align-items: center;
@@ -1034,183 +1109,597 @@ body::before {
   color: var(--accent);
   flex-shrink: 0;
 }
-.menu-row .mr-label {
+.mr-label {
   flex: 1;
   font-size: 15px;
   font-weight: 600;
 }
-.menu-row .mr-arrow { color: var(--ink-muted); }
+.mr-value {
+  font-size: 13px;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+.mr-arrow { color: var(--ink-faint); }
 
-/* ---------- Tab bar ---------- */
+/* =========================================================
+   TAB BAR — PREMIUM
+   ========================================================= */
 .tabbar {
   position: fixed;
-  bottom: 0;
-  left: 0; right: 0;
-  background: var(--bg-elevated);
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--tabbar-h) + var(--safe-b));
+  background: rgba(var(--bg-elevated-rgb, 255,255,255), 0.92);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
   border-top: 1px solid var(--line);
-  padding: 10px 10px calc(10px + var(--safe-bottom));
+  padding: 10px 8px calc(10px + var(--safe-b));
   display: flex;
   z-index: 50;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
 }
 .tab {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 8px 4px;
-  color: var(--ink-muted);
-  transition: color 0.2s var(--ease);
+  padding: 6px 4px;
+  color: var(--ink-faint);
+  transition: color 0.22s var(--ease);
+  position: relative;
 }
 .tab.active { color: var(--accent); }
-.tab .tab-label {
+.tab-pip {
+  position: absolute;
+  top: -2px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s var(--spring);
+}
+.tab.active .tab-pip { opacity: 1; transform: scale(1); }
+.tab svg { transition: transform 0.3s var(--spring); flex-shrink: 0; }
+.tab.active svg { transform: scale(1.14); }
+.tab-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Reels tab special */
+.tab-reels-icon {
+  width: 40px; height: 40px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #C2185B, #E91E63, #FF4081);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(233,30,99,0.38);
+  transition: all 0.25s var(--spring);
+}
+.tab.active .tab-reels-icon {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(233,30,99,0.5);
+}
+.tab:not(.active) .tab-reels-icon {
+  background: var(--bg-subtle);
+  box-shadow: none;
+  color: var(--ink-faint);
+}
+
+/* =========================================================
+   BOOKING SHEET — BOTTOM SHEET
+   ========================================================= */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.38s var(--ease);
+}
+.sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.sheet {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  max-height: 93dvh;
+  background: var(--bg);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  z-index: 101;
+  transform: translateY(100%);
+  transition: transform 0.48s var(--ease);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 60px -10px rgba(0,0,0,0.28);
+  will-change: transform;
+}
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 44px; height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  margin: 14px auto 6px;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  padding: 8px 22px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.sheet-title-wrap { flex: 1; min-width: 0; }
+.sheet-eyebrow {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 3px;
 }
-.tab svg { transition: transform 0.3s var(--ease-spring); }
-.tab.active svg { transform: scale(1.1); }
-
-/* ---------- Toast ---------- */
-.toast {
-  position: fixed;
-  top: calc(var(--safe-top) + 20px);
-  left: 20px;
-  right: 20px;
-  background: var(--ink);
-  color: var(--bg);
-  padding: 14px 20px;
-  border-radius: var(--radius);
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  z-index: 200;
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-120%);
-  transition: transform 0.4s var(--ease-spring);
+.sheet-title {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  font-variation-settings: "opsz" 144, "SOFT" 40;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.toast.show { transform: translateY(0); }
-.toast.success { background: var(--success); }
-.toast.error { background: var(--danger); }
-
-/* ---------- Detail sheet for restaurant view ---------- */
-.rest-hero {
-  position: relative;
-  aspect-ratio: 16/10;
+.sheet-close-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
   background: var(--bg-subtle);
-  margin: -24px -24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s var(--spring);
+  flex-shrink: 0;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.sheet-close-btn:active { transform: scale(0.88); }
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 22px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.sheet-foot {
+  padding: 14px 22px calc(18px + var(--safe-b));
+  background: var(--bg);
+  border-top: 1px solid var(--line-soft);
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   STEP INDICATOR
+   ========================================================= */
+.steps-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 22px;
+  align-items: center;
+}
+.step-seg {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+  position: relative;
+}
+.step-seg::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s var(--ease);
+}
+.step-seg.done::after { width: 100%; }
+.step-seg.active::after {
+  background: var(--ink);
+  animation: fillSeg 0.4s var(--ease) forwards;
+}
+@keyframes fillSeg {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+.field-block { margin-bottom: 24px; }
+.field-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.field-label-hint {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-muted);
+}
+
+/* Zone grid */
+.zone-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.zone-card {
+  padding: 16px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+  text-align: left;
+  transition: all 0.2s var(--ease);
+  position: relative;
   overflow: hidden;
 }
-.rest-hero img { width: 100%; height: 100%; object-fit: cover; }
-.rest-hero::after {
+.zone-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, var(--bg) 0%, transparent 40%);
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
 }
-.rest-detail-title {
-  font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
-  margin-bottom: 8px;
-  font-variation-settings: "opsz" 144, "SOFT" 50;
+.zone-card:active { transform: scale(0.96); }
+.zone-card.active {
+  border-color: var(--ink);
+  background: var(--ink);
 }
-.rest-detail-meta {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  color: var(--ink-muted);
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 20px;
-}
-.rest-detail-section { margin-bottom: 22px; }
-.rest-detail-section h4 {
+.zone-card > * { position: relative; }
+.zone-card .zn { font-weight: 800; font-size: 14px; margin-bottom: 2px; }
+.zone-card.active .zn { color: var(--bg); }
+.zone-card .zc {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 10px;
+  opacity: 0.6;
+  font-weight: 600;
 }
-.rest-detail-section p {
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--ink-soft);
+.zone-card.active .zc { color: var(--bg); }
+
+/* Date row */
+.date-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.date-row::-webkit-scrollbar { display: none; }
+.date-card {
+  flex-shrink: 0;
+  min-width: 62px;
+  padding: 13px 8px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--line);
+  border-radius: var(--r-md);
+  text-align: center;
+  transition: all 0.2s var(--ease);
+}
+.date-card:active { transform: scale(0.92); }
+.date-card.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.date-card .dc-dow {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 3px;
+}
+.date-card .dc-day {
+  font-family: var(--fd);
+  font-size: 24px;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  line-height: 1;
+  margin-bottom: 1px;
+}
+.date-card .dc-mon {
+  font-size: 9px;
+  font-weight: 700;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Loading spinner */
+/* Guests */
+.guests-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.guests-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.guests-num {
+  font-family: var(--fd);
+  font-size: 32px;
+  font-weight: 400;
+  font-variation-settings: "opsz" 144;
+  line-height: 1;
+}
+.guests-unit {
+  font-size: 13px;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.guests-btns { display: flex; gap: 10px; }
+.g-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 400;
+  transition: all 0.15s var(--spring);
+  color: var(--ink);
+}
+.g-btn:active { transform: scale(0.86); }
+.g-btn:disabled { opacity: 0.25; pointer-events: none; }
+
+/* Time grid */
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.time-card {
+  padding: 14px 6px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--line);
+  border-radius: var(--r-md);
+  font-size: 13.5px;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.2s var(--ease);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.time-card:active:not([disabled]) { transform: scale(0.92); }
+.time-card.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.time-card[disabled] {
+  opacity: 0.28;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Menu preorder */
+.menu-item-row {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  align-items: center;
+  border-bottom: 1px solid var(--line-soft);
+}
+.menu-item-row:last-child { border-bottom: none; }
+.mi-img {
+  width: 54px; height: 54px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+  background: var(--bg-subtle);
+  flex-shrink: 0;
+}
+.mi-info { flex: 1; min-width: 0; }
+.mi-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; line-height: 1.3; }
+.mi-desc {
+  font-size: 12px;
+  color: var(--ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.mi-price { font-weight: 800; font-size: 13px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.mi-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.mi-ctrl-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.15s var(--spring);
+  line-height: 1;
+}
+.mi-ctrl-btn:active { transform: scale(0.84); }
+.mi-ctrl-btn.add { background: var(--ink); color: var(--bg); }
+.mi-qty { min-width: 18px; text-align: center; font-weight: 800; font-size: 15px; }
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.btn-primary {
+  width: 100%;
+  padding: 17px 24px;
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: var(--r-lg);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.22s var(--spring);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+}
+.btn-primary:active:not([disabled]) { transform: scale(0.97); box-shadow: var(--shadow-sm); }
+.btn-primary[disabled] { opacity: 0.38; }
+
+.order-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-subtle);
+  border-radius: var(--r-md);
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+}
+.order-summary .os-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); }
+.order-summary .os-val {
+  font-family: var(--fd);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--ink);
+  font-variation-settings: "opsz" 144;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+.toast {
+  position: fixed;
+  top: calc(var(--safe-t) + 18px);
+  left: 18px; right: 18px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 14px 20px;
+  border-radius: var(--r-lg);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  z-index: 300;
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-130%);
+  transition: transform 0.42s var(--spring);
+}
+.toast.show { transform: translateY(0); }
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+
+/* Spinner */
 .spin {
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   border: 2px solid currentColor;
   border-top-color: transparent;
   border-radius: 50%;
-  animation: spinA 0.7s linear infinite;
+  animation: spin360 0.7s linear infinite;
   display: inline-block;
+  flex-shrink: 0;
 }
-@keyframes spinA { to { transform: rotate(360deg); } }
-
-/* Stagger children on reveal */
-.stagger > * { animation: fadeUp 0.5s var(--ease) both; }
-.stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger > *:nth-child(2) { animation-delay: 0.1s; }
-.stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.stagger > *:nth-child(4) { animation-delay: 0.2s; }
-.stagger > *:nth-child(5) { animation-delay: 0.25s; }
-.stagger > *:nth-child(6) { animation-delay: 0.3s; }
-.stagger > *:nth-child(7) { animation-delay: 0.35s; }
-.stagger > *:nth-child(8) { animation-delay: 0.4s; }
-
+@keyframes spin360 { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
 <div id="app">
-  <!-- ========== HOME PAGE ========== -->
+
+  <!-- ========== PAGE: HOME ========== -->
   <div class="page active" id="page-home">
     <div class="topbar">
       <div class="greeting">
         <div class="eyebrow" id="home-eyebrow">Xush kelibsiz</div>
-        <h1><span id="home-greet-text">Oqshom yaxshi,</span><br><em id="home-user-name">mehmon</em></h1>
+        <h1 class="greet-title">
+          <span id="home-greeting">Xayrli tong,</span><br>
+          <em id="home-user-name">mehmon</em>
+        </h1>
       </div>
-      <button class="lang-btn" id="lang-btn" aria-label="Language">🇺🇿</button>
+      <div class="topbar-actions">
+        <button class="icon-btn" id="lang-btn" aria-label="Language">🇺🇿</button>
+      </div>
     </div>
 
     <div class="search-wrap">
-      <div class="search">
+      <div class="search" id="search-box">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" id="search-input" placeholder="Restoran qidirish...">
+        <button class="search-clear" id="search-clear" aria-label="Clear">✕</button>
       </div>
     </div>
 
-    <div class="chip-row" id="chip-row">
-      <!-- chips injected by JS -->
-    </div>
+    <div class="chip-row" id="chip-row"></div>
 
     <div class="section">
       <div class="section-head">
         <div class="section-title">Yaqin <em>atrofda</em></div>
-        <span class="section-link" id="rest-count"></span>
+        <span class="section-count" id="rest-count"></span>
       </div>
       <div class="card-list stagger" id="rest-list">
-        <div class="skeleton sk-card"></div>
-        <div class="skeleton sk-card"></div>
-        <div class="skeleton sk-card"></div>
+        <!-- skeleton -->
+        <div class="sk-card skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-70"></div><div class="sk-line w-50"></div><div class="sk-line w-90"></div></div></div>
+        <div class="sk-card skeleton"><div class="sk-img"></div><div class="sk-body"><div class="sk-line w-70"></div><div class="sk-line w-50"></div></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ========== BOOKINGS PAGE ========== -->
+  <!-- ========== PAGE: REELS ========== -->
+  <div class="page" id="page-reels">
+    <div class="reels-container" id="reels-container">
+      <div class="reels-loading">
+        <div class="spin" style="width:32px;height:32px;border-width:2.5px;border-color:rgba(255,255,255,0.15);border-top-color:rgba(255,255,255,0.6);"></div>
+        <span style="font-size:13px;font-weight:500;">Reels yuklanmoqda...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PAGE: BOOKINGS ========== -->
   <div class="page" id="page-bookings">
     <div class="topbar">
       <div class="greeting">
-        <div class="eyebrow">Mening</div>
-        <h1><em>Bronlarim</em></h1>
+        <div class="eyebrow" data-i18n="tab_bookings_my">Mening</div>
+        <h1 class="greet-title"><em data-i18n="tab_bookings">Bronlarim</em></h1>
       </div>
     </div>
     <div class="section">
@@ -1218,46 +1707,48 @@ body::before {
     </div>
   </div>
 
-  <!-- ========== FAVORITES PAGE ========== -->
+  <!-- ========== PAGE: FAVORITES ========== -->
   <div class="page" id="page-favorites">
     <div class="topbar">
       <div class="greeting">
-        <div class="eyebrow">Sevimli</div>
-        <h1><em>Joylar</em></h1>
+        <div class="eyebrow" data-i18n="favs_eyebrow">Sevimli</div>
+        <h1 class="greet-title"><em data-i18n="tab_favorites">Joylar</em></h1>
       </div>
     </div>
     <div class="section">
-      <div id="favorites-list" class="stagger"></div>
+      <div id="fav-list" class="card-list stagger"></div>
     </div>
   </div>
 
-  <!-- ========== PROFILE PAGE ========== -->
+  <!-- ========== PAGE: PROFILE ========== -->
   <div class="page" id="page-profile">
     <div class="profile-head">
       <div class="profile-avatar" id="profile-avatar">M</div>
       <div class="profile-name" id="profile-name">Mehmon</div>
-      <div class="profile-handle" id="profile-handle">@mehmon</div>
+      <div class="profile-handle" id="profile-handle"></div>
     </div>
     <div class="profile-stats">
-      <div class="profile-stat"><div class="num" id="stat-bookings">0</div><div class="lbl">Bron</div></div>
-      <div class="profile-stat"><div class="num" id="stat-visited">0</div><div class="lbl">Restoran</div></div>
-      <div class="profile-stat"><div class="num" id="stat-favorites">0</div><div class="lbl">Sevimli</div></div>
+      <div class="profile-stat"><div class="pnum" id="stat-bookings">0</div><div class="plbl" data-i18n="stat_bookings">Bron</div></div>
+      <div class="profile-stat"><div class="pnum" id="stat-visited">0</div><div class="plbl" data-i18n="stat_visited">Restoran</div></div>
+      <div class="profile-stat"><div class="pnum" id="stat-favs">0</div><div class="plbl" data-i18n="tab_favorites">Sevimli</div></div>
     </div>
-    <div class="profile-menu">
+    <div class="profile-section-title" style="margin-bottom:12px;">Sozlamalar</div>
+    <div class="profile-menu" style="margin:0 22px 12px;">
       <div class="menu-row" data-action="language">
-        <div class="mr-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+        <div class="mr-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
         <div class="mr-label" data-i18n="profile_language">Til</div>
-        <svg class="mr-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        <span class="mr-value" id="lang-display">O'zbekcha</span>
+        <svg class="mr-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
       </div>
       <div class="menu-row" data-action="support">
-        <div class="mr-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="mr-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <div class="mr-label" data-i18n="profile_support">Yordam</div>
-        <svg class="mr-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        <svg class="mr-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
       </div>
       <div class="menu-row" data-action="about">
-        <div class="mr-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+        <div class="mr-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
         <div class="mr-label" data-i18n="profile_about">OneTable haqida</div>
-        <svg class="mr-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        <svg class="mr-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
       </div>
     </div>
   </div>
@@ -1265,330 +1756,215 @@ body::before {
   <!-- ========== TAB BAR ========== -->
   <nav class="tabbar">
     <button class="tab active" data-tab="home">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      <div class="tab-pip"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="tab-label" data-i18n="tab_home">Asosiy</span>
     </button>
+    <button class="tab" data-tab="reels">
+      <div class="tab-pip"></div>
+      <div class="tab-reels-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <span class="tab-label" style="color:inherit">Reels</span>
+    </button>
     <button class="tab" data-tab="bookings">
+      <div class="tab-pip"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       <span class="tab-label" data-i18n="tab_bookings">Bronlar</span>
     </button>
     <button class="tab" data-tab="favorites">
+      <div class="tab-pip"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       <span class="tab-label" data-i18n="tab_favorites">Sevimli</span>
     </button>
     <button class="tab" data-tab="profile">
+      <div class="tab-pip"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="tab-label" data-i18n="tab_profile">Profil</span>
     </button>
   </nav>
 </div>
 
-<!-- ========== BOOKING SHEET ========== -->
+<!-- ========== BOOKING BOTTOM SHEET ========== -->
 <div class="sheet-backdrop" id="sheet-backdrop"></div>
 <div class="sheet" id="sheet">
-  <div class="handle"></div>
-  <div class="sheet-head">
-    <div class="sheet-title" id="sheet-title">Restoran</div>
-    <button class="sheet-close" id="sheet-close" aria-label="Close">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title-wrap">
+      <div class="sheet-eyebrow" data-i18n="book">Bron qilish</div>
+      <div class="sheet-title" id="sheet-title">Restoran</div>
+    </div>
+    <button class="sheet-close-btn" id="sheet-close-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
     </button>
   </div>
-  <div class="sheet-body" id="sheet-body">
-    <!-- content injected -->
-  </div>
-  <div class="sheet-foot" id="sheet-foot">
-    <!-- button injected -->
-  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+  <div class="sheet-foot" id="sheet-foot"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
 <script>
-/* =====================================================
-   STATE + CONFIG
-   ===================================================== */
-const API_BASE = 'https://cooperative-insight-production-11df.up.railway.app/api';
+'use strict';
 
+/* ===== CONFIG ===== */
+const API = 'https://cooperative-insight-production-11df.up.railway.app/api';
 const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
+if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
-const state = {
-  lang: localStorage.getItem('onetable_lang') || 'uz',
-  token: localStorage.getItem('onetable_token') || null,
+/* ===== STATE ===== */
+const S = {
+  lang: localStorage.getItem('ot_lang') || 'uz',
+  token: localStorage.getItem('ot_token') || null,
   user: null,
   restaurants: [],
   filtered: [],
-  favorites: JSON.parse(localStorage.getItem('onetable_favs') || '[]'),
   bookings: [],
-  currentCuisine: 'all',
-  currentSearch: '',
+  reels: [],
+  favorites: JSON.parse(localStorage.getItem('ot_favs') || '[]'),
   coords: null,
-  currentTab: 'home',
-  // Booking flow
+  tab: 'home',
+  reelsLoaded: false,
   booking: {
-    restaurant: null,
-    step: 1,
-    zones: [],
-    menu: [],
-    selectedZone: null,
-    selectedDate: null,
-    selectedTime: null,
-    guests: 2,
-    preOrder: {},
-    availability: [],
+    restaurant: null, step: 1,
+    zones: [], menu: [],
+    zone: null, date: null, time: null,
+    guests: 2, preOrder: {}, availability: [],
   }
 };
 
-/* =====================================================
-   i18n
-   ===================================================== */
+/* ===== i18n ===== */
 const i18n = {
   uz: {
-    welcome: 'Xush kelibsiz',
-    good_morning: 'Xayrli tong,',
-    good_afternoon: 'Xayrli kun,',
-    good_evening: 'Xayrli oqshom,',
-    good_night: 'Xayrli kech,',
-    guest: 'mehmon',
-    search_placeholder: 'Restoran qidirish...',
-    nearby_near: 'Yaqin',
-    nearby_around: 'atrofda',
-    all: 'Barchasi',
-    uzbek: 'O\'zbek',
-    european: 'Yevropa',
-    asian: 'Osiyo',
-    italian: 'Italyan',
-    caucasian: 'Kavkaz',
-    seafood: 'Dengiz',
-    tab_home: 'Asosiy',
-    tab_bookings: 'Bronlar',
-    tab_favorites: 'Sevimli',
-    tab_profile: 'Profil',
-    book: 'Bron qilish',
-    open_now: 'Hozir ochiq',
-    closed_now: 'Yopiq',
-    verified: 'Tasdiqlangan',
-    restaurants_found: 'ta restoran',
-    step_where: 'Qayerda?',
-    step_when: 'Qachon?',
-    step_menu: 'Taomnoma',
-    zone_label: 'Zona tanlang',
-    date_label: 'Sana',
-    guests_label: 'Mehmonlar',
-    time_label: 'Vaqt',
-    preorder_label: 'Oldindan buyurtma',
-    preorder_hint: 'Ixtiyoriy — oshxona tayyor kutib oladi',
-    continue: 'Davom etish',
-    skip_continue: 'O\'tkazib yuborish',
-    confirm: 'Tasdiqlash',
-    people: 'kishi',
-    today: 'Bugun',
-    tomorrow: 'Ertaga',
-    total: 'Jami',
-    sum: 'so\'m',
-    no_bookings: 'Hali bronlar yo\'q',
-    no_bookings_hint: 'Yoqtirgan joyingizni tanlang va stolni oldindan band qiling',
-    empty_favorites: 'Sevimlilar bo\'sh',
-    empty_favorites_hint: '❤️ belgisini bosib restoranlarni sevimlilarga qo\'shing',
-    no_time_slots: 'Bu sanada bo\'sh vaqtlar yo\'q',
-    booking_created: 'Bron yaratildi!',
-    booking_error: 'Xatolik yuz berdi',
-    cancel_booking: 'Bekor qilish',
-    loading: 'Yuklanmoqda...',
-    profile_language: 'Til',
-    profile_support: 'Yordam',
-    profile_about: 'OneTable haqida',
-    status_pending: 'Kutilmoqda',
-    status_confirmed: 'Tasdiqlangan',
-    status_cancelled: 'Bekor qilingan',
-    status_completed: 'Tugallangan',
-    status_noshow: 'Kelmagan',
-    about_text: 'OneTable — Toshkentdagi eng yaxshi restoranlarda stolni oldindan band qilish uchun platforma.',
-    months: ['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'],
-    weekdays: ['Yak','Du','Se','Chor','Pay','Ju','Sha'],
+    welcome:'Xush kelibsiz', greeting_m:'Xayrli tong,', greeting_a:'Xayrli kun,', greeting_e:'Xayrli oqshom,', greeting_n:'Xayrli kech,',
+    guest:'mehmon', search_ph:'Restoran qidirish...', places:'ta joy',
+    tab_home:'Asosiy', tab_bookings:'Bronlar', tab_favorites:'Sevimli', tab_profile:'Profil',
+    tab_bookings_my:'Mening', favs_eyebrow:'Sevimli',
+    all:'Barchasi', uzbek:"O'zbek", european:'Yevropa', asian:'Osiyo', italian:'Italyan', caucasian:'Kavkaz', seafood:'Dengiz',
+    open:'Hozir ochiq', closed:'Yopiq', verified:'Premium',
+    book:'Bron qilish',
+    zone_lbl:'Zona', date_lbl:'Sana', guests_lbl:'Mehmonlar', time_lbl:'Vaqt', preorder_lbl:'Oldindan buyurtma', preorder_hint:'Ixtiyoriy — oshxona tayyor kutib oladi',
+    today:"Bugun", tomorrow:"Ertaga", people:"kishi",
+    next:'Davom etish', skip:'O\'tkazib yuborish', confirm:'Tasdiqlash', back:'Ortga',
+    total:'Jami', sum:"so'm",
+    no_bookings:"Bronlar yo'q", no_bookings_h:'Yoqtirgan joyingizni tanlang va oldindan band qiling',
+    no_favs:"Sevimlilar bo'sh", no_favs_h:"❤️ tugmani bosib restoranlarga qo'shing",
+    booking_ok:"Bron yaratildi!", booking_err:"Xatolik yuz berdi",
+    cancel:'Bekor qilish', cancel_q:"Haqiqatan bekor qilasizmi?",
+    cancelled:"Bekor qilindi",
+    status_pending:"Kutilmoqda", status_confirmed:"Tasdiqlangan", status_cancelled:"Bekor qilingan", status_completed:"Tugallangan", status_noshow:"Kelmagan",
+    profile_language:'Til', profile_support:'Yordam', profile_about:'OneTable haqida',
+    stat_bookings:'Bron', stat_visited:'Restoran',
+    lang_name:"O'zbekcha",
+    months:['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'],
+    days:['Yak','Du','Se','Chor','Pay','Ju','Sha'],
+    about:"OneTable — Toshkentdagi eng yaxshi restoranlarda stolni oldindan band qilish uchun platforma.",
+    reels_book:"Bron qilish",
+    no_time_slots:"Bu sanada bo'sh vaqt yo'q",
+    no_zone:"Zona topilmadi",
   },
   ru: {
-    welcome: 'Добро пожаловать',
-    good_morning: 'Доброе утро,',
-    good_afternoon: 'Добрый день,',
-    good_evening: 'Добрый вечер,',
-    good_night: 'Доброй ночи,',
-    guest: 'гость',
-    search_placeholder: 'Поиск ресторана...',
-    nearby_near: 'Рядом',
-    nearby_around: 'с вами',
-    all: 'Все',
-    uzbek: 'Узбекская',
-    european: 'Европейская',
-    asian: 'Азиатская',
-    italian: 'Итальянская',
-    caucasian: 'Кавказская',
-    seafood: 'Морская',
-    tab_home: 'Главная',
-    tab_bookings: 'Брони',
-    tab_favorites: 'Избранное',
-    tab_profile: 'Профиль',
-    book: 'Забронировать',
-    open_now: 'Открыто',
-    closed_now: 'Закрыто',
-    verified: 'Проверено',
-    restaurants_found: 'ресторанов',
-    step_where: 'Где?',
-    step_when: 'Когда?',
-    step_menu: 'Меню',
-    zone_label: 'Выберите зону',
-    date_label: 'Дата',
-    guests_label: 'Гости',
-    time_label: 'Время',
-    preorder_label: 'Предзаказ',
-    preorder_hint: 'Необязательно — кухня встретит вас готовой',
-    continue: 'Продолжить',
-    skip_continue: 'Пропустить',
-    confirm: 'Подтвердить',
-    people: 'чел.',
-    today: 'Сегодня',
-    tomorrow: 'Завтра',
-    total: 'Итого',
-    sum: 'сум',
-    no_bookings: 'Ещё нет броней',
-    no_bookings_hint: 'Выберите любимое место и забронируйте столик',
-    empty_favorites: 'Избранное пусто',
-    empty_favorites_hint: 'Нажмите ❤️ чтобы добавить ресторан в избранное',
-    no_time_slots: 'Нет свободных слотов на эту дату',
-    booking_created: 'Бронь создана!',
-    booking_error: 'Произошла ошибка',
-    cancel_booking: 'Отменить',
-    loading: 'Загрузка...',
-    profile_language: 'Язык',
-    profile_support: 'Поддержка',
-    profile_about: 'О OneTable',
-    status_pending: 'Ожидает',
-    status_confirmed: 'Подтверждено',
-    status_cancelled: 'Отменено',
-    status_completed: 'Завершено',
-    status_noshow: 'Не пришёл',
-    about_text: 'OneTable — платформа для бронирования столов в лучших ресторанах Ташкента.',
-    months: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
-    weekdays: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+    welcome:'Добро пожаловать', greeting_m:'Доброе утро,', greeting_a:'Добрый день,', greeting_e:'Добрый вечер,', greeting_n:'Доброй ночи,',
+    guest:'гость', search_ph:'Поиск ресторанов...', places:'мест',
+    tab_home:'Главная', tab_bookings:'Брони', tab_favorites:'Избранное', tab_profile:'Профиль',
+    tab_bookings_my:'Мои', favs_eyebrow:'Избранные',
+    all:'Все', uzbek:'Узбекская', european:'Европейская', asian:'Азиатская', italian:'Итальянская', caucasian:'Кавказская', seafood:'Морская',
+    open:'Открыто', closed:'Закрыто', verified:'Премиум',
+    book:'Забронировать',
+    zone_lbl:'Зона', date_lbl:'Дата', guests_lbl:'Гости', time_lbl:'Время', preorder_lbl:'Предзаказ', preorder_hint:'Необязательно — кухня встретит вас готовой',
+    today:'Сегодня', tomorrow:'Завтра', people:'чел.',
+    next:'Продолжить', skip:'Пропустить', confirm:'Подтвердить', back:'Назад',
+    total:'Итого', sum:'сум',
+    no_bookings:'Нет броней', no_bookings_h:'Выберите место и забронируйте столик',
+    no_favs:'Избранное пусто', no_favs_h:'Нажмите ❤️ чтобы добавить ресторан',
+    booking_ok:'Бронь создана!', booking_err:'Произошла ошибка',
+    cancel:'Отменить', cancel_q:'Точно отменить?',
+    cancelled:'Отменено',
+    status_pending:'Ожидает', status_confirmed:'Подтверждено', status_cancelled:'Отменено', status_completed:'Завершено', status_noshow:'Не пришёл',
+    profile_language:'Язык', profile_support:'Поддержка', profile_about:'О OneTable',
+    stat_bookings:'Брони', stat_visited:'Ресторан',
+    lang_name:'Русский',
+    months:['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
+    days:['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+    about:'OneTable — платформа для бронирования столов в лучших ресторанах Ташкента.',
+    reels_book:'Забронировать',
+    no_time_slots:'Нет доступных слотов на эту дату',
+    no_zone:'Зоны не найдены',
   },
   en: {
-    welcome: 'Welcome',
-    good_morning: 'Good morning,',
-    good_afternoon: 'Good afternoon,',
-    good_evening: 'Good evening,',
-    good_night: 'Good night,',
-    guest: 'guest',
-    search_placeholder: 'Search restaurants...',
-    nearby_near: 'Near',
-    nearby_around: 'you',
-    all: 'All',
-    uzbek: 'Uzbek',
-    european: 'European',
-    asian: 'Asian',
-    italian: 'Italian',
-    caucasian: 'Caucasian',
-    seafood: 'Seafood',
-    tab_home: 'Home',
-    tab_bookings: 'Bookings',
-    tab_favorites: 'Favorites',
-    tab_profile: 'Profile',
-    book: 'Book',
-    open_now: 'Open now',
-    closed_now: 'Closed',
-    verified: 'Verified',
-    restaurants_found: 'places',
-    step_where: 'Where?',
-    step_when: 'When?',
-    step_menu: 'Menu',
-    zone_label: 'Select zone',
-    date_label: 'Date',
-    guests_label: 'Guests',
-    time_label: 'Time',
-    preorder_label: 'Pre-order',
-    preorder_hint: 'Optional — kitchen will have it ready',
-    continue: 'Continue',
-    skip_continue: 'Skip',
-    confirm: 'Confirm',
-    people: 'people',
-    today: 'Today',
-    tomorrow: 'Tomorrow',
-    total: 'Total',
-    sum: 'UZS',
-    no_bookings: 'No bookings yet',
-    no_bookings_hint: 'Pick a favorite spot and reserve your table',
-    empty_favorites: 'No favorites yet',
-    empty_favorites_hint: 'Tap ❤️ to save restaurants here',
-    no_time_slots: 'No available slots for this date',
-    booking_created: 'Booking created!',
-    booking_error: 'Something went wrong',
-    cancel_booking: 'Cancel',
-    loading: 'Loading...',
-    profile_language: 'Language',
-    profile_support: 'Support',
-    profile_about: 'About OneTable',
-    status_pending: 'Pending',
-    status_confirmed: 'Confirmed',
-    status_cancelled: 'Cancelled',
-    status_completed: 'Completed',
-    status_noshow: 'No-show',
-    about_text: 'OneTable — the best way to reserve tables at top restaurants in Tashkent.',
-    months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-    weekdays: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    welcome:'Welcome', greeting_m:'Good morning,', greeting_a:'Good afternoon,', greeting_e:'Good evening,', greeting_n:'Good night,',
+    guest:'guest', search_ph:'Search restaurants...', places:'places',
+    tab_home:'Home', tab_bookings:'Bookings', tab_favorites:'Favorites', tab_profile:'Profile',
+    tab_bookings_my:'My', favs_eyebrow:'Favorite',
+    all:'All', uzbek:'Uzbek', european:'European', asian:'Asian', italian:'Italian', caucasian:'Caucasian', seafood:'Seafood',
+    open:'Open now', closed:'Closed', verified:'Premium',
+    book:'Book now',
+    zone_lbl:'Zone', date_lbl:'Date', guests_lbl:'Guests', time_lbl:'Time', preorder_lbl:'Pre-order', preorder_hint:'Optional — kitchen will have it ready',
+    today:'Today', tomorrow:'Tomorrow', people:'people',
+    next:'Continue', skip:'Skip', confirm:'Confirm', back:'Back',
+    total:'Total', sum:'UZS',
+    no_bookings:'No bookings yet', no_bookings_h:'Pick a spot and reserve your table',
+    no_favs:'No favorites yet', no_favs_h:'Tap ❤️ to save restaurants here',
+    booking_ok:'Booking created!', booking_err:'Something went wrong',
+    cancel:'Cancel', cancel_q:'Really cancel this booking?',
+    cancelled:'Cancelled',
+    status_pending:'Pending', status_confirmed:'Confirmed', status_cancelled:'Cancelled', status_completed:'Completed', status_noshow:'No-show',
+    profile_language:'Language', profile_support:'Support', profile_about:'About OneTable',
+    stat_bookings:'Bookings', stat_visited:'Restaurants',
+    lang_name:'English',
+    months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    about:'OneTable — the best way to reserve tables at top restaurants in Tashkent.',
+    reels_book:'Book Now',
+    no_time_slots:'No available slots for this date',
+    no_zone:'No zones found',
   }
 };
-const t = (key) => i18n[state.lang][key] || key;
+const T = k => (i18n[S.lang] || i18n.uz)[k] || k;
 
-/* =====================================================
-   API CLIENT
-   ===================================================== */
-async function api(path, opts = {}) {
-  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
-  if (state.token) headers.Authorization = `Bearer ${state.token}`;
-  try {
-    const res = await fetch(`${API_BASE}${path}`, { ...opts, headers });
-    const ct = res.headers.get('content-type') || '';
-    const data = ct.includes('application/json') ? await res.json() : await res.text();
-    if (!res.ok) throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
-    return data;
-  } catch (err) {
-    console.error('API error:', path, err);
-    throw err;
-  }
+/* ===== UTILS ===== */
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmt(n) {
+  if (!n && n !== 0) return '—';
+  return new Intl.NumberFormat('fr-FR').format(n).replace(/\s/g, '\u202F');
+}
+function isoDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function addDays(n) {
+  const d = new Date(); d.setDate(d.getDate() + n); return d;
+}
+function humanDate(iso) {
+  const d = new Date(iso);
+  return `${d.getDate()} ${T('months')[d.getMonth()]}`;
+}
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 6)  return T('greeting_n');
+  if (h < 12) return T('greeting_m');
+  if (h < 18) return T('greeting_a');
+  if (h < 22) return T('greeting_e');
+  return T('greeting_n');
+}
+function isOpen(wh) {
+  if (!wh) return null;
+  const m = String(wh).match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const [,oh,om,ch,cm] = m.map(Number);
+  const now = new Date();
+  const cur = now.getHours()*60 + now.getMinutes();
+  const open = oh*60+om;
+  let close = ch*60+cm;
+  if (close <= open) close += 1440;
+  return cur >= open && cur <= close;
 }
 
-/* =====================================================
-   TELEGRAM AUTH
-   ===================================================== */
-async function authenticate() {
-  const tgUser = tg?.initDataUnsafe?.user;
-  const mockUser = { id: 12345, first_name: 'Guest', username: 'guest', language_code: 'uz' };
-  const user = tgUser || mockUser;
-
-  try {
-    const res = await api('/auth/telegram', {
-      method: 'POST',
-      body: JSON.stringify({
-        telegram_id: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name || '',
-        username: user.username || '',
-        language: user.language_code || 'uz',
-        init_data: tg?.initData || ''
-      })
-    });
-    if (res.token) {
-      state.token = res.token;
-      localStorage.setItem('onetable_token', res.token);
-    }
-    state.user = res.user || user;
-  } catch (e) {
-    state.user = user; // fallback
-  }
-}
-
-/* =====================================================
-   HAPTIC + TOAST
-   ===================================================== */
+/* ===== HAPTIC + TOAST ===== */
 function haptic(type = 'light') {
   if (!tg?.HapticFeedback) return;
   if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
@@ -1596,825 +1972,792 @@ function haptic(type = 'light') {
   else if (type === 'warning') tg.HapticFeedback.notificationOccurred('warning');
   else tg.HapticFeedback.impactOccurred(type);
 }
-let toastTimer;
+let _toastT;
 function toast(msg, type = '') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast show ' + type;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2600);
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-/* =====================================================
-   GREETING + DATE HELPERS
-   ===================================================== */
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 6)  return t('good_night');
-  if (h < 12) return t('good_morning');
-  if (h < 17) return t('good_afternoon');
-  if (h < 22) return t('good_evening');
-  return t('good_night');
+/* ===== API ===== */
+async function api(path, opts = {}) {
+  const h = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (S.token) h.Authorization = `Bearer ${S.token}`;
+  const res = await fetch(API + path, { ...opts, headers: h });
+  const ct = res.headers.get('content-type') || '';
+  const data = ct.includes('json') ? await res.json() : await res.text();
+  if (!res.ok) throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+  return data;
 }
 
-function formatCurrency(n) {
-  if (!n && n !== 0) return '—';
-  return new Intl.NumberFormat('fr-FR').format(n).replace(/\s/g, ' ');
+/* ===== AUTH ===== */
+async function auth() {
+  const u = tg?.initDataUnsafe?.user || { id: 9999, first_name: 'Demo', username: 'demo', language_code: 'uz' };
+  try {
+    const r = await api('/auth/telegram', {
+      method: 'POST',
+      body: JSON.stringify({
+        telegram_id: u.id,
+        first_name: u.first_name || '',
+        last_name: u.last_name || '',
+        username: u.username || '',
+        language: u.language_code || 'uz',
+        init_data: tg?.initData || ''
+      })
+    });
+    if (r.token) { S.token = r.token; localStorage.setItem('ot_token', r.token); }
+    S.user = r.user || u;
+  } catch { S.user = u; }
 }
 
-function daysFromNow(n) {
-  const d = new Date();
-  d.setDate(d.getDate() + n);
-  return d;
-}
-function formatDateISO(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-/* Parse working_hours string like "10:00-23:00" or "10:00 - 23:00" */
-function isOpenNow(workingHours) {
-  if (!workingHours) return null;
-  const m = String(workingHours).match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
-  if (!m) return null;
-  const [_, oh, om, ch, cm] = m.map(Number);
-  const now = new Date();
-  const cur = now.getHours() * 60 + now.getMinutes();
-  const open = oh * 60 + om;
-  let close = ch * 60 + cm;
-  if (close <= open) close += 24 * 60; // overnight
-  return cur >= open && cur <= close;
-}
-
-/* =====================================================
-   RESTAURANT LIST
-   ===================================================== */
+/* ===== RESTAURANTS ===== */
 async function loadRestaurants() {
   try {
     let url = '/restaurants';
-    if (state.coords) url += `?lat=${state.coords.lat}&lng=${state.coords.lng}`;
-    const data = await api(url);
-    state.restaurants = Array.isArray(data) ? data : (data.restaurants || data.data || []);
-    // Filter out demo/inactive
-    state.restaurants = state.restaurants.filter(r => r.is_active !== false && r.is_demo !== true);
-    // Sort: premium first, then rating
-    state.restaurants.sort((a, b) => {
+    if (S.coords) url += `?lat=${S.coords.lat}&lng=${S.coords.lng}`;
+    const raw = await api(url);
+    let list = Array.isArray(raw) ? raw : (raw.restaurants || raw.data || []);
+    list = list.filter(r => r.is_active !== false && r.is_demo !== true && r.status !== 'rejected');
+    list.sort((a, b) => {
       if (a.is_premium !== b.is_premium) return b.is_premium ? 1 : -1;
-      if (state.coords && a.distance_km != null && b.distance_km != null) {
-        return a.distance_km - b.distance_km;
-      }
+      if (S.coords && a.distance_km != null && b.distance_km != null) return a.distance_km - b.distance_km;
       return (b.rating || 0) - (a.rating || 0);
     });
+    S.restaurants = list;
     applyFilters();
-  } catch (e) {
-    document.getElementById('rest-list').innerHTML = `
-      <div class="empty">
-        <div class="icon">⚠</div>
-        <h3>Ulanib bo'lmadi</h3>
-        <p>Internet ulanishini tekshiring yoki qayta urinib ko'ring</p>
-      </div>`;
+  } catch {
+    document.getElementById('rest-list').innerHTML = emptyHTML('⚠', 'Ulanib bo\'lmadi', 'Internet yoki server muammosi. Qaytadan urinib ko\'ring.');
   }
 }
 
 function applyFilters() {
-  let list = state.restaurants;
-  if (state.currentCuisine !== 'all') {
+  const chip = S.chip || 'all';
+  const q = (S.q || '').toLowerCase();
+  let list = S.restaurants;
+  if (chip !== 'all') {
     list = list.filter(r => {
       const cs = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
-      return cs.some(c => String(c).toLowerCase().includes(state.currentCuisine.toLowerCase()));
+      return cs.some(c => String(c).toLowerCase().includes(chip));
     });
   }
-  if (state.currentSearch) {
-    const q = state.currentSearch.toLowerCase();
-    list = list.filter(r =>
-      (r.name || '').toLowerCase().includes(q) ||
-      (r.address || '').toLowerCase().includes(q)
-    );
-  }
-  state.filtered = list;
+  if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q) || (r.address||'').toLowerCase().includes(q));
+  S.filtered = list;
   renderRestaurants();
 }
 
 function renderRestaurants() {
   const el = document.getElementById('rest-list');
-  const count = document.getElementById('rest-count');
-  if (count) count.textContent = `${state.filtered.length} ${t('restaurants_found')}`;
-
-  if (state.filtered.length === 0) {
-    el.innerHTML = `
-      <div class="empty">
-        <div class="icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        </div>
-        <h3>Hech narsa topilmadi</h3>
-        <p>Qidiruvni o'zgartirib ko'ring</p>
-      </div>`;
+  const cnt = document.getElementById('rest-count');
+  if (cnt) cnt.textContent = `${S.filtered.length} ${T('places')}`;
+  if (!S.filtered.length) {
+    el.innerHTML = emptyHTML('🔍', 'Hech narsa topilmadi', 'Qidiruvni yoki filterni o\'zgartirib ko\'ring');
     return;
   }
+  el.className = 'card-list stagger';
+  el.innerHTML = S.filtered.map(r => cardHTML(r)).join('');
+  // Fav buttons
+  el.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      toggleFav(Number(btn.dataset.id));
+      btn.classList.toggle('active', S.favorites.includes(Number(btn.dataset.id)));
+      haptic('light');
+    });
+  });
+  // Book buttons
+  el.querySelectorAll('.book-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); haptic('medium'); openSheet(Number(btn.dataset.id)); });
+  });
+  // Card click
+  el.querySelectorAll('.rest-card').forEach(card => {
+    card.addEventListener('click', () => { haptic('light'); openSheet(Number(card.dataset.id)); });
+  });
+}
 
-  el.innerHTML = state.filtered.map(r => {
-    const img = r.image_url || (Array.isArray(r.gallery) && r.gallery[0]) || `https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800`;
-    const cuisines = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
-    const price = r.price_category || '$$';
-    const priceDisplay = ['$','$','$'].map((s,i) => {
-      const active = (price.match(/\$/g) || []).length > i;
-      return `<span class="${active?'':'inactive'}">$</span>`;
-    }).join('');
-    const open = isOpenNow(r.working_hours);
-    const openBadge = open === true
-      ? `<span class="badge badge-open">${t('open_now')}</span>`
-      : open === false
-        ? `<span class="badge badge-closed">${t('closed_now')}</span>`
-        : '<span></span>';
-    const verifiedBadge = r.is_premium
-      ? `<span class="badge badge-verified">✓ ${t('verified')}</span>`
+function cardHTML(r) {
+  const img = r.image_url || (Array.isArray(r.gallery) && r.gallery[0]) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop';
+  const cuisines = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
+  const priceSym = (r.price_category || '$$').replace(/[^$]/g,'');
+  const priceHTML = ['$','$','$'].map((s,i) => `<span${priceSym.length > i ? '' : ' class="dim"'}>$</span>`).join('');
+  const openState = isOpen(r.working_hours);
+  const openBadge = openState === true
+    ? `<span class="badge badge-open"><span class="dot"></span>${T('open')}</span>`
+    : openState === false
+      ? `<span class="badge badge-closed"><span class="dot" style="background:#F07070"></span>${T('closed')}</span>`
       : '';
+  const premiumBadge = r.is_premium ? `<span class="badge badge-premium">✦ ${T('verified')}</span>` : '';
+  const dist = r.distance_km != null ? `<span class="c-dist"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="10" r="3"/><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${r.distance_km.toFixed(1)} km</span>` : '';
+  const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
+  const isFav = S.favorites.includes(r.id);
 
-    const dist = r.distance_km != null ? `${r.distance_km.toFixed(1)} km` : '';
-    const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
-
-    return `
-      <div class="rest-card" data-id="${r.id}">
-        <div class="image">
-          <img src="${img}" alt="${escapeHtml(r.name)}" loading="lazy" onerror="this.style.display='none'">
-          <div class="badges">
-            ${openBadge}
-            ${verifiedBadge}
+  return `
+    <div class="rest-card fadein" data-id="${r.id}">
+      <div class="c-image">
+        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800'">
+        <div class="c-badges">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">${openBadge}${premiumBadge}</div>
+        </div>
+        <button class="fav-btn${isFav?' active':''}" data-id="${r.id}" aria-label="Favourite">
+          <svg viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="c-body">
+        <div class="c-title-row">
+          <div class="c-name">${esc(r.name)}</div>
+          <div class="c-rating">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+            ${rating}
           </div>
         </div>
-        <div class="body">
-          <div class="title-row">
-            <div class="name">${escapeHtml(r.name || '')}</div>
-            <div class="rating">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-              ${rating}
-            </div>
-          </div>
-          <div class="meta">
-            <span class="price">${priceDisplay}</span>
-            ${dist ? `<span class="dot"></span><span>${dist}</span>` : ''}
-            ${r.address ? `<span class="dot"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px;">${escapeHtml(r.address)}</span>` : ''}
-          </div>
-          <div class="foot">
-            <div class="cuisines">
-              ${cuisines.slice(0,2).map(c => `<span class="cuisine-tag">${escapeHtml(c)}</span>`).join('')}
-            </div>
-            <button class="book-btn" onclick="event.stopPropagation(); openBookingSheet(${r.id})">${t('book')}</button>
-          </div>
+        <div class="c-meta">
+          <span class="c-price">${priceHTML}</span>
+          ${dist ? `<span class="sep"></span>${dist}` : ''}
+          ${r.address ? `<span class="sep"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;">${esc(r.address)}</span>` : ''}
+        </div>
+        <div class="c-foot">
+          <div class="c-cuisines">${cuisines.slice(0,2).map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
+          <button class="book-btn" data-id="${r.id}">${T('book')}</button>
         </div>
       </div>
-    `;
-  }).join('');
-
-  // Card click → open detail/booking
-  el.querySelectorAll('.rest-card').forEach(card => {
-    card.addEventListener('click', () => {
-      haptic('light');
-      openBookingSheet(Number(card.dataset.id));
-    });
-  });
+    </div>`;
 }
 
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c =>
-    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function emptyHTML(icon, title, desc) {
+  return `<div class="empty"><div class="empty-icon">${icon}</div><h3>${esc(title)}</h3><p>${esc(desc)}</p></div>`;
 }
 
-/* =====================================================
-   CHIPS
-   ===================================================== */
+/* ===== CHIPS ===== */
 function renderChips() {
-  const chips = [
-    { id: 'all', label: t('all') },
-    { id: 'uzbek', label: t('uzbek') },
-    { id: 'european', label: t('european') },
-    { id: 'italian', label: t('italian') },
-    { id: 'asian', label: t('asian') },
-    { id: 'caucasian', label: t('caucasian') },
-    { id: 'seafood', label: t('seafood') },
+  const defs = [
+    {id:'all', lbl:T('all')}, {id:'uzbek', lbl:T('uzbek')}, {id:'european', lbl:T('european')},
+    {id:'italian', lbl:T('italian')}, {id:'asian', lbl:T('asian')}, {id:'caucasian', lbl:T('caucasian')}, {id:'seafood', lbl:T('seafood')}
   ];
   const row = document.getElementById('chip-row');
-  row.innerHTML = chips.map(c =>
-    `<button class="chip ${c.id === state.currentCuisine ? 'active' : ''}" data-cuisine="${c.id}">${c.label}</button>`
-  ).join('');
-  row.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
+  row.innerHTML = defs.map(d => `<button class="chip${(S.chip||'all')===d.id?' active':''}" data-c="${d.id}"><span>${d.lbl}</span></button>`).join('');
+  row.querySelectorAll('.chip').forEach(el => el.addEventListener('click', () => {
+    haptic('light'); S.chip = el.dataset.c; renderChips(); applyFilters();
+  }));
+}
+
+/* ===== FAVORITES ===== */
+function toggleFav(id) {
+  const idx = S.favorites.indexOf(id);
+  if (idx >= 0) S.favorites.splice(idx, 1);
+  else S.favorites.push(id);
+  localStorage.setItem('ot_favs', JSON.stringify(S.favorites));
+  if (S.tab === 'favorites') renderFavorites();
+  updateProfileStats();
+}
+function renderFavorites() {
+  const el = document.getElementById('fav-list');
+  const favRests = S.restaurants.filter(r => S.favorites.includes(r.id));
+  if (!favRests.length) {
+    el.innerHTML = emptyHTML('❤', T('no_favs'), T('no_favs_h'));
+    return;
+  }
+  el.className = 'card-list stagger';
+  el.innerHTML = favRests.map(r => cardHTML(r)).join('');
+  el.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      toggleFav(Number(btn.dataset.id));
+      btn.classList.toggle('active', S.favorites.includes(Number(btn.dataset.id)));
       haptic('light');
-      state.currentCuisine = chip.dataset.cuisine;
-      renderChips();
-      applyFilters();
+    });
+  });
+  el.querySelectorAll('.book-btn').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); haptic('medium'); openSheet(Number(btn.dataset.id)); });
+  });
+  el.querySelectorAll('.rest-card').forEach(card => {
+    card.addEventListener('click', () => { haptic('light'); openSheet(Number(card.dataset.id)); });
+  });
+}
+
+/* ===== REELS ===== */
+async function loadReels() {
+  if (S.reelsLoaded && S.reels.length) { renderReels(); return; }
+  const container = document.getElementById('reels-container');
+  try {
+    let url = '/restaurants/reels?limit=20';
+    if (S.coords) url += `&lat=${S.coords.lat}&lng=${S.coords.lng}`;
+    const raw = await api(url).catch(() => null);
+    let reels = Array.isArray(raw) ? raw : (raw?.reels || raw?.data || []);
+    // Fallback: use restaurant images as reels if no real reels
+    if (!reels.length && S.restaurants.length) {
+      reels = S.restaurants.slice(0, 10).map(r => ({
+        id: `r${r.id}`, restaurant_id: r.id,
+        url: r.image_url || (Array.isArray(r.gallery) && r.gallery[0]) || '',
+        thumbnail_url: r.image_url || '',
+        type: 'image', caption: r.description || r.address || '',
+        restaurant: { name: r.name, cuisine: r.cuisine, rating: r.rating, working_hours: r.working_hours, image_url: r.image_url }
+      }));
+    }
+    S.reels = reels;
+    S.reelsLoaded = true;
+    renderReels();
+  } catch {
+    container.innerHTML = `<div class="reels-loading"><span style="font-size:30px">🎬</span><span style="font-size:14px;color:rgba(255,255,255,0.4)">Reels hozircha yo'q</span></div>`;
+  }
+}
+
+function renderReels() {
+  const container = document.getElementById('reels-container');
+  if (!S.reels.length) {
+    container.innerHTML = `<div class="reels-loading"><span style="font-size:36px">🎬</span><span style="font-size:14px;color:rgba(255,255,255,0.4)">Reels hozircha yo'q</span></div>`;
+    return;
+  }
+  container.innerHTML = `
+    <div style="position:absolute;top:calc(env(safe-area-inset-top)+14px);left:0;right:0;display:flex;justify-content:center;z-index:10;pointer-events:none;">
+      <div style="font-family:var(--fd);font-size:18px;font-weight:600;color:rgba(255,255,255,0.9);letter-spacing:-0.01em;font-variation-settings:'opsz' 144">
+        OneTable <em style="font-style:italic;font-weight:300;color:rgba(255,255,255,0.65)">Reels</em>
+      </div>
+    </div>
+    ${S.reels.map((reel, i) => reelItemHTML(reel, i)).join('')}
+  `;
+
+  // IntersectionObserver for autoplay
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const vid = entry.target.querySelector('video.reel-media');
+      if (!vid) return;
+      if (entry.isIntersecting) { vid.play().catch(()=>{}); }
+      else { vid.pause(); vid.currentTime = 0; }
+    });
+  }, { threshold: 0.6 });
+
+  container.querySelectorAll('.reel-item').forEach(item => obs.observe(item));
+
+  // Like buttons
+  container.querySelectorAll('.reel-like-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      haptic('medium');
+      btn.classList.toggle('liked');
+      const icon = btn.querySelector('svg');
+      if (icon) icon.setAttribute('fill', btn.classList.contains('liked') ? 'currentColor' : 'none');
+      const cnt = btn.closest('.reel-action').querySelector('.reel-action-label');
+      if (cnt) {
+        const n = parseInt(cnt.textContent) || 0;
+        cnt.textContent = btn.classList.contains('liked') ? n+1 : Math.max(0,n-1);
+      }
+    });
+  });
+
+  // Book buttons
+  container.querySelectorAll('.reel-book-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      haptic('medium');
+      const rid = Number(btn.dataset.rid);
+      const r = S.restaurants.find(x => x.id === rid);
+      if (r) { switchTab('home'); setTimeout(() => openSheet(rid), 300); }
+    });
+  });
+
+  // Fav on reel
+  container.querySelectorAll('.reel-fav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      haptic('light');
+      toggleFav(Number(btn.dataset.id));
+      btn.classList.toggle('liked', S.favorites.includes(Number(btn.dataset.id)));
     });
   });
 }
 
-/* =====================================================
-   BOOKING SHEET
-   ===================================================== */
-async function openBookingSheet(restaurantId) {
-  const backdrop = document.getElementById('sheet-backdrop');
-  const sheet = document.getElementById('sheet');
-  const body = document.getElementById('sheet-body');
-  const foot = document.getElementById('sheet-foot');
-  const title = document.getElementById('sheet-title');
+function reelItemHTML(reel, i) {
+  const rest = reel.restaurant || {};
+  const name = rest.name || reel.restaurant_name || 'OneTable';
+  const img = reel.thumbnail_url || reel.url || rest.image_url || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800';
+  const isVideo = reel.type === 'video' || reel.type === 'reel' || (reel.url||'').match(/\.(mp4|webm|mov)/i);
+  const openState = isOpen(rest.working_hours);
+  const cuisines = Array.isArray(rest.cuisine) ? rest.cuisine.slice(0,2).join(' · ') : (rest.cuisine || '');
+  const rating = rest.rating ? Number(rest.rating).toFixed(1) : '';
+  const likes = Math.floor(Math.random() * 300) + 50;
+  const isFav = S.favorites.includes(reel.restaurant_id);
 
-  const r = state.restaurants.find(x => x.id === restaurantId);
-  if (!r) return;
+  const mediaTag = isVideo
+    ? `<video class="reel-media" src="${esc(reel.url)}" poster="${esc(img)}" playsinline muted loop preload="none"></video>`
+    : `<img class="reel-media" src="${esc(img)}" alt="${esc(name)}" loading="${i===0?'eager':'lazy'}">`;
 
-  state.booking = {
-    restaurant: r,
-    step: 1,
-    zones: [],
-    menu: [],
-    selectedZone: null,
-    selectedDate: formatDateISO(new Date()),
-    selectedTime: null,
-    guests: 2,
-    preOrder: {},
-    availability: [],
-  };
+  const openBadge = openState === true
+    ? `<span class="reel-badge"><span class="rdot"></span>${T('open')}</span>`
+    : openState === false
+      ? `<span class="reel-badge" style="background:rgba(180,30,30,0.45);">✕ ${T('closed')}</span>`
+      : '';
 
-  title.textContent = r.name;
-  body.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-muted)"><div class="spin"></div></div>`;
-  foot.innerHTML = '';
+  return `
+    <div class="reel-item">
+      ${mediaTag}
+      <div class="reel-overlay"></div>
 
-  backdrop.classList.add('open');
-  sheet.classList.add('open');
-  if (tg?.BackButton) { tg.BackButton.show(); tg.BackButton.onClick(closeSheet); }
+      <div class="reel-info">
+        <div class="reel-name">${esc(name)}</div>
+        <div class="reel-meta">
+          ${openBadge}
+          ${rating ? `<span class="reel-badge">⭐ ${rating}</span>` : ''}
+          ${cuisines ? `<span class="reel-badge">🍽 ${esc(cuisines)}</span>` : ''}
+        </div>
+        ${reel.caption ? `<div class="reel-caption">${esc(reel.caption)}</div>` : ''}
+        <button class="reel-book-btn" data-rid="${reel.restaurant_id||''}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          ${T('reels_book')}
+        </button>
+      </div>
 
-  // Load zones + menu
-  try {
-    const [zones, menu] = await Promise.all([
-      api(`/restaurants/${restaurantId}/zones`).catch(() => []),
-      api(`/restaurants/${restaurantId}/menu`).catch(() => [])
-    ]);
-    state.booking.zones = Array.isArray(zones) ? zones : (zones.zones || []);
-    state.booking.menu = Array.isArray(menu) ? menu : (menu.menu || menu.items || []);
-  } catch (e) {
-    console.error(e);
-  }
-
-  renderBookingStep();
+      <div class="reel-actions">
+        <div style="margin-bottom:2px;">
+          <img class="reel-avatar" src="${esc(img)}" alt="">
+        </div>
+        <div class="reel-action">
+          <button class="reel-action-btn reel-like-btn" aria-label="Like">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <div class="reel-action-label">${likes}</div>
+        </div>
+        <div class="reel-action">
+          <button class="reel-action-btn reel-fav-btn${isFav?' liked':''}" data-id="${reel.restaurant_id||''}" aria-label="Favourite">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="${isFav?'currentColor':'none'}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <div class="reel-action-label">${T('tab_favorites')}</div>
+        </div>
+        <div class="reel-action">
+          <button class="reel-action-btn" aria-label="Share" onclick="haptic('light');tg?.shareUrl?tg.shareUrl('https://t.me/onetable_uz_bot','${esc(name)}'):null">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </button>
+          <div class="reel-action-label">Ulash</div>
+        </div>
+      </div>
+    </div>`;
 }
 
+/* ===== BOOKINGS ===== */
+async function loadBookings() {
+  const el = document.getElementById('bookings-list');
+  el.innerHTML = `<div class="sk-card skeleton" style="height:140px;margin-bottom:14px"></div><div class="sk-card skeleton" style="height:140px"></div>`;
+  try {
+    const raw = await api('/reservations/my');
+    S.bookings = Array.isArray(raw) ? raw : (raw.reservations || []);
+    renderBookings();
+  } catch { S.bookings = []; renderBookings(); }
+}
+
+function renderBookings() {
+  const el = document.getElementById('bookings-list');
+  if (!S.bookings.length) {
+    el.innerHTML = emptyHTML('📅', T('no_bookings'), T('no_bookings_h'));
+    return;
+  }
+  el.innerHTML = S.bookings.map(bk => {
+    const st = bk.status || 'pending';
+    const canCancel = st === 'pending' || st === 'confirmed';
+    return `
+      <div class="booking-card status-${st}">
+        <div class="bk-head">
+          <div class="bk-name">${esc(bk.restaurant_name || bk.restaurant?.name || '—')}</div>
+          <span class="bk-status ${st}">${T('status_'+st)}</span>
+        </div>
+        <div class="bk-details">
+          <div class="bk-detail"><div class="bk-lbl">${T('date_lbl')}</div><div class="bk-val">${humanDate(bk.date)}</div></div>
+          <div class="bk-detail"><div class="bk-lbl">${T('time_lbl')}</div><div class="bk-val">${String(bk.time||'').slice(0,5)}</div></div>
+          <div class="bk-detail"><div class="bk-lbl">${T('guests_lbl')}</div><div class="bk-val">${bk.guests} ${T('people')}</div></div>
+        </div>
+        ${canCancel ? `<div class="bk-actions"><button class="bk-cancel-btn" data-id="${bk.id}">${T('cancel')}</button></div>` : ''}
+      </div>`;
+  }).join('');
+  el.querySelectorAll('.bk-cancel-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      haptic('warning');
+      const doCancel = () => cancelBooking(btn.dataset.id);
+      if (tg?.showConfirm) { tg.showConfirm(T('cancel_q'), ok => { if(ok) doCancel(); }); }
+      else if (confirm(T('cancel_q'))) doCancel();
+    });
+  });
+  updateProfileStats();
+}
+
+async function cancelBooking(id) {
+  try {
+    await api(`/reservations/${id}`, { method: 'DELETE' });
+    haptic('success'); toast(T('cancelled'), 'success'); loadBookings();
+  } catch(e) { haptic('error'); toast(e.message, 'error'); }
+}
+
+/* ===== PROFILE ===== */
+function renderProfile() {
+  const u = S.user || {};
+  const name = u.first_name || u.username || T('guest');
+  document.getElementById('profile-name').textContent = name;
+  document.getElementById('profile-handle').textContent = u.username ? `@${u.username}` : '';
+  document.getElementById('profile-avatar').textContent = (name[0]||'M').toUpperCase();
+  document.getElementById('lang-display').textContent = T('lang_name');
+  updateProfileStats();
+}
+function updateProfileStats() {
+  document.getElementById('stat-bookings').textContent = S.bookings.length;
+  document.getElementById('stat-favs').textContent = S.favorites.length;
+  const visited = new Set(S.bookings.filter(b => b.status==='completed').map(b=>b.restaurant_id));
+  document.getElementById('stat-visited').textContent = visited.size;
+}
+
+/* ===== TABS ===== */
+function switchTab(tab) {
+  if (S.tab === tab && tab !== 'reels') return;
+  S.tab = tab;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  haptic('light');
+  if (tab === 'reels')     loadReels();
+  if (tab === 'bookings')  loadBookings();
+  if (tab === 'favorites') renderFavorites();
+  if (tab === 'profile')   renderProfile();
+  // Adjust body padding for reels
+  document.getElementById('app').style.paddingBottom =
+    tab === 'reels' ? '0' : `calc(var(--tabbar-h) + var(--safe-b))`;
+}
+
+/* ===== BOOKING SHEET ===== */
+async function openSheet(restaurantId) {
+  const r = S.restaurants.find(x => x.id === restaurantId);
+  if (!r) return;
+  S.booking = {
+    restaurant: r, step: 1,
+    zones: [], menu: [],
+    zone: null, date: isoDate(new Date()), time: null,
+    guests: 2, preOrder: {}, availability: [],
+  };
+  document.getElementById('sheet-title').textContent = r.name;
+  document.getElementById('sheet-body').innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-muted)"><div class="spin"></div></div>`;
+  document.getElementById('sheet-foot').innerHTML = '';
+  document.getElementById('sheet-backdrop').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  if (tg?.BackButton) { tg.BackButton.show(); tg.BackButton.onClick(closeSheet); }
+  try {
+    const [zones, menu] = await Promise.all([
+      api(`/restaurants/${restaurantId}/zones`).catch(()=>[]),
+      api(`/restaurants/${restaurantId}/menu`).catch(()=>[]),
+    ]);
+    S.booking.zones = Array.isArray(zones) ? zones : (zones.zones || []);
+    S.booking.menu  = Array.isArray(menu)  ? menu  : (menu.menu || menu.items || []);
+  } catch {}
+  renderStep();
+}
 function closeSheet() {
   document.getElementById('sheet-backdrop').classList.remove('open');
   document.getElementById('sheet').classList.remove('open');
   if (tg?.BackButton) { tg.BackButton.hide(); tg.BackButton.offClick(closeSheet); }
 }
 
-function renderBookingStep() {
+function stepsBar() {
+  const b = S.booking;
+  return `<div class="steps-bar">
+    <div class="step-seg ${b.step>1?'done':b.step===1?'active':''}"></div>
+    <div class="step-seg ${b.step>2?'done':b.step===2?'active':''}"></div>
+    <div class="step-seg ${b.step===3?'active':''}"></div>
+  </div>`;
+}
+
+function renderStep() {
+  const b = S.booking;
   const body = document.getElementById('sheet-body');
   const foot = document.getElementById('sheet-foot');
-  const b = state.booking;
-
-  // Steps indicator
-  const stepsHtml = `
-    <div class="steps">
-      <div class="step-dot ${b.step >= 1 ? (b.step > 1 ? 'done' : 'active') : ''}"></div>
-      <div class="step-dot ${b.step >= 2 ? (b.step > 2 ? 'done' : 'active') : ''}"></div>
-      <div class="step-dot ${b.step >= 3 ? 'active' : ''}"></div>
-    </div>
-  `;
 
   if (b.step === 1) {
-    // Zone + date + guests
-    const zonesHtml = (b.zones.length ? b.zones : [{ id: null, name: 'Asosiy zal', capacity: 50 }]).map(z => `
-      <button class="zone-opt ${b.selectedZone?.id === z.id ? 'selected' : ''}" data-zone="${z.id ?? ''}">
-        <div class="zone-name">${escapeHtml(z.name)}</div>
-        <div class="zone-cap">${z.capacity || ''} ${t('people')}</div>
-      </button>
-    `).join('');
+    const zones = b.zones.length ? b.zones : [{ id: null, name: 'Asosiy zal', capacity: b.restaurant.capacity || 50 }];
+    const zonesHTML = zones.map(z => `
+      <button class="zone-card${b.zone?.id===z.id?' active':''}" data-zid="${z.id??''}">
+        <div class="zn">${esc(z.name)}</div>
+        <div class="zc">${z.capacity||''} ${T('people')}</div>
+      </button>`).join('');
 
-    const dateHtml = Array.from({ length: 14 }, (_, i) => {
-      const d = daysFromNow(i);
-      const iso = formatDateISO(d);
-      const dow = i === 0 ? t('today') : i === 1 ? t('tomorrow') : i18n[state.lang].weekdays[d.getDay()];
-      return `
-        <button class="date-opt ${b.selectedDate === iso ? 'selected' : ''}" data-date="${iso}">
-          <div class="dow">${dow}</div>
-          <div class="day">${d.getDate()}</div>
-        </button>
-      `;
+    const dateHTML = Array.from({length:14}, (_,i) => {
+      const d = addDays(i);
+      const iso = isoDate(d);
+      const dow = i===0 ? T('today') : i===1 ? T('tomorrow') : T('days')[d.getDay()];
+      return `<button class="date-card${b.date===iso?' active':''}" data-date="${iso}">
+        <div class="dc-dow">${dow.slice(0,3)}</div>
+        <div class="dc-day">${d.getDate()}</div>
+        <div class="dc-mon">${T('months')[d.getMonth()]}</div>
+      </button>`;
     }).join('');
 
     body.innerHTML = `
-      ${stepsHtml}
-      <div class="field-group">
-        <label class="label">${t('zone_label')}</label>
-        <div class="zone-grid">${zonesHtml}</div>
+      ${stepsBar()}
+      <div class="field-block">
+        <div class="field-label">${T('zone_lbl')}</div>
+        <div class="zone-grid">${zonesHTML}</div>
       </div>
-      <div class="field-group">
-        <label class="label">${t('date_label')}</label>
-        <div class="date-row">${dateHtml}</div>
+      <div class="field-block">
+        <div class="field-label">${T('date_lbl')}</div>
+        <div class="date-row">${dateHTML}</div>
       </div>
-      <div class="field-group">
-        <label class="label">${t('guests_label')}</label>
-        <div class="guests-row">
-          <div class="guests-count">${b.guests}<small>${t('people')}</small></div>
+      <div class="field-block">
+        <div class="field-label">${T('guests_lbl')}</div>
+        <div class="guests-control">
+          <div class="guests-display">
+            <div class="guests-num">${b.guests}</div>
+            <div class="guests-unit">${T('people')}</div>
+          </div>
           <div class="guests-btns">
-            <button class="guests-btn" id="guests-minus" ${b.guests <= 1 ? 'disabled' : ''}>−</button>
-            <button class="guests-btn" id="guests-plus" ${b.guests >= 20 ? 'disabled' : ''}>+</button>
+            <button class="g-btn" id="g-minus" ${b.guests<=1?'disabled':''}>−</button>
+            <button class="g-btn" id="g-plus"  ${b.guests>=20?'disabled':''}>+</button>
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
 
-    foot.innerHTML = `<button class="btn-primary" id="step-next" ${!b.selectedZone ? 'disabled' : ''}>${t('continue')}</button>`;
+    foot.innerHTML = `<button class="btn-primary" id="step-next" ${!b.zone?'disabled':''}>${T('next')} →</button>`;
 
-    // Events
-    body.querySelectorAll('.zone-opt').forEach(el => {
-      el.addEventListener('click', () => {
-        haptic('light');
-        const zid = el.dataset.zone;
-        const z = b.zones.find(x => String(x.id) === zid) || { id: null, name: 'Asosiy zal' };
-        b.selectedZone = z;
-        renderBookingStep();
-      });
-    });
-    body.querySelectorAll('.date-opt').forEach(el => {
-      el.addEventListener('click', () => {
-        haptic('light');
-        b.selectedDate = el.dataset.date;
-        renderBookingStep();
-      });
-    });
-    document.getElementById('guests-minus').addEventListener('click', () => {
-      if (b.guests > 1) { b.guests--; haptic('light'); renderBookingStep(); }
-    });
-    document.getElementById('guests-plus').addEventListener('click', () => {
-      if (b.guests < 20) { b.guests++; haptic('light'); renderBookingStep(); }
-    });
+    body.querySelectorAll('.zone-card').forEach(el => el.addEventListener('click', () => {
+      haptic('light');
+      const zid = el.dataset.zid;
+      b.zone = b.zones.find(z => String(z.id)===zid) || { id: null, name: el.querySelector('.zn').textContent };
+      renderStep();
+    }));
+    body.querySelectorAll('.date-card').forEach(el => el.addEventListener('click', () => {
+      haptic('light'); b.date = el.dataset.date; renderStep();
+    }));
+    document.getElementById('g-minus').addEventListener('click', () => { if(b.guests>1){b.guests--;haptic('light');renderStep();} });
+    document.getElementById('g-plus').addEventListener('click',  () => { if(b.guests<20){b.guests++;haptic('light');renderStep();} });
     document.getElementById('step-next').addEventListener('click', async () => {
-      if (!b.selectedZone) return;
-      haptic('medium');
-      b.step = 2;
-      // Load availability
+      if(!b.zone) return;
+      haptic('medium'); b.step=2;
       try {
-        const av = await api(`/restaurants/${b.restaurant.id}/availability?date=${b.selectedDate}`);
-        b.availability = Array.isArray(av) ? av : (av.slots || av.busy || []);
-      } catch (e) { b.availability = []; }
-      renderBookingStep();
+        const av = await api(`/restaurants/${b.restaurant.id}/availability?date=${b.date}`);
+        b.availability = Array.isArray(av) ? av : (av.slots||av.busy||[]);
+      } catch { b.availability = []; }
+      renderStep();
     });
 
   } else if (b.step === 2) {
-    // Time selection
     const slots = [];
-    for (let h = 10; h <= 23; h++) {
-      slots.push(`${String(h).padStart(2,'0')}:00`);
-      if (h < 23) slots.push(`${String(h).padStart(2,'0')}:30`);
-    }
-    const busy = new Set((b.availability || []).map(a => {
-      if (typeof a === 'string') return a.slice(0,5);
-      return (a.time || '').slice(0,5);
-    }));
-
-    const timesHtml = slots.map(s => {
-      const isBusy = busy.has(s);
-      return `<button class="time-opt ${b.selectedTime === s ? 'selected' : ''}" data-time="${s}" ${isBusy ? 'disabled' : ''}>${s}</button>`;
-    }).join('');
+    for (let h=10;h<=23;h++) { slots.push(`${String(h).padStart(2,'0')}:00`); if(h<23)slots.push(`${String(h).padStart(2,'0')}:30`); }
+    const busy = new Set((b.availability||[]).map(a => typeof a==='string'?a.slice(0,5):(a.time||'').slice(0,5)));
 
     body.innerHTML = `
-      ${stepsHtml}
-      <div class="field-group">
-        <label class="label">${t('time_label')} · ${formatDateHuman(b.selectedDate)}</label>
-        <div class="time-grid">${timesHtml}</div>
-      </div>
-    `;
+      ${stepsBar()}
+      <div class="field-block">
+        <div class="field-label">${T('time_lbl')} <span class="field-label-hint">${humanDate(b.date)}</span></div>
+        <div class="time-grid">
+          ${slots.map(s => {
+            const isBusy = busy.has(s);
+            return `<button class="time-card${b.time===s?' active':''}" ${isBusy?'disabled':''} data-time="${s}">${s}</button>`;
+          }).join('')}
+        </div>
+        ${!slots.filter(s=>!busy.has(s)).length ? `<div style="text-align:center;padding:20px;color:var(--ink-muted);font-size:13px;">${T('no_time_slots')}</div>` : ''}
+      </div>`;
 
     foot.innerHTML = `
-      <button class="btn-primary" id="step-next" ${!b.selectedTime ? 'disabled' : ''}>${t('continue')}</button>
-    `;
+      <div style="display:flex;gap:10px;">
+        <button class="btn-primary" id="step-back" style="background:var(--bg-subtle);color:var(--ink);box-shadow:none;flex:0 0 48px;">←</button>
+        <button class="btn-primary" id="step-next" ${!b.time?'disabled':''} style="flex:1">${T('next')} →</button>
+      </div>`;
 
-    body.querySelectorAll('.time-opt').forEach(el => {
-      if (el.disabled) return;
-      el.addEventListener('click', () => {
-        haptic('medium');
-        b.selectedTime = el.dataset.time;
-        renderBookingStep();
-      });
-    });
-    document.getElementById('step-next').addEventListener('click', () => {
-      if (!b.selectedTime) return;
-      haptic('medium');
-      b.step = 3;
-      renderBookingStep();
-    });
+    body.querySelectorAll('.time-card:not([disabled])').forEach(el => el.addEventListener('click', () => {
+      haptic('medium'); b.time = el.dataset.time; renderStep();
+    }));
+    document.getElementById('step-back').addEventListener('click', () => { haptic('light'); b.step=1; renderStep(); });
+    document.getElementById('step-next').addEventListener('click', () => { if(!b.time)return; haptic('medium'); b.step=3; renderStep(); });
 
   } else if (b.step === 3) {
-    // Pre-order menu
     const menu = b.menu || [];
-    const menuHtml = menu.length ? menu.slice(0, 30).map(m => {
-      const qty = b.preOrder[m.id] || 0;
-      return `
-        <div class="menu-item">
-          <div class="mi-info">
-            <div class="mi-name">${escapeHtml(m.name || '')}</div>
-            ${m.description ? `<div class="mi-desc">${escapeHtml(m.description)}</div>` : ''}
-            <div class="mi-price">${formatCurrency(m.price)} ${t('sum')}</div>
-          </div>
-          <div class="mi-ctrl">
-            <button class="mi-btn" data-mi-id="${m.id}" data-mi-act="minus" ${qty === 0 ? 'style="opacity:0.3"' : ''}>−</button>
-            <div class="mi-qty">${qty}</div>
-            <button class="mi-btn plus" data-mi-id="${m.id}" data-mi-act="plus">+</button>
-          </div>
-        </div>
-      `;
-    }).join('') : `
-      <div class="empty" style="padding:30px 0">
-        <p>${state.lang === 'uz' ? 'Taomnoma bo\'sh' : state.lang === 'ru' ? 'Меню пусто' : 'Menu is empty'}</p>
-      </div>
-    `;
+    const menuHTML = menu.length
+      ? menu.slice(0,30).map(m => {
+          const qty = b.preOrder[m.id]||0;
+          return `<div class="menu-item-row">
+            ${m.image_url ? `<img class="mi-img" src="${esc(m.image_url)}" loading="lazy" onerror="this.style.display='none'">` : `<div class="mi-img" style="display:flex;align-items:center;justify-content:center;font-size:24px;">🍽</div>`}
+            <div class="mi-info">
+              <div class="mi-name">${esc(m.name)}</div>
+              ${m.description?`<div class="mi-desc">${esc(m.description)}</div>`:''}
+              <div class="mi-price">${fmt(m.price)} ${T('sum')}</div>
+            </div>
+            <div class="mi-controls">
+              <button class="mi-ctrl-btn" data-id="${m.id}" data-act="minus" ${qty===0?'style="opacity:0.25"':''}>−</button>
+              <div class="mi-qty">${qty}</div>
+              <button class="mi-ctrl-btn add" data-id="${m.id}" data-act="plus">+</button>
+            </div>
+          </div>`;
+        }).join('')
+      : `<div style="text-align:center;padding:30px 0;color:var(--ink-muted);font-size:14px;">—</div>`;
 
-    const total = Object.entries(b.preOrder).reduce((sum, [id, q]) => {
-      const item = menu.find(x => String(x.id) === String(id));
-      return sum + (item ? (item.price || 0) * q : 0);
-    }, 0);
+    const total = Object.entries(b.preOrder).reduce((s,[id,q]) => {
+      const item = menu.find(x=>String(x.id)===String(id));
+      return s + (item?(item.price||0)*q:0);
+    },0);
 
     body.innerHTML = `
-      ${stepsHtml}
-      <div class="field-group">
-        <label class="label">${t('preorder_label')}</label>
-        <div style="font-size:13px;color:var(--ink-muted);margin-bottom:14px;">${t('preorder_hint')}</div>
-        <div>${menuHtml}</div>
-      </div>
-    `;
+      ${stepsBar()}
+      <div class="field-block">
+        <div class="field-label">${T('preorder_lbl')}</div>
+        <div style="font-size:12.5px;color:var(--ink-muted);margin-bottom:14px;">${T('preorder_hint')}</div>
+        ${menuHTML}
+      </div>`;
 
     foot.innerHTML = `
-      ${total > 0 ? `
-        <div class="total-row">
-          <span class="lbl">${t('total')}</span>
-          <span class="val">${formatCurrency(total)} ${t('sum')}</span>
-        </div>` : ''}
-      <button class="btn-primary" id="step-confirm">
-        ${total === 0 ? t('skip_continue') : t('confirm')} · ${b.selectedTime}
-      </button>
-    `;
+      ${total>0?`<div class="order-summary"><span class="os-lbl">${T('total')}</span><span class="os-val">${fmt(total)} ${T('sum')}</span></div>`:''}
+      <div style="display:flex;gap:10px;">
+        <button class="btn-primary" id="step-back" style="background:var(--bg-subtle);color:var(--ink);box-shadow:none;flex:0 0 48px;">←</button>
+        <button class="btn-primary" id="step-confirm" style="flex:1">
+          ${total===0?T('skip')+' & '+T('confirm'):T('confirm')} · ${b.time}
+        </button>
+      </div>`;
 
-    body.querySelectorAll('[data-mi-id]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        haptic('light');
-        const id = btn.dataset.miId;
-        const act = btn.dataset.miAct;
-        const cur = b.preOrder[id] || 0;
-        if (act === 'plus') b.preOrder[id] = cur + 1;
-        else if (cur > 0) {
-          b.preOrder[id] = cur - 1;
-          if (b.preOrder[id] === 0) delete b.preOrder[id];
-        }
-        renderBookingStep();
-      });
-    });
-
+    body.querySelectorAll('[data-act]').forEach(btn => btn.addEventListener('click', () => {
+      haptic('light');
+      const id=btn.dataset.id, act=btn.dataset.act;
+      const cur = b.preOrder[id]||0;
+      if(act==='plus') b.preOrder[id]=cur+1;
+      else if(cur>0) { b.preOrder[id]=cur-1; if(!b.preOrder[id]) delete b.preOrder[id]; }
+      renderStep();
+    }));
+    document.getElementById('step-back').addEventListener('click', () => { haptic('light'); b.step=2; renderStep(); });
     document.getElementById('step-confirm').addEventListener('click', submitBooking);
   }
 }
 
-function formatDateHuman(iso) {
-  const d = new Date(iso);
-  const M = i18n[state.lang].months;
-  return `${d.getDate()} ${M[d.getMonth()]}`;
-}
-
 async function submitBooking() {
-  const b = state.booking;
+  const b = S.booking;
   const btn = document.getElementById('step-confirm');
   btn.disabled = true;
   btn.innerHTML = `<span class="spin"></span>`;
   haptic('medium');
-
-  const preOrderArr = Object.entries(b.preOrder).map(([id, qty]) => ({
-    menu_item_id: Number(id),
-    quantity: qty
-  }));
-
+  const preOrderArr = Object.entries(b.preOrder).map(([id,qty])=>({menu_item_id:Number(id),quantity:qty}));
   try {
     await api('/reservations', {
-      method: 'POST',
+      method:'POST',
       body: JSON.stringify({
         restaurant_id: b.restaurant.id,
-        zone_id: b.selectedZone?.id || null,
-        date: b.selectedDate,
-        time: b.selectedTime,
+        zone_id: b.zone?.id || null,
+        date: b.date,
+        time: b.time,
         guests: b.guests,
         pre_order: preOrderArr.length ? preOrderArr : null,
       })
     });
     haptic('success');
-    toast(t('booking_created'), 'success');
+    toast(T('booking_ok'), 'success');
     closeSheet();
     loadBookings();
     switchTab('bookings');
-  } catch (e) {
+  } catch(e) {
     haptic('error');
-    toast(e.message || t('booking_error'), 'error');
+    toast(e.message || T('booking_err'), 'error');
     btn.disabled = false;
-    btn.innerHTML = t('confirm');
+    btn.innerHTML = `${T('confirm')} · ${b.time}`;
   }
 }
 
-/* =====================================================
-   BOOKINGS PAGE
-   ===================================================== */
-async function loadBookings() {
-  const el = document.getElementById('bookings-list');
-  el.innerHTML = `<div class="skeleton sk-card" style="height:140px;margin-bottom:14px"></div><div class="skeleton sk-card" style="height:140px"></div>`;
-  try {
-    const data = await api('/reservations/my');
-    state.bookings = Array.isArray(data) ? data : (data.reservations || []);
-    renderBookings();
-  } catch (e) {
-    state.bookings = [];
-    renderBookings();
-  }
-}
-
-function renderBookings() {
-  const el = document.getElementById('bookings-list');
-  if (!state.bookings.length) {
-    el.innerHTML = `
-      <div class="empty">
-        <div class="icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </div>
-        <h3>${t('no_bookings')}</h3>
-        <p>${t('no_bookings_hint')}</p>
-      </div>`;
-    return;
-  }
-  el.innerHTML = state.bookings.map(bk => {
-    const status = bk.status || 'pending';
-    return `
-      <div class="booking-card">
-        <div class="bk-head">
-          <div class="bk-name">${escapeHtml(bk.restaurant_name || bk.restaurant?.name || '—')}</div>
-          <span class="bk-status ${status}">${t('status_' + status)}</span>
-        </div>
-        <div class="bk-details">
-          <div class="bk-detail">
-            <div class="bk-lbl">${t('date_label')}</div>
-            <div class="bk-val">${formatDateHuman(bk.date)}</div>
-          </div>
-          <div class="bk-detail">
-            <div class="bk-lbl">${t('time_label')}</div>
-            <div class="bk-val">${String(bk.time || '').slice(0,5)}</div>
-          </div>
-          <div class="bk-detail">
-            <div class="bk-lbl">${t('guests_label')}</div>
-            <div class="bk-val">${bk.guests} ${t('people')}</div>
-          </div>
-        </div>
-        ${(status === 'pending' || status === 'confirmed') ? `
-          <div class="bk-actions">
-            <button class="bk-action danger" data-cancel="${bk.id}">${t('cancel_booking')}</button>
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }).join('');
-
-  el.querySelectorAll('[data-cancel]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const id = btn.dataset.cancel;
-      haptic('warning');
-      if (tg?.showConfirm) {
-        tg.showConfirm(state.lang === 'uz' ? 'Haqiqatan bekor qilasizmi?' : state.lang === 'ru' ? 'Точно отменить?' : 'Really cancel?', async (ok) => {
-          if (ok) await cancelBooking(id);
-        });
-      } else if (confirm('Cancel?')) {
-        await cancelBooking(id);
-      }
-    });
-  });
-}
-
-async function cancelBooking(id) {
-  try {
-    await api(`/reservations/${id}`, { method: 'DELETE' });
-    haptic('success');
-    toast(state.lang === 'uz' ? 'Bekor qilindi' : state.lang === 'ru' ? 'Отменено' : 'Cancelled', 'success');
-    loadBookings();
-  } catch (e) {
-    haptic('error');
-    toast(e.message, 'error');
-  }
-}
-
-/* =====================================================
-   FAVORITES
-   ===================================================== */
-function renderFavorites() {
-  const el = document.getElementById('favorites-list');
-  const favs = state.restaurants.filter(r => state.favorites.includes(r.id));
-  if (!favs.length) {
-    el.innerHTML = `
-      <div class="empty">
-        <div class="icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </div>
-        <h3>${t('empty_favorites')}</h3>
-        <p>${t('empty_favorites_hint')}</p>
-      </div>`;
-    return;
-  }
-  // reuse rest card render
-  const prevFiltered = state.filtered;
-  state.filtered = favs;
-  const prev = document.getElementById('rest-list').innerHTML;
-  renderRestaurants();
-  el.innerHTML = document.getElementById('rest-list').innerHTML;
-  state.filtered = prevFiltered;
-  document.getElementById('rest-list').innerHTML = prev;
-  renderRestaurants();
-}
-
-/* =====================================================
-   PROFILE
-   ===================================================== */
-function renderProfile() {
-  const u = state.user || {};
-  const name = u.first_name || u.username || t('guest');
-  document.getElementById('profile-name').textContent = name;
-  document.getElementById('profile-handle').textContent = u.username ? `@${u.username}` : '';
-  document.getElementById('profile-avatar').textContent = (name[0] || 'M').toUpperCase();
-  document.getElementById('stat-bookings').textContent = state.bookings.length;
-  document.getElementById('stat-favorites').textContent = state.favorites.length;
-  const visited = new Set(state.bookings.filter(b => b.status === 'completed').map(b => b.restaurant_id));
-  document.getElementById('stat-visited').textContent = visited.size;
-}
-
-/* =====================================================
-   TABS / NAV
-   ===================================================== */
-function switchTab(tab) {
-  if (state.currentTab === tab) return;
-  state.currentTab = tab;
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`page-${tab}`).classList.add('active');
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  haptic('light');
-  if (tab === 'bookings') loadBookings();
-  if (tab === 'favorites') renderFavorites();
-  if (tab === 'profile') renderProfile();
-}
-
-/* =====================================================
-   LANGUAGE
-   ===================================================== */
-function setLanguage(lang) {
-  state.lang = lang;
-  localStorage.setItem('onetable_lang', lang);
+/* ===== LANGUAGE ===== */
+function setLang(lang) {
+  S.lang = lang; localStorage.setItem('ot_lang', lang);
   document.documentElement.lang = lang;
-  applyI18n();
-  renderChips();
-  renderRestaurants();
+  applyI18n(); renderChips(); renderRestaurants();
 }
-
-function applyI18n() {
-  // Greeting
-  document.getElementById('home-eyebrow').textContent = t('welcome');
-  document.getElementById('home-greet-text').textContent = getGreeting();
-  document.getElementById('home-user-name').textContent = state.user?.first_name || t('guest');
-  // Search
-  document.getElementById('search-input').placeholder = t('search_placeholder');
-  // Tab labels
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    el.textContent = t(el.dataset.i18n);
-  });
-  // Lang btn flag
-  const flags = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
-  document.getElementById('lang-btn').textContent = flags[state.lang];
-}
-
-function cycleLanguage() {
-  const order = ['uz', 'ru', 'en'];
-  const i = order.indexOf(state.lang);
-  setLanguage(order[(i + 1) % order.length]);
+function cycleLang() {
+  const order=['uz','ru','en'];
+  setLang(order[(order.indexOf(S.lang)+1)%3]);
   haptic('light');
 }
+function applyI18n() {
+  const flags = {uz:'🇺🇿',ru:'🇷🇺',en:'🇬🇧'};
+  document.getElementById('lang-btn').textContent = flags[S.lang];
+  document.getElementById('home-eyebrow').textContent = T('welcome');
+  document.getElementById('home-greeting').textContent = greeting();
+  document.getElementById('home-user-name').textContent = S.user?.first_name || T('guest');
+  document.getElementById('search-input').placeholder = T('search_ph');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = T(el.dataset.i18n); });
+  const ld = document.getElementById('lang-display');
+  if (ld) ld.textContent = T('lang_name');
+}
 
-/* =====================================================
-   THEME
-   ===================================================== */
+/* ===== THEME ===== */
 function applyTheme() {
   const scheme = tg?.colorScheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', scheme);
-  document.querySelector('meta[name="theme-color"]').content =
-    scheme === 'dark' ? '#12100E' : '#FAF7F2';
-  if (tg?.setHeaderColor) {
-    try { tg.setHeaderColor(scheme === 'dark' ? '#12100E' : '#FAF7F2'); } catch(e){}
-  }
-  if (tg?.setBackgroundColor) {
-    try { tg.setBackgroundColor(scheme === 'dark' ? '#12100E' : '#FAF7F2'); } catch(e){}
-  }
+  const color = scheme==='dark'?'#100D0A':'#FAF7F2';
+  document.querySelector('meta[name="theme-color"]').content = color;
+  try { tg?.setHeaderColor?.(color); tg?.setBackgroundColor?.(color); } catch {}
 }
 
-/* =====================================================
-   GEOLOCATION
-   ===================================================== */
-function requestLocation() {
-  if (!navigator.geolocation) return;
+/* ===== GEO ===== */
+function requestGeo() {
+  if (!navigator.geolocation) { S.coords = {lat:41.2995,lng:69.2401}; return; }
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      state.coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      loadRestaurants();
-    },
-    () => {
-      // fallback: Tashkent center
-      state.coords = { lat: 41.2995, lng: 69.2401 };
-    },
-    { timeout: 4000, maximumAge: 300000 }
+    p => { S.coords = {lat:p.coords.latitude, lng:p.coords.longitude}; loadRestaurants(); },
+    ()  => { S.coords = {lat:41.2995,lng:69.2401}; },
+    { timeout:5000, maximumAge:300000 }
   );
 }
 
-/* =====================================================
-   DEEP LINKING
-   ===================================================== */
-function handleDeepLink() {
+/* ===== DEEP LINK ===== */
+function deepLink() {
   const params = new URLSearchParams(location.search);
-  const page = params.get('page');
-  const restId = params.get('restaurant');
-  const tgParam = tg?.initDataUnsafe?.start_param || '';
-
+  const page = params.get('page'), rid = params.get('restaurant');
+  const sp = tg?.initDataUnsafe?.start_param || '';
   if (page === 'bookings') switchTab('bookings');
-
-  if (restId || tgParam.startsWith('restaurant_')) {
-    const id = Number(restId || tgParam.replace('restaurant_', ''));
-    // Wait until restaurants are loaded
+  const targetId = rid || (sp.startsWith('restaurant_') ? sp.replace('restaurant_','') : null);
+  if (targetId) {
     const check = setInterval(() => {
-      if (state.restaurants.length) {
+      if (S.restaurants.length) {
         clearInterval(check);
-        if (state.restaurants.find(r => r.id === id)) {
-          openBookingSheet(id);
-        }
+        if (S.restaurants.find(r=>r.id===Number(targetId))) openSheet(Number(targetId));
       }
-    }, 200);
-    setTimeout(() => clearInterval(check), 8000);
+    },200);
+    setTimeout(()=>clearInterval(check), 8000);
   }
 }
 
-/* =====================================================
-   INIT
-   ===================================================== */
+/* ===== INIT ===== */
 async function init() {
   applyTheme();
+  if (tg?.onEvent) tg.onEvent('themeChanged', applyTheme);
 
-  // Tabs
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-  });
-  // Sheet close
-  document.getElementById('sheet-close').addEventListener('click', closeSheet);
+  // Tab events
+  document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+
+  // Sheet
+  document.getElementById('sheet-close-btn').addEventListener('click', closeSheet);
   document.getElementById('sheet-backdrop').addEventListener('click', closeSheet);
+
   // Lang
-  document.getElementById('lang-btn').addEventListener('click', cycleLanguage);
+  document.getElementById('lang-btn').addEventListener('click', cycleLang);
+
   // Search
-  let searchTimer;
-  document.getElementById('search-input').addEventListener('input', (e) => {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => {
-      state.currentSearch = e.target.value.trim();
-      applyFilters();
-    }, 250);
+  let st;
+  document.getElementById('search-input').addEventListener('input', e => {
+    clearTimeout(st);
+    const v = e.target.value.trim();
+    document.getElementById('search-box').classList.toggle('has-value', !!v);
+    st = setTimeout(() => { S.q = v; applyFilters(); }, 240);
   });
+  document.getElementById('search-clear').addEventListener('click', () => {
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-box').classList.remove('has-value');
+    S.q = ''; applyFilters();
+  });
+
   // Profile menu
   document.querySelectorAll('.menu-row').forEach(r => {
     r.addEventListener('click', () => {
-      const a = r.dataset.action;
-      haptic('light');
-      if (a === 'language') cycleLanguage();
-      else if (a === 'support') {
-        if (tg?.openTelegramLink) tg.openTelegramLink('https://t.me/onetable_uz_bot');
-        else window.open('https://t.me/onetable_uz_bot', '_blank');
-      }
-      else if (a === 'about') {
-        if (tg?.showAlert) tg.showAlert(t('about_text'));
-        else alert(t('about_text'));
-      }
+      const a = r.dataset.action; haptic('light');
+      if (a==='language') cycleLang();
+      else if (a==='support') { tg?.openTelegramLink?.('https://t.me/onetable_uz_bot') || window.open('https://t.me/onetable_uz_bot','_blank'); }
+      else if (a==='about') { tg?.showAlert?.(T('about')) || alert(T('about')); }
     });
   });
-
-  // Telegram theme change
-  if (tg?.onEvent) tg.onEvent('themeChanged', applyTheme);
 
   applyI18n();
   renderChips();
 
-  // Auth + load
-  await authenticate();
-  applyI18n(); // re-apply with user name
-  requestLocation();
-  await loadRestaurants();
+  await auth();
+  applyI18n();
 
-  // Deep link
-  handleDeepLink();
+  requestGeo();
+  await loadRestaurants();
+  deepLink();
 }
 
-// Kick off
-document.addEventListener('DOMContentLoaded', init);
-if (document.readyState !== 'loading') init();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else init();
 </script>
-
 </body>
 </html>
