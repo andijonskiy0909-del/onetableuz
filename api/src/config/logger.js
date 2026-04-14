@@ -1,27 +1,8 @@
-const { createLogger, format, transports } = require('winston');
-const { combine, timestamp, colorize, printf, errors } = format;
+const ts = () => new Date().toISOString()
 
-const logFormat = printf(({ level, message, timestamp, stack }) => {
-  return `${timestamp} [${level}]: ${stack || message}`;
-});
-
-const logger = createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'warn' : 'debug',
-  format: combine(
-    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    errors({ stack: true }),
-    logFormat
-  ),
-  transports: [
-    new transports.Console({
-      format: combine(colorize(), timestamp({ format: 'HH:mm:ss' }), logFormat)
-    })
-  ]
-});
-
-if (process.env.NODE_ENV === 'production') {
-  logger.add(new transports.File({ filename: 'logs/error.log', level: 'error' }));
-  logger.add(new transports.File({ filename: 'logs/combined.log' }));
+module.exports = {
+  info:  (...a) => console.log(`[${ts()}] [INFO]`, ...a),
+  warn:  (...a) => console.warn(`[${ts()}] [WARN]`, ...a),
+  error: (...a) => console.error(`[${ts()}] [ERROR]`, ...a),
+  debug: (...a) => { if (process.env.NODE_ENV !== 'production') console.log(`[${ts()}] [DEBUG]`, ...a) }
 }
-
-module.exports = logger;
