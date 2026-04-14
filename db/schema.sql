@@ -1,198 +1,207 @@
--- ═══════════════════════════════════════════════════════════════
--- OneTable — Production Database Schema
--- ═══════════════════════════════════════════════════════════════
+-- ============================================================
+-- OneTable — Full PostgreSQL Schema
+-- ============================================================
 
--- Users (Telegram foydalanuvchilar)
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- ---------- USERS (Mini App foydalanuvchilari) ----------
 CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  telegram_id BIGINT UNIQUE NOT NULL,
-  first_name VARCHAR(255),
-  last_name VARCHAR(255),
-  phone VARCHAR(50),
-  language VARCHAR(10) DEFAULT 'uz',
-  created_at TIMESTAMP DEFAULT NOW()
+  id              BIGSERIAL PRIMARY KEY,
+  telegram_id     BIGINT UNIQUE NOT NULL,
+  first_name      VARCHAR(120),
+  last_name       VARCHAR(120),
+  username        VARCHAR(120),
+  phone           VARCHAR(30),
+  language        VARCHAR(8) DEFAULT 'uz',
+  created_at      TIMESTAMP DEFAULT NOW(),
+  updated_at      TIMESTAMP DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_users_telegram ON users(telegram_id);
 
--- Restaurants
+-- ---------- OWNERS (Dashboard foydalanuvchilari) ----------
+CREATE TABLE IF NOT EXISTS owners (
+  id              BIGSERIAL PRIMARY KEY,
+  full_name       VARCHAR(180) NOT NULL,
+  email           VARCHAR(180) UNIQUE NOT NULL,
+  phone           VARCHAR(30),
+  password_hash   VARCHAR(255) NOT NULL,
+  role            VARCHAR(20) DEFAULT 'owner',
+  restaurant_id   BIGINT,
+  telegram_id     BIGINT,
+  created_at      TIMESTAMP DEFAULT NOW(),
+  updated_at      TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_owners_email ON owners(email);
+
+-- ---------- RESTAURANTS ----------
 CREATE TABLE IF NOT EXISTS restaurants (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  address VARCHAR(255),
-  phone VARCHAR(50),
-  cuisine TEXT[],
-  price_category VARCHAR(10) DEFAULT '$$',
-  rating NUMERIC(3,1) DEFAULT 0,
-  review_count INTEGER DEFAULT 0,
-  image_url TEXT,
-  gallery TEXT[], -- rasmlar massivi
-  working_hours VARCHAR(100) DEFAULT '10:00 — 22:00',
-  latitude DECIMAL(10,6),
-  longitude DECIMAL(10,6),
-  capacity INTEGER DEFAULT 50,
-  is_premium BOOLEAN DEFAULT false,
-  status VARCHAR(20) DEFAULT 'approved',
-  created_at TIMESTAMP DEFAULT NOW()
+  id                BIGSERIAL PRIMARY KEY,
+  owner_id          BIGINT REFERENCES owners(id) ON DELETE SET NULL,
+  name              VARCHAR(200) NOT NULL,
+  description       TEXT,
+  cuisine           TEXT[] DEFAULT '{}',
+  price_category    VARCHAR(8) DEFAULT '$$',
+  phone             VARCHAR(30),
+  email             VARCHAR(180),
+  address           TEXT,
+  latitude          DOUBLE PRECISION,
+  longitude         DOUBLE PRECISION,
+  working_hours     VARCHAR(60) DEFAULT '10:00-23:00',
+  capacity          INTEGER DEFAULT 50,
+  image_url         TEXT,
+  cover_url         TEXT,
+  gallery           TEXT[] DEFAULT '{}',
+  rating            NUMERIC(3,2) DEFAULT 0,
+  review_count      INTEGER DEFAULT 0,
+  is_active         BOOLEAN DEFAULT TRUE,
+  is_premium        BOOLEAN DEFAULT FALSE,
+  premium_until     TIMESTAMP,
+  has_parking       BOOLEAN DEFAULT FALSE,
+  has_wifi          BOOLEAN DEFAULT FALSE,
+  has_kids_area     BOOLEAN DEFAULT FALSE,
+  status            VARCHAR(20) DEFAULT 'approved',
+  created_at        TIMESTAMP DEFAULT NOW(),
+  updated_at        TIMESTAMP DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_rest_owner ON restaurants(owner_id);
+CREATE INDEX IF NOT EXISTS idx_rest_active ON restaurants(is_active, status);
 
--- Restaurant Owners
-CREATE TABLE IF NOT EXISTS restaurant_owners (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  full_name VARCHAR(255),
-  phone VARCHAR(50),
-  role VARCHAR(20) DEFAULT 'owner',
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  telegram_id BIGINT, -- owner ga Telegram xabar yuborish uchun
-  created_at TIMESTAMP DEFAULT NOW()
-);
+ALTER TABLE owners
+  ADD CONSTRAINT owners_restaurant_fk
+  FOREIGN KEY (restaurant_id) REFERENCES restaurants(id) ON DELETE SET NULL
+  DEFERRABLE INITIALLY DEFERRED;
 
--- Zones (Zal, Veranda, VIP, Terrace)
+-- ---------- ZONES ----------
 CREATE TABLE IF NOT EXISTS zones (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  icon VARCHAR(20) DEFAULT '🪑',
-  capacity INTEGER DEFAULT 10,
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT NOW()
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  name            VARCHAR(120) NOT NULL,
+  description     TEXT,
+  capacity        INTEGER DEFAULT 20,
+  is_available    BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMP DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_zones_rest ON zones(restaurant_id);
 
--- Tables (Har bir zona ichidagi stollar)
+-- ---------- TABLES ----------
 CREATE TABLE IF NOT EXISTS tables (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-  zone_id INTEGER REFERENCES zones(id) ON DELETE CASCADE,
-  table_number VARCHAR(20) NOT NULL,
-  capacity INTEGER DEFAULT 4, -- max kishi soni
-  is_available BOOLEAN DEFAULT true,
-  created_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(restaurant_id, table_number)
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  zone_id         BIGINT REFERENCES zones(id) ON DELETE SET NULL,
+  table_number    VARCHAR(20) NOT NULL,
+  capacity        INTEGER NOT NULL DEFAULT 4,
+  is_available    BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMP DEFAULT NOW(),
+  UNIQUE (restaurant_id, table_number)
 );
+CREATE INDEX IF NOT EXISTS idx_tables_rest ON tables(restaurant_id);
 
--- Menu Categories
-CREATE TABLE IF NOT EXISTS menu_categories (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Menu Items
+-- ---------- MENU ----------
 CREATE TABLE IF NOT EXISTS menu_items (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id) ON DELETE CASCADE,
-  category_id INTEGER REFERENCES menu_categories(id),
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  price INTEGER NOT NULL, -- tiyin/sum
-  image_url TEXT,
-  is_available BOOLEAN DEFAULT true,
-  prep_time INTEGER DEFAULT 30, -- tayyorlanish vaqti (daqiqa)
-  created_at TIMESTAMP DEFAULT NOW()
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  category        VARCHAR(120),
+  name            VARCHAR(200) NOT NULL,
+  description     TEXT,
+  price           NUMERIC(12,2) NOT NULL DEFAULT 0,
+  image_url       TEXT,
+  is_available    BOOLEAN DEFAULT TRUE,
+  sort_order      INTEGER DEFAULT 0,
+  created_at      TIMESTAMP DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_menu_rest ON menu_items(restaurant_id);
 
--- Reservations (Asosiy bron jadvali)
+-- ---------- RESERVATIONS ----------
 CREATE TABLE IF NOT EXISTS reservations (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  zone_id INTEGER REFERENCES zones(id),
-  table_id INTEGER REFERENCES tables(id),
-  date DATE NOT NULL,
-  time TIME NOT NULL,
-  guests INTEGER NOT NULL CHECK (guests > 0 AND guests <= 50),
-  comment TEXT,
-  special_request TEXT, -- "19:00 ga taomlar tayyor bo'lsin"
-  food_ready_time TIME, -- taomlar tayyor bo'lish vaqti
-  pre_order JSONB DEFAULT '[]',
-  pre_order_total INTEGER DEFAULT 0,
-  status VARCHAR(20) DEFAULT 'pending',
-  -- pending → confirmed → completed | cancelled | noshow
-  payment_status VARCHAR(20) DEFAULT 'unpaid',
-  -- unpaid → deposit_paid → fully_paid
-  review_asked BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT NOW(),
-
-  -- Double booking oldini olish
-  CONSTRAINT no_double_booking UNIQUE(table_id, date, time)
+  id                BIGSERIAL PRIMARY KEY,
+  user_id           BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  restaurant_id     BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  zone_id           BIGINT REFERENCES zones(id) ON DELETE SET NULL,
+  table_id          BIGINT REFERENCES tables(id) ON DELETE SET NULL,
+  date              DATE NOT NULL,
+  time              TIME NOT NULL,
+  guests            INTEGER NOT NULL DEFAULT 2,
+  comment           TEXT,
+  special_request   TEXT,
+  pre_order         JSONB DEFAULT '[]'::jsonb,
+  pre_order_total   NUMERIC(12,2) DEFAULT 0,
+  status            VARCHAR(20) DEFAULT 'pending',
+  payment_status    VARCHAR(20) DEFAULT 'unpaid',
+  review_asked      BOOLEAN DEFAULT FALSE,
+  expires_at        TIMESTAMP DEFAULT (NOW() + INTERVAL '30 minutes'),
+  created_at        TIMESTAMP DEFAULT NOW(),
+  updated_at        TIMESTAMP DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS idx_res_rest_date ON reservations(restaurant_id, date);
+CREATE INDEX IF NOT EXISTS idx_res_user ON reservations(user_id);
+CREATE INDEX IF NOT EXISTS idx_res_status ON reservations(status);
 
--- Payments
-CREATE TABLE IF NOT EXISTS payments (
-  id SERIAL PRIMARY KEY,
-  reservation_id INTEGER REFERENCES reservations(id),
-  user_id INTEGER REFERENCES users(id),
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  amount INTEGER NOT NULL, -- tiyin
-  type VARCHAR(20) DEFAULT 'deposit', -- deposit | full
-  provider VARCHAR(20), -- payme | click
-  transaction_id VARCHAR(255) UNIQUE,
-  status VARCHAR(20) DEFAULT 'pending',
-  -- pending → paid | failed | refunded
-  paid_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Chat Messages (Mijoz ↔ Restoran)
-CREATE TABLE IF NOT EXISTS chat_messages (
-  id SERIAL PRIMARY KEY,
-  reservation_id INTEGER REFERENCES reservations(id),
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  user_id INTEGER REFERENCES users(id),
-  sender_type VARCHAR(20) NOT NULL, -- user | owner
-  message TEXT NOT NULL,
-  is_read BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Reviews
-CREATE TABLE IF NOT EXISTS reviews (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  reservation_id INTEGER REFERENCES reservations(id),
-  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  photo_url TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- Availability (Bloklangan vaqtlar)
+-- ---------- AVAILABILITY (blocked times) ----------
 CREATE TABLE IF NOT EXISTS availability (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  date DATE NOT NULL,
-  time TIME NOT NULL,
-  is_blocked BOOLEAN DEFAULT false,
-  reason TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  UNIQUE(restaurant_id, date, time)
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  date            DATE NOT NULL,
+  time            TIME NOT NULL,
+  is_blocked      BOOLEAN DEFAULT TRUE,
+  reason          TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_avail_rest ON availability(restaurant_id, date);
+
+-- ---------- REVIEWS ----------
+CREATE TABLE IF NOT EXISTS reviews (
+  id              BIGSERIAL PRIMARY KEY,
+  user_id         BIGINT REFERENCES users(id) ON DELETE SET NULL,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  reservation_id  BIGINT REFERENCES reservations(id) ON DELETE SET NULL,
+  rating          INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment         TEXT,
+  photo_url       TEXT,
+  created_at      TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_reviews_rest ON reviews(restaurant_id);
+
+-- ---------- REELS ----------
+CREATE TABLE IF NOT EXISTS reels (
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  type            VARCHAR(10) DEFAULT 'video',
+  url             TEXT NOT NULL,
+  thumbnail_url   TEXT,
+  caption         TEXT,
+  views           INTEGER DEFAULT 0,
+  likes           INTEGER DEFAULT 0,
+  is_published    BOOLEAN DEFAULT TRUE,
+  created_at      TIMESTAMP DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_reels_rest ON reels(restaurant_id);
+
+-- ---------- FAVORITES ----------
+CREATE TABLE IF NOT EXISTS favorites (
+  user_id         BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  created_at      TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (user_id, restaurant_id)
 );
 
--- Premium Subscriptions
-CREATE TABLE IF NOT EXISTS premium_subscriptions (
-  id SERIAL PRIMARY KEY,
-  restaurant_id INTEGER REFERENCES restaurants(id),
-  plan VARCHAR(20) DEFAULT 'monthly',
-  amount INTEGER NOT NULL,
-  status VARCHAR(20) DEFAULT 'active',
-  started_at TIMESTAMP DEFAULT NOW(),
-  expires_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW()
+-- ---------- PREMIUM REQUESTS ----------
+CREATE TABLE IF NOT EXISTS premium_requests (
+  id              BIGSERIAL PRIMARY KEY,
+  restaurant_id   BIGINT NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+  plan            VARCHAR(20) NOT NULL,
+  amount          NUMERIC(12,2) NOT NULL,
+  status          VARCHAR(20) DEFAULT 'pending',
+  created_at      TIMESTAMP DEFAULT NOW()
 );
 
--- ── INDEXES (Performance) ─────────────────────────────────────
-CREATE INDEX IF NOT EXISTS idx_reservations_restaurant_date ON reservations(restaurant_id, date);
-CREATE INDEX IF NOT EXISTS idx_reservations_user ON reservations(user_id);
-CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status);
-CREATE INDEX IF NOT EXISTS idx_reservations_table_date_time ON reservations(table_id, date, time);
-CREATE INDEX IF NOT EXISTS idx_menu_items_restaurant ON menu_items(restaurant_id);
-CREATE INDEX IF NOT EXISTS idx_chat_messages_reservation ON chat_messages(reservation_id);
-CREATE INDEX IF NOT EXISTS idx_restaurants_premium ON restaurants(is_premium, rating DESC);
-CREATE INDEX IF NOT EXISTS idx_payments_reservation ON payments(reservation_id);
-CREATE INDEX IF NOT EXISTS idx_payments_transaction ON payments(transaction_id);
+-- ---------- TRIGGERS ----------
+CREATE OR REPLACE FUNCTION touch_updated_at() RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_rest_updated ON restaurants;
+CREATE TRIGGER trg_rest_updated BEFORE UPDATE ON restaurants
+  FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
+
+DROP TRIGGER IF EXISTS trg_res_updated ON reservations;
+CREATE TRIGGER trg_res_updated BEFORE UPDATE ON reservations
+  FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
