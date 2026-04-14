@@ -1696,8 +1696,9 @@ body::before {
    ONETABLE STUDIO — APPLICATION LOGIC
    ===================================================== */
 
-const API = 'https://cooperative-insight-production-11df.up.railway.app/api';
-const SOCKET_URL = 'https://cooperative-insight-production-11df.up.railway.app';
+const APP_ORIGIN = window.location.origin;
+const API = (window.__OT_API_BASE__ || localStorage.getItem('ot_api_base') || `${APP_ORIGIN}/api`).replace(/\/$/, '');
+const SOCKET_URL = (window.__OT_SOCKET_URL__ || localStorage.getItem('ot_socket_url') || APP_ORIGIN).replace(/\/$/, '');
 
 const state = {
   token: localStorage.getItem('ot_owner_token') || null,
@@ -1722,34 +1723,119 @@ const state = {
 /* ------- Utils ------- */
 function $(sel) { return document.querySelector(sel); }
 function $$(sel) { return document.querySelectorAll(sel); }
-function fmtNum(n) { return new Intl.NumberFormat('fr-FR').format(n || 0).replace(/\s/g, ' '); }
-function fmtCurrency(n) { return fmtNum(n) + ' so\'m'; }
+function fmtNum(n) { return new Intl.NumberFormat('fr-FR').format(Number(n) || 0).replace(/\s/g, ' '); }
+function fmtCurrency(n) { return fmtNum(n) + " so'm"; }
 function escapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-function todayISO() { return new Date().toISOString().slice(0,10); }
+function todayISO() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
 function fmtDateHuman(iso) {
   if (!iso) return '—';
-  const d = new Date(iso);
+  const raw = String(iso).slice(0, 10);
+  const [y, m, d] = raw.split('-').map(Number);
+  if (!y || !m || !d) return raw;
+  const date = new Date(y, m - 1, d);
   const months = ['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];
-  return `${d.getDate()} ${months[d.getMonth()]}`;
+  return `${date.getDate()} ${months[date.getMonth()]}`;
 }
-function fmtTime(t) { return String(t || '').slice(0,5); }
+function fmtTime(t) {
+  if (!t) return '—';
+  return String(t).slice(0, 5);
+}
+function safeNum(v, fallback = 0) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+function makeFullName(...parts) {
+  return parts.flat().filter(Boolean).map(x => String(x).trim()).filter(Boolean).join(' ').trim();
+}
+function normalizeRestaurant(raw) {
+  if (!raw) return null;
+  const restaurant = raw.restaurant || raw;
+  if (!restaurant) return null;
+  return {
+    ...restaurant,
+    id: safeNum(restaurant.id, restaurant.id),
+    name: restaurant.name || restaurant.restaurant_name || 'Restoran',
+    address: restaurant.address || '',
+    email: restaurant.email || '',
+    phone: restaurant.phone || '',
+    working_hours: restaurant.working_hours || '10:00 — 22:00',
+    capacity: safeNum(restaurant.capacity, 50),
+    is_premium: Boolean(restaurant.is_premium),
+  };
+}
+function normalizeReservation(row) {
+  const userName = row.user_name || row.guest_name || makeFullName(row.first_name, row.last_name) || 'Mijoz';
+  const rawDate = row.date ? String(row.date).slice(0, 10) : '';
+  return {
+    ...row,
+    id: safeNum(row.id, row.id),
+    date: rawDate,
+    time: fmtTime(row.time),
+    guests: safeNum(row.guests, 0),
+    user_name: userName,
+    guest_name: userName,
+    zone_name: row.zone_name || row.zone || '—',
+  };
+}
+function normalizeAnalytics(raw) {
+  if (!raw) return null;
+  const analytics = raw.analytics || raw;
+  return {
+    ...analytics,
+    today: safeNum(analytics.today, 0),
+    weekly: safeNum(analytics.weekly, 0),
+    monthly: safeNum(analytics.monthly, 0),
+    revenue: safeNum(analytics.revenue, 0),
+    todayRevenue: safeNum(analytics.todayRevenue ?? analytics.revenue?.today, 0),
+    peakHours: Array.isArray(analytics.peakHours) ? analytics.peakHours : [],
+    dailyStats: Array.isArray(analytics.dailyStats) ? analytics.dailyStats : [],
+  };
+}
+function normalizePremium(raw) {
+  if (!raw) return null;
+  const premium = raw.premium || raw;
+  return {
+    ...premium,
+    subscription: premium.subscription || null,
+    is_premium: Boolean(premium.is_premium),
+  };
+}
 function statusLabel(s) {
-  return ({pending:'Kutilmoqda',confirmed:'Tasdiqlangan',cancelled:'Bekor qilingan',completed:'Tugallangan',noshow:'Kelmagan',waiting_payment:'To\'lov kutmoqda'})[s] || s;
+  return ({ pending: "Kutilmoqda", confirmed: "Tasdiqlangan", cancelled: "Bekor qilingan", completed: "Tugallangan", noshow: "Kelmagan", waiting_payment: "To'lov kutmoqda" })[s] || s;
+}
+function persistOwner(owner) {
+  if (!owner) return;
+  state.owner = owner;
+  localStorage.setItem('ot_owner_data', JSON.stringify(owner));
 }
 
 /* ------- API client ------- */
 async function api(path, opts = {}) {
-  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  const headers = { ...(opts.headers || {}) };
+  const isFormData = typeof FormData !== 'undefined' && opts.body instanceof FormData;
+  if (!isFormData && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
+
   const res = await fetch(`${API}${path}`, { ...opts, headers });
-  let data;
-  try { data = await res.json(); } catch { data = null; }
+  const text = await res.text();
+  let data = null;
+
+  try { data = text ? JSON.parse(text) : null; }
+  catch { data = text ? { message: text } : null; }
+
   if (!res.ok) {
-    if (res.status === 401) { logout(); }
+    if (res.status === 401) logout();
     throw new Error(data?.error || data?.message || `Xatolik: ${res.status}`);
   }
+
   return data;
 }
 
@@ -1880,9 +1966,20 @@ $('#form-register').addEventListener('submit', async (e) => {
 function logout() {
   state.token = null;
   state.owner = null;
+  state.restaurant = null;
+  state.reservations = [];
+  state.todayReservations = [];
+  state.menu = [];
+  state.zones = [];
+  state.tables = [];
+  state.analytics = null;
+  state.premium = null;
   localStorage.removeItem('ot_owner_token');
   localStorage.removeItem('ot_owner_data');
-  if (state.socket) { state.socket.disconnect(); state.socket = null; }
+  if (state.socket) {
+    state.socket.disconnect();
+    state.socket = null;
+  }
   showAuth();
 }
 $('#logout-btn').addEventListener('click', () => {
@@ -1902,16 +1999,24 @@ async function loadAll() {
     api('/owner/analytics').catch(() => null),
     api('/owner/premium').catch(() => null),
   ];
+
   const [rest, res, menu, zones, tables, analytics, premium] = await Promise.all(promises);
-  state.restaurant = rest?.restaurant || rest || null;
-  state.reservations = Array.isArray(res) ? res : (res?.reservations || []);
+
+  if (rest?.owner) persistOwner(rest.owner);
+
+  state.restaurant = normalizeRestaurant(rest);
+  state.reservations = (Array.isArray(res) ? res : (res?.reservations || [])).map(normalizeReservation);
   state.menu = Array.isArray(menu) ? menu : (menu?.menu || menu?.items || []);
   state.zones = Array.isArray(zones) ? zones : (zones?.zones || []);
   state.tables = Array.isArray(tables) ? tables : (tables?.tables || []);
-  state.analytics = analytics?.analytics || analytics || null;
-  state.premium = premium?.premium || premium || null;
+  state.analytics = normalizeAnalytics(analytics);
+  state.premium = normalizePremium(premium);
 
-  state.todayReservations = state.reservations.filter(r => r.date && r.date.slice(0,10) === todayISO());
+  state.todayReservations = state.reservations.filter(r => r.date === todayISO());
+
+  if (state.socket?.connected && state.restaurant?.id) {
+    state.socket.emit('join_restaurant', state.restaurant.id);
+  }
 
   updateSidebarRest();
   updateBadges();
@@ -1967,7 +2072,7 @@ function renderOverview() {
   const todayGuests = today.reduce((s,r) => s + (r.guests || 0), 0);
   const pending = today.filter(r => r.status === 'pending').length;
   const confirmed = today.filter(r => r.status === 'confirmed').length;
-  const revenue = state.analytics?.revenue?.today || state.analytics?.todayRevenue || 0;
+  const revenue = state.analytics?.todayRevenue || state.analytics?.revenue || 0;
 
   const greetingHour = new Date().getHours();
   const greeting = greetingHour < 12 ? 'Xayrli tong' : greetingHour < 17 ? 'Xayrli kun' : greetingHour < 22 ? 'Xayrli oqshom' : 'Xayrli kech';
@@ -2892,9 +2997,17 @@ function renderRestaurant() {
     const body = Object.fromEntries(fd.entries());
     body.capacity = Number(body.capacity);
     try {
-      await api('/owner/restaurant', { method: 'PUT', body: JSON.stringify(body) });
+      const path = state.restaurant?.id ? '/owner/restaurant' : '/owner/restaurants';
+      const method = state.restaurant?.id ? 'PUT' : 'POST';
+      const res = await api(path, { method, body: JSON.stringify(body) });
+      if (res?.token) {
+        state.token = res.token;
+        localStorage.setItem('ot_owner_token', state.token);
+      }
+      if (res?.owner) persistOwner(res.owner);
       toast('Saqlandi', 'success');
       await loadAll();
+      renderRestaurant();
     } catch (err) { toast(err.message, 'error'); }
   });
 }
@@ -3023,6 +3136,7 @@ function renderPremium() {
 async function requestPremium(plan) {
   try {
     const res = await api('/owner/premium/request', { method: 'POST', body: JSON.stringify({ plan }) });
+    const payment = res?.payment_instructions || res?.payment || res || {};
     openModal({
       title: 'To\'lov <em>ko\'rsatmasi</em>',
       body: `
@@ -3030,12 +3144,12 @@ async function requestPremium(plan) {
           <p style="margin-bottom:16px">Quyidagi karta raqamiga to'lovni amalga oshiring:</p>
           <div style="background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:16px">
             <div class="eyebrow" style="margin-bottom:6px">Karta</div>
-            <div class="mono" style="font-size:18px;font-weight:700;color:var(--ink)">${res.payment?.card_number || res.card_number || '—'}</div>
-            <div style="margin-top:10px;font-size:13px">${escapeHtml(res.payment?.card_holder || res.card_holder || '')}</div>
+            <div class="mono" style="font-size:18px;font-weight:700;color:var(--ink)">${payment.card_number || '—'}</div>
+            <div style="margin-top:10px;font-size:13px">${escapeHtml(payment.card_holder || '')}</div>
           </div>
           <div class="eyebrow">Summa</div>
           <div style="font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--accent);margin-top:4px">
-            ${fmtNum(res.payment?.amount || res.amount || (plan === 'yearly' ? 1200000 : 150000))} so'm
+            ${fmtNum(payment.amount || res.amount || (plan === 'yearly' ? 1200000 : 150000))} so'm
           </div>
           <p style="margin-top:16px;color:var(--ink-mute);font-size:12px">To'lovdan keyin chek skrinshotini admin'ga yuboring</p>
         </div>
@@ -3164,9 +3278,13 @@ async function initApp() {
   try {
     await loadAll();
     connectSocket();
-    navigate('overview');
+    const targetPage = state.restaurant?.id ? 'overview' : 'restaurant';
+    navigate(targetPage);
+    if (!state.restaurant?.id) {
+      toast("Restoran profilingizni to'ldiring", "info");
+    }
   } catch (e) {
-    toast('Ma\'lumotlarni yuklab bo\'lmadi', 'error');
+    toast("Ma'lumotlarni yuklab bo'lmadi", "error");
     console.error(e);
   }
 }
