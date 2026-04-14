@@ -1,44 +1,37 @@
-const jwt = require('jsonwebtoken')
+const { verify } = require('../utils/jwt')
+const db = require('../config/db')
 
-function userAuth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1]
-  if (!token) return res.status(401).json({ error: 'Token kerak' })
+async function authUser(req, res, next) {
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET)
+    const header = req.headers.authorization || ''
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null
+    if (!token) return res.status(401).json({ error: 'Token yoʻq' })
+
+    const payload = verify(token)
+    if (!payload || payload.kind !== 'user') return res.status(401).json({ error: 'Yaroqsiz token' })
+
+    const r = await db.query('SELECT * FROM users WHERE id = $1', [payload.id])
+    if (!r.rows.length) return res.status(401).json({ error: 'Foydalanuvchi topilmadi' })
+
+    req.user = r.rows[0]
     next()
-  } catch(e) {
-    return res.status(401).json({ error: e.name === 'TokenExpiredError' ? 'Token muddati tugagan' : 'Token noto\'g\'ri' })
+  } catch (e) {
+    res.status(401).json({ error: 'Auth xatolik' })
   }
 }
 
-function ownerAuth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1]
-  if (!token) return res.status(401).json({ error: 'Token kerak' })
+async function authUserOptional(req, res, next) {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    if (!['owner','admin'].includes(decoded.role)) return res.status(403).json({ error: 'Ruxsat yo\'q' })
-    req.owner = decoded
+    const header = req.headers.authorization || ''
+    const token = header.startsWith('Bearer ') ? header.slice(7) : null
+    if (!token) return next()
+    const payload = verify(token)
+    if (payload && payload.kind === 'user') {
+      const r = await db.query('SELECT * FROM users WHERE id = $1', [payload.id])
+      if (r.rows.length) req.user = r.rows[0]
+    }
     next()
-  } catch(e) {
-    return res.status(401).json({ error: 'Token noto\'g\'ri' })
-  }
+  } catch { next() }
 }
 
-function adminAuth(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1]
-  if (!token) return res.status(401).json({ error: 'Token kerak' })
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    if (decoded.role !== 'admin') return res.status(403).json({ error: 'Faqat admin' })
-    req.admin = decoded
-    next()
-  } catch(e) {
-    return res.status(401).json({ error: 'Token noto\'g\'ri' })
-  }
-}
-
-function createToken(payload, expiresIn = '30d') {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn })
-}
-
-module.exports = { userAuth, ownerAuth, adminAuth, createToken }
+module.exports = { authUser, authUserOptional }
