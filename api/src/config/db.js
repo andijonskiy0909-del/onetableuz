@@ -5,11 +5,15 @@ const pool = new Pool({
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000
 })
 
 pool.on('error', (err) => {
-  console.error('DB pool error:', err.message)
+  console.error('[db] unexpected pool error:', err.message)
 })
 
-module.exports = pool
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  connect: () => pool.connect(),
+  pool
+}
