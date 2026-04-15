@@ -1,270 +1,1264 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#FAF7F2">
+<meta name="theme-color" content="#FAF7F0">
 <title>OneTable — Toshkent restoranlari</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* NOTE: This is a minimal stub. Replace with the full index.html from the user's original code.
-   The ONLY change needed in the original is:
-   const API = '${window.location.origin}/api';
-   instead of the hardcoded URL */
+/* ─── DESIGN TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  --bg:        #FAF7F0;
+  --bg2:       #FFFFFF;
+  --bg3:       #F3EDE0;
+  --bg4:       #EDE6D5;
+  --ink:       #1A1714;
+  --ink2:      #3D3830;
+  --ink3:      #857A6E;
+  --ink4:      #C0B5A8;
+  --line:      #E8DFD0;
+  --line2:     #F0E9DC;
+  --accent:    #7B2D26;
+  --accent2:   #9B3D34;
+  --accentRgb: 123,45,38;
+  --gold:      #A8722A;
+  --goldLight: #F5E9D0;
+  --success:   #3A6835;
+  --danger:    #8B2828;
+  --r:   10px;
+  --r2:  16px;
+  --r3:  22px;
+  --r4:  28px;
+  --fd: 'Fraunces', Georgia, serif;
+  --fb: 'Manrope', system-ui, sans-serif;
+  --tabbar-h: 68px;
+  --safe-b:   env(safe-area-inset-bottom, 0px);
+  --safe-t:   env(safe-area-inset-top, 0px);
+  --sh1: 0 2px 12px rgba(0,0,0,.05);
+  --sh2: 0 8px 32px rgba(0,0,0,.09);
+  --sh3: 0 20px 60px rgba(0,0,0,.14);
+  --tt: .35s ease;
+}
+[data-theme="dark"] {
+  --bg:        #0E0C09;
+  --bg2:       #181410;
+  --bg3:       #221D17;
+  --bg4:       #2C2520;
+  --ink:       #F2EDE3;
+  --ink2:      #CFC7BB;
+  --ink3:      #8A8078;
+  --ink4:      #4A4540;
+  --line:      #2A231A;
+  --line2:     #1E1A14;
+  --accent:    #D4866E;
+  --accent2:   #E09A82;
+  --accentRgb: 212,134,110;
+  --gold:      #D4A045;
+  --goldLight: #2A2010;
+  --success:   #6FA860;
+  --danger:    #D47070;
+  --sh1: 0 2px 12px rgba(0,0,0,.32);
+  --sh2: 0 8px 32px rgba(0,0,0,.42);
+  --sh3: 0 20px 60px rgba(0,0,0,.52);
+}
 
-:root{--bg:#FAF7F2;--bg2:#FFF;--bg3:#F2ECE0;--ink:#1C1917;--ink2:#44403C;--ink3:#8B8178;--ink4:#C4B9AD;--line:#E8E0D0;--accent:#7B2D26;--accent2:#642019;--gold:#B07B2A;--success:#3D6B38;--danger:#9B2C2C;--r:12px;--r2:18px;--r3:24px;--fd:'Fraunces',serif;--fb:'Manrope',sans-serif;--tabbar-h:72px;--safe-b:env(safe-area-inset-bottom,0px)}
-[data-theme="dark"]{--bg:#100D0A;--bg2:#1A1612;--bg3:#231E18;--ink:#F5F0E8;--ink2:#D8D0C4;--ink3:#9A9188;--ink4:#5A5248;--line:#2A231B;--accent:#D4866E;--accent2:#E09A82;--gold:#D4A045;--success:#6FA860;--danger:#D47070}
+/* ─── RESET ──────────────────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--fb);font-size:15px;line-height:1.55;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--fb);font-size:15px;line-height:1.55;
+  color:var(--ink);background:var(--bg);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  transition:background var(--tt),color var(--tt)
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;-webkit-tap-highlight-color:transparent}
 input{font-family:inherit;font-size:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
+
+/* ─── LAYOUT ─────────────────────────────────────────────────────────────── */
 #app{display:flex;flex-direction:column;min-height:100dvh;padding-bottom:calc(var(--tabbar-h) + var(--safe-b))}
 .page{display:none;min-height:calc(100dvh - var(--tabbar-h) - var(--safe-b))}
-.page.active{display:block}
-.topbar{padding:calc(env(safe-area-inset-top,0px) + 22px) 22px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-bottom:5px}
-.greet-title{font-family:var(--fd);font-size:30px;font-weight:400;line-height:1.08;letter-spacing:-.03em;color:var(--ink)}
+.page.active{display:block;animation:pageFade .38s ease}
+@keyframes pageFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── TOP BAR ────────────────────────────────────────────────────────────── */
+.topbar{
+  padding:calc(var(--safe-t) + 20px) 20px 12px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px
+}
+.eyebrow{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-bottom:4px}
+.greet-title{font-family:var(--fd);font-size:28px;font-weight:400;line-height:1.1;letter-spacing:-.03em;color:var(--ink)}
 .greet-title em{font-style:italic;font-weight:300;color:var(--accent)}
-.search-wrap{padding:14px 22px 6px}
-.search{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r3);padding:14px 18px}
-.search:focus-within{border-color:var(--accent)}
-.search input{flex:1;border:none;background:none;outline:none;font-size:15px}
-.search input::placeholder{color:var(--ink3)}
-.section{padding:20px 22px 6px}
-.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
-.section-title{font-family:var(--fd);font-size:23px;font-weight:400;color:var(--ink)}
-.section-title em{font-style:italic;font-weight:300;color:var(--accent)}
-.card-list{display:flex;flex-direction:column;gap:20px}
-.rest-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden;transition:all .35s ease}
-.rest-card:active{transform:scale(.983)}
-.rest-card .c-image{position:relative;aspect-ratio:16/9;background:var(--bg3);overflow:hidden}
-.rest-card .c-image img{width:100%;height:100%;object-fit:cover}
-.c-body{padding:18px 20px 20px}
-.c-name{font-family:var(--fd);font-size:22px;font-weight:500;letter-spacing:-.022em;line-height:1.12;color:var(--ink)}
-.c-meta{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink3);margin-top:3px}
-.c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-.book-btn{padding:11px 20px;background:var(--ink);color:var(--bg);border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:all .22s ease}
-.book-btn:active{transform:scale(.92)}
-.chip-row{display:flex;gap:8px;padding:12px 22px 6px;overflow-x:auto;scrollbar-width:none}
+.header-controls{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-top:4px}
+.icon-btn{
+  width:42px;height:42px;border-radius:50%;background:var(--bg2);
+  border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;
+  font-size:16px;transition:all .2s ease;box-shadow:var(--sh1)
+}
+.icon-btn:active{transform:scale(.9)}
+
+/* ─── THEME TOGGLE ───────────────────────────────────────────────────────── */
+.theme-toggle{
+  width:52px;height:28px;border-radius:14px;background:var(--bg3);
+  border:1.5px solid var(--line);position:relative;
+  transition:background var(--tt),border-color var(--tt);cursor:pointer;flex-shrink:0
+}
+.theme-pill{
+  position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+  background:var(--ink);transition:transform .35s cubic-bezier(.34,1.56,.64,1),background var(--tt);
+  display:flex;align-items:center;justify-content:center;font-size:11px
+}
+[data-theme="dark"] .theme-pill{transform:translateX(24px)}
+
+/* ─── SEARCH ─────────────────────────────────────────────────────────────── */
+.search-wrap{padding:6px 20px 8px}
+.search{
+  display:flex;align-items:center;gap:11px;background:var(--bg2);
+  border:1.5px solid var(--line);border-radius:var(--r4);padding:13px 18px;
+  transition:border-color .2s ease,box-shadow .2s ease;box-shadow:var(--sh1)
+}
+.search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accentRgb),.1)}
+.search svg{color:var(--ink3);flex-shrink:0}
+.search input{flex:1;border:none;background:none;outline:none;font-size:14.5px}
+.search input::placeholder{color:var(--ink4)}
+
+/* ─── CHIP ROW ───────────────────────────────────────────────────────────── */
+.chip-row{display:flex;gap:8px;padding:10px 20px 8px;overflow-x:auto;scrollbar-width:none}
 .chip-row::-webkit-scrollbar{display:none}
-.chip{flex-shrink:0;padding:9px 18px;border-radius:100px;background:var(--bg2);border:1.5px solid var(--line);font-size:12.5px;font-weight:700;color:var(--ink2)}
+.chip{
+  flex-shrink:0;padding:8px 17px;border-radius:100px;background:var(--bg2);
+  border:1.5px solid var(--line);font-size:12px;font-weight:700;color:var(--ink2);
+  transition:all .2s ease;white-space:nowrap
+}
 .chip.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.tabbar{position:fixed;bottom:0;left:0;right:0;height:calc(var(--tabbar-h) + var(--safe-b));background:var(--bg2);border-top:1px solid var(--line);padding:10px 8px calc(10px + var(--safe-b));display:flex;z-index:50}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--ink4);font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.chip:active{transform:scale(.93)}
+
+/* ─── SECTIONS ───────────────────────────────────────────────────────────── */
+.section{padding:18px 20px 6px}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:var(--fd);font-size:22px;font-weight:400;color:var(--ink);letter-spacing:-.02em}
+.section-title em{font-style:italic;font-weight:300;color:var(--accent)}
+.see-all{font-size:11.5px;font-weight:700;color:var(--accent);letter-spacing:.04em;text-transform:uppercase}
+.divider{height:1px;background:var(--line2);margin:6px 20px 0}
+
+/* ─── LIVE BADGE ─────────────────────────────────────────────────────────── */
+.live-badge{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+  border-radius:100px;background:rgba(var(--accentRgb),.1);color:var(--accent);
+  font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--accent);
+  animation:livePulse 1.6s ease-in-out infinite
+}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* ─── TRENDING PILLS ─────────────────────────────────────────────────────── */
+.trending-strip{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 20px 10px;overflow-x:auto;scrollbar-width:none
+}
+.trending-strip::-webkit-scrollbar{display:none}
+.trend-pill{
+  flex-shrink:0;display:flex;align-items:center;gap:7px;
+  padding:7px 13px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r3);font-size:12px;font-weight:700;color:var(--ink2);
+  box-shadow:var(--sh1)
+}
+.trend-pill-emoji{font-size:13px}
+.trend-pill-count{font-size:10px;color:var(--ink3);font-weight:600}
+
+/* ─── RESTAURANT CARDS ───────────────────────────────────────────────────── */
+.card-list{display:flex;flex-direction:column;gap:18px}
+.rest-card{
+  background:var(--bg2);border:1px solid var(--line);border-radius:var(--r3);
+  overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;
+  box-shadow:var(--sh1);will-change:transform
+}
+.rest-card:active{transform:scale(.984);box-shadow:none}
+.rest-card .c-image{position:relative;aspect-ratio:16/9;background:var(--bg3);overflow:hidden}
+.rest-card .c-image img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.rest-card:hover .c-image img{transform:scale(1.03)}
+.badge-open{
+  display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:100px;
+  font-size:10.5px;font-weight:700;background:rgba(10,25,10,.6);color:#6ECC6A;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  position:absolute;top:12px;left:12px;z-index:2
+}
+.badge-open .dot{width:5px;height:5px;border-radius:50%;background:#6ECC6A}
+.badge-premium{
+  position:absolute;top:12px;right:12px;z-index:2;padding:4px 10px;
+  border-radius:100px;background:rgba(168,114,42,.85);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  color:#fff;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase
+}
+.c-body{padding:15px 17px 17px}
+.c-name{font-family:var(--fd);font-size:19px;font-weight:500;letter-spacing:-.022em;line-height:1.14;color:var(--ink)}
+.c-meta{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3);margin-top:3px}
+.c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--line2)}
+.c-rating{
+  display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;
+  color:var(--ink);padding:4px 9px;background:var(--bg3);border-radius:100px
+}
+.book-btn{
+  padding:9px 17px;background:var(--ink);color:var(--bg);border-radius:100px;
+  font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  transition:all .2s ease
+}
+.book-btn:active{transform:scale(.9);opacity:.85}
+.cuisine-tag{font-size:10.5px;font-weight:700;padding:3px 9px;background:var(--bg3);border-radius:100px;color:var(--ink3)}
+
+/* ─── REELS ──────────────────────────────────────────────────────────────── */
+.reels-scroll{
+  display:flex;gap:12px;padding:4px 20px 16px;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.reels-scroll::-webkit-scrollbar{display:none}
+.reel-card{
+  flex-shrink:0;width:162px;border-radius:var(--r3);overflow:hidden;position:relative;
+  background:var(--bg3);box-shadow:var(--sh2);cursor:pointer;
+  transition:transform .3s ease;will-change:transform
+}
+.reel-card:active{transform:scale(.95)}
+.reel-thumb{width:100%;aspect-ratio:9/16;object-fit:cover;display:block}
+.reel-gradient{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,transparent 28%,rgba(0,0,0,.14) 52%,rgba(0,0,0,.8) 100%)
+}
+.reel-play{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.22);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.45);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s ease,background .2s ease
+}
+.reel-card:active .reel-play{transform:translate(-50%,-58%) scale(.86);background:rgba(255,255,255,.35)}
+.reel-play svg{margin-left:3px}
+.reel-meta{position:absolute;bottom:0;left:0;right:0;padding:11px 11px 13px}
+.reel-name{
+  font-family:var(--fd);font-size:13.5px;font-weight:500;color:#fff;
+  line-height:1.2;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.4)
+}
+.reel-caption{font-size:10px;color:rgba(255,255,255,.75);margin-bottom:7px;line-height:1.3}
+.reel-stats{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.reel-stat{display:flex;align-items:center;gap:3px;font-size:10px;color:rgba(255,255,255,.8);font-weight:700}
+.reel-book-btn{
+  width:100%;padding:7px 0;background:rgba(255,255,255,.18);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.28);border-radius:100px;
+  font-size:10px;font-weight:800;color:#fff;letter-spacing:.05em;
+  text-transform:uppercase;text-align:center;transition:background .2s ease
+}
+.reel-book-btn:active{background:rgba(255,255,255,.3)}
+.reel-media-badge{
+  position:absolute;top:10px;right:10px;padding:3px 8px;border-radius:100px;
+  font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
+}
+.reel-media-badge.video{background:rgba(0,0,0,.5);color:#fff;border:1px solid rgba(255,255,255,.2)}
+.reel-media-badge.image{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.2)}
+
+/* ─── DEALS ──────────────────────────────────────────────────────────────── */
+.deals-scroll{display:flex;flex-direction:column;gap:13px;padding:4px 20px 16px}
+.deal-card{
+  border-radius:var(--r3);overflow:hidden;background:var(--bg2);border:1px solid var(--line);
+  box-shadow:var(--sh1);display:flex;min-height:116px;position:relative;
+  transition:transform .28s ease,box-shadow .28s ease;cursor:pointer
+}
+.deal-card:active{transform:scale(.983);box-shadow:none}
+.deal-thumb{width:108px;flex-shrink:0;position:relative;overflow:hidden;background:var(--bg3)}
+.deal-thumb img{width:100%;height:100%;object-fit:cover}
+.deal-thumb-grad{position:absolute;inset:0;background:linear-gradient(to right,transparent 50%,var(--bg2))}
+.deal-disc{
+  position:absolute;top:9px;left:9px;padding:5px 10px;border-radius:var(--r);
+  background:var(--accent);color:#fff;font-size:13px;font-weight:800;letter-spacing:-.01em;
+  box-shadow:0 3px 12px rgba(var(--accentRgb),.45)
+}
+.deal-play{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center
+}
+.deal-play svg{filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.deal-body{flex:1;padding:13px 14px 13px 7px;display:flex;flex-direction:column;justify-content:space-between}
+.deal-title{font-family:var(--fd);font-size:15.5px;font-weight:500;color:var(--ink);line-height:1.2;margin-bottom:4px}
+.deal-desc{font-size:11px;color:var(--ink3);line-height:1.4}
+.deal-footer{display:flex;align-items:center;justify-content:space-between;margin-top:9px}
+.deal-expire{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.05em}
+.deal-cta{
+  padding:6px 13px;background:var(--ink);color:var(--bg);border-radius:100px;
+  font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  transition:all .18s ease
+}
+.deal-cta:active{transform:scale(.9)}
+.deal-new{
+  position:absolute;top:0;right:0;padding:3px 10px;background:var(--goldLight);
+  color:var(--gold);font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:0 var(--r3) 0 var(--r)
+}
+
+/* ─── TRENDING TONIGHT ───────────────────────────────────────────────────── */
+.tonight-scroll{display:flex;gap:11px;padding:4px 20px 16px;overflow-x:auto;scrollbar-width:none}
+.tonight-scroll::-webkit-scrollbar{display:none}
+.tonight-card{
+  flex-shrink:0;width:196px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--r3);overflow:hidden;box-shadow:var(--sh1);cursor:pointer;
+  transition:transform .28s ease
+}
+.tonight-card:active{transform:scale(.95)}
+.tonight-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.tonight-body{padding:11px 13px 14px}
+.tonight-name{font-family:var(--fd);font-size:14.5px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.tonight-meta{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);font-weight:600}
+.tonight-pop{display:flex;align-items:center;gap:5px;margin-top:7px}
+.pop-bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.pop-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--gold));border-radius:2px;transition:width 1.2s ease}
+.pop-label{font-size:9.5px;color:var(--accent);font-weight:800}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────────────────── */
+.tabbar{
+  position:fixed;bottom:0;left:0;right:0;
+  height:calc(var(--tabbar-h) + var(--safe-b));
+  background:rgba(var(--bg2-rgb, 255,255,255),.92);
+  border-top:1px solid var(--line);
+  padding:8px 6px calc(8px + var(--safe-b));
+  display:flex;z-index:50;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  transition:background var(--tt),border-color var(--tt)
+}
+[data-theme="dark"] .tabbar{background:rgba(24,20,16,.92)}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;color:var(--ink4);font-size:9px;font-weight:800;letter-spacing:.04em;
+  text-transform:uppercase;position:relative;transition:color .25s ease;
+  border-radius:var(--r2)
+}
 .tab.active{color:var(--accent)}
-.tab svg{transition:transform .3s ease}
-.tab.active svg{transform:scale(1.14)}
-.empty{padding:56px 36px;text-align:center}
-.empty h3{font-family:var(--fd);font-size:22px;font-weight:400;font-style:italic;margin-bottom:8px}
-.empty p{font-size:14px;color:var(--ink3);max-width:260px;margin:0 auto}
-.skeleton{background:linear-gradient(90deg,var(--bg3) 0%,var(--line) 45%,var(--bg3) 100%);background-size:200% 100%;animation:shimmer 1.6s ease-in-out infinite;border-radius:var(--r2)}
+.tab-icon-wrap{
+  width:36px;height:28px;display:flex;align-items:center;justify-content:center;
+  border-radius:10px;transition:background .25s ease,transform .3s cubic-bezier(.34,1.56,.64,1)
+}
+.tab.active .tab-icon-wrap{background:rgba(var(--accentRgb),.1);transform:scale(1.08)}
+
+/* ─── PROFILE PAGE ───────────────────────────────────────────────────────── */
+.profile-header{padding:calc(var(--safe-t) + 34px) 20px 22px;text-align:center}
+.profile-avatar{
+  width:90px;height:90px;border-radius:50%;
+  background:linear-gradient(145deg,var(--accent),var(--gold));
+  margin:0 auto 16px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-size:34px;color:#fff;
+  box-shadow:0 8px 30px rgba(var(--accentRgb),.35)
+}
+.profile-name{font-family:var(--fd);font-size:24px;letter-spacing:-.02em}
+.profile-handle{font-size:13px;color:var(--ink3);margin-top:3px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:0 20px 24px}
+.stat-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:16px 10px;text-align:center;box-shadow:var(--sh1)}
+.stat-num{font-family:var(--fd);font-size:28px;font-weight:400;line-height:1}
+.stat-label{font-size:9px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+
+/* ─── SKELETON ───────────────────────────────────────────────────────────── */
+.skeleton{
+  background:linear-gradient(90deg,var(--bg3) 0%,var(--line) 45%,var(--bg3) 100%);
+  background-size:200% 100%;animation:shimmer 1.6s ease-in-out infinite;border-radius:var(--r2)
+}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.toast{position:fixed;top:calc(env(safe-area-inset-top,0px) + 18px);left:18px;right:18px;background:var(--ink);color:var(--bg);padding:14px 20px;border-radius:var(--r2);font-size:14px;font-weight:700;text-align:center;z-index:300;transform:translateY(-130%);transition:transform .42s ease}
+.skel-reel{width:162px;flex-shrink:0;border-radius:var(--r3);aspect-ratio:9/16}
+.skel-deal{height:116px;border-radius:var(--r3)}
+
+/* ─── TOAST ──────────────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;top:calc(var(--safe-t) + 16px);left:16px;right:16px;
+  background:var(--ink);color:var(--bg);padding:13px 20px;border-radius:var(--r2);
+  font-size:13.5px;font-weight:700;text-align:center;z-index:300;
+  transform:translateY(-140%);transition:transform .42s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:var(--sh3)
+}
 .toast.show{transform:translateY(0)}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
-.badge-open{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:100px;font-size:10.5px;font-weight:700;background:rgba(15,30,15,.55);color:#7ECD72;backdrop-filter:blur(16px);position:absolute;top:14px;left:14px;z-index:2}
-.badge-open .dot{width:6px;height:6px;border-radius:50%;background:#7ECD72}
-.c-rating{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:800;color:var(--ink);padding:4px 10px;background:var(--bg3);border-radius:100px}
-.spin{width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
-@keyframes sp{to{transform:rotate(360deg)}}
 
-/* Sheet */
-.sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);z-index:100;opacity:0;pointer-events:none;transition:opacity .38s ease}
+/* ─── SHEET ──────────────────────────────────────────────────────────────── */
+.sheet-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  z-index:100;opacity:0;pointer-events:none;transition:opacity .36s ease
+}
 .sheet-backdrop.open{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;max-height:93dvh;background:var(--bg);border-radius:var(--r3) var(--r3) 0 0;z-index:101;transform:translateY(100%);transition:transform .48s ease;display:flex;flex-direction:column;will-change:transform}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;max-height:93dvh;background:var(--bg);
+  border-radius:var(--r3) var(--r3) 0 0;z-index:101;transform:translateY(100%);
+  transition:transform .48s cubic-bezier(.32,.72,0,1);
+  display:flex;flex-direction:column;will-change:transform
+}
 .sheet.open{transform:translateY(0)}
-.sheet-handle{width:44px;height:4px;border-radius:2px;background:var(--line);margin:14px auto 6px}
-.sheet-header{padding:8px 22px 18px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--line)}
-.sheet-title{font-family:var(--fd);font-size:24px;font-weight:500;letter-spacing:-.025em}
-.sheet-body{flex:1;overflow-y:auto;padding:20px 22px 16px}
-.sheet-foot{padding:14px 22px calc(18px + var(--safe-b));border-top:1px solid var(--line)}
-.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.zone-card{padding:16px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);text-align:left;transition:all .2s ease}
-.zone-card:active{transform:scale(.96)}
+.sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--line);margin:13px auto 5px}
+.sheet-header{padding:6px 20px 15px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--line)}
+.sheet-title{font-family:var(--fd);font-size:21px;font-weight:500;letter-spacing:-.025em}
+.sheet-body{flex:1;overflow-y:auto;padding:17px 20px 13px}
+.sheet-foot{padding:11px 20px calc(15px + var(--safe-b));border-top:1px solid var(--line)}
+
+/* ─── BOOKING FORM ───────────────────────────────────────────────────────── */
+.steps-bar{display:flex;gap:5px;margin-bottom:20px}
+.step-seg{flex:1;height:3px;border-radius:2px;background:var(--line);overflow:hidden;position:relative}
+.step-seg.done{background:var(--accent)}
+.step-seg.active::after{content:'';position:absolute;inset:0;background:var(--ink);animation:stepFill .45s ease forwards}
+@keyframes stepFill{from{width:0}to{width:100%}}
+.field-block{margin-bottom:20px}
+.field-label{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px}
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.zone-card{padding:14px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);text-align:left;transition:all .2s ease}
+.zone-card:active{transform:scale(.95)}
 .zone-card.active{border-color:var(--ink);background:var(--ink);color:var(--bg)}
-.date-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.date-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .date-row::-webkit-scrollbar{display:none}
-.date-card{flex-shrink:0;min-width:62px;padding:13px 8px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);text-align:center;transition:all .2s ease}
+.date-card{flex-shrink:0;min-width:58px;padding:11px 7px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);text-align:center;transition:all .2s ease}
 .date-card.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.date-card .dc-day{font-family:var(--fd);font-size:24px;font-weight:400;line-height:1}
+.date-card .dc-day{font-family:var(--fd);font-size:21px;font-weight:400;line-height:1}
 .date-card .dc-dow,.date-card .dc-mon{font-size:9px;font-weight:700;opacity:.55;text-transform:uppercase}
-.guests-control{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2)}
-.guests-num{font-family:var(--fd);font-size:32px;font-weight:400;line-height:1}
-.g-btn{width:42px;height:42px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .15s ease}
-.g-btn:active{transform:scale(.86)}
+.guests-control{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2)}
+.guests-num{font-family:var(--fd);font-size:29px;font-weight:400;line-height:1}
+.g-btn{width:40px;height:40px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .15s ease}
+.g-btn:active{transform:scale(.84)}
 .g-btn:disabled{opacity:.25}
-.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.time-card{padding:14px 6px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);font-size:13.5px;font-weight:700;text-align:center;transition:all .2s ease}
-.time-card:active:not([disabled]){transform:scale(.92)}
+.time-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.time-card{padding:12px 4px;background:var(--bg2);border:2px solid var(--line);border-radius:var(--r2);font-size:12.5px;font-weight:700;text-align:center;transition:all .2s ease}
+.time-card:active:not([disabled]){transform:scale(.9)}
 .time-card.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .time-card[disabled]{opacity:.28;text-decoration:line-through;pointer-events:none}
-.btn-primary{width:100%;padding:17px 24px;background:var(--ink);color:var(--bg);border-radius:var(--r2);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .22s ease}
-.btn-primary:active:not([disabled]){transform:scale(.97)}
+.btn-primary{
+  width:100%;padding:15px 22px;background:var(--ink);color:var(--bg);
+  border-radius:var(--r2);font-size:14.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:all .2s ease;box-shadow:0 4px 18px rgba(0,0,0,.15)
+}
+.btn-primary:active:not([disabled]){transform:scale(.97);box-shadow:none}
 .btn-primary[disabled]{opacity:.38}
-.field-label{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
-.field-block{margin-bottom:24px}
-.steps-bar{display:flex;gap:6px;margin-bottom:22px}
-.step-seg{flex:1;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
-.step-seg.done{background:var(--accent)}
-.step-seg.active{background:var(--ink)}
 
-/* Booking card */
-.booking-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r3);padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+/* ─── BOOKING CARD ───────────────────────────────────────────────────────── */
+.booking-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r3);padding:17px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:var(--sh1)}
 .booking-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
 .booking-card.status-confirmed::before{background:var(--success)}
 .booking-card.status-pending::before{background:var(--gold)}
 .booking-card.status-cancelled::before{background:var(--danger)}
-.bk-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-left:8px}
-.bk-name{font-family:var(--fd);font-size:20px;font-weight:500;flex:1}
-.bk-status{font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:5px 12px;border-radius:100px}
-.bk-status.pending{background:rgba(176,123,42,.12);color:var(--gold)}
-.bk-status.confirmed{background:rgba(61,107,56,.12);color:var(--success)}
-.bk-status.cancelled{background:rgba(155,44,44,.12);color:var(--danger)}
-.bk-details{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 8px 0;border-top:1px solid var(--line)}
-.bk-detail .bk-lbl{font-size:9.5px;color:var(--ink3);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
-.bk-detail .bk-val{font-size:14px;font-weight:800;color:var(--ink)}
+.bk-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-left:8px}
+.bk-name{font-family:var(--fd);font-size:17px;font-weight:500;flex:1}
+.bk-status{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;padding:4px 11px;border-radius:100px}
+.bk-status.pending{background:rgba(168,114,42,.12);color:var(--gold)}
+.bk-status.confirmed{background:rgba(58,104,53,.12);color:var(--success)}
+.bk-status.cancelled{background:rgba(139,40,40,.12);color:var(--danger)}
+.bk-details{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:12px 8px 0;border-top:1px solid var(--line)}
+.bk-detail .bk-lbl{font-size:9px;color:var(--ink3);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.bk-detail .bk-val{font-size:13px;font-weight:800;color:var(--ink)}
+
+/* ─── EMPTY ──────────────────────────────────────────────────────────────── */
+.empty{padding:50px 32px;text-align:center}
+.empty h3{font-family:var(--fd);font-size:20px;font-weight:400;font-style:italic;margin-bottom:7px}
+.empty p{font-size:13.5px;color:var(--ink3);max-width:240px;margin:0 auto}
+
+/* ─── SPINNER ────────────────────────────────────────────────────────────── */
+.spin{width:18px;height:18px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ─── REVEAL ─────────────────────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .58s ease,transform .58s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ─── LANG POPUP ─────────────────────────────────────────────────────────── */
+.lang-popup{
+  position:fixed;top:82px;right:16px;background:var(--bg2);
+  border:1.5px solid var(--line);border-radius:var(--r2);
+  box-shadow:var(--sh3);z-index:200;overflow:hidden;display:none;min-width:142px;
+  animation:popIn .22s cubic-bezier(.34,1.56,.64,1)
+}
+.lang-popup.open{display:block}
+@keyframes popIn{from{opacity:0;transform:scale(.88) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.lang-option{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;
+  font-size:13.5px;font-weight:700;cursor:pointer;
+  transition:background .15s ease;border-bottom:1px solid var(--line2)
+}
+.lang-option:last-child{border-bottom:none}
+.lang-option:active{background:var(--bg3)}
+.lang-option.active{color:var(--accent)}
+.lang-option-flag{font-size:18px}
 </style>
 </head>
 <body>
 <div id="app">
-<div class="page active" id="page-home">
-<div class="topbar"><div><div class="eyebrow" id="home-eyebrow">Xush kelibsiz</div><h1 class="greet-title"><span id="home-greeting">Xayrli kun,</span><br><em id="home-user-name">mehmon</em></h1></div><div style="display:flex;gap:10px"><button style="width:44px;height:44px;border-radius:50%;background:var(--bg2);border:1px solid var(--line);font-size:17px" id="lang-btn">🇺🇿</button></div></div>
-<div class="search-wrap"><div class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input type="text" id="search-input" placeholder="Restoran qidirish..."></div></div>
-<div class="chip-row" id="chip-row"></div>
-<div class="section"><div class="section-head"><div class="section-title">Yaqin <em>atrofda</em></div><span id="rest-count" style="font-size:11px;color:var(--ink4);font-weight:700"></span></div><div class="card-list" id="rest-list"><div class="skeleton" style="height:260px;border-radius:var(--r3)"></div><div class="skeleton" style="height:260px;border-radius:var(--r3)"></div></div></div>
-</div>
-<div class="page" id="page-bookings">
-<div class="topbar"><div><div class="eyebrow">Mening</div><h1 class="greet-title"><em>Bronlarim</em></h1></div></div>
-<div class="section"><div id="bookings-list"></div></div>
-</div>
-<div class="page" id="page-favorites">
-<div class="topbar"><div><div class="eyebrow">Sevimli</div><h1 class="greet-title"><em>Joylar</em></h1></div></div>
-<div class="section"><div id="fav-list" class="card-list"></div></div>
-</div>
-<div class="page" id="page-profile">
-<div style="padding:calc(env(safe-area-inset-top,0px)+36px) 22px 24px;text-align:center">
-<div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(145deg,var(--accent),var(--gold));margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:38px;color:#fff" id="profile-avatar">M</div>
-<div style="font-family:var(--fd);font-size:26px" id="profile-name">Mehmon</div>
-<div style="font-size:13px;color:var(--ink3)" id="profile-handle"></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0 22px 26px">
-<div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:18px 12px;text-align:center"><div style="font-family:var(--fd);font-size:30px" id="stat-bookings">0</div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Bron</div></div>
-<div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:18px 12px;text-align:center"><div style="font-family:var(--fd);font-size:30px" id="stat-visited">0</div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Restoran</div></div>
-<div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:18px 12px;text-align:center"><div style="font-family:var(--fd);font-size:30px" id="stat-favs">0</div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Sevimli</div></div>
-</div>
-</div>
-<nav class="tabbar">
-<button class="tab active" data-tab="home"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Asosiy</span></button>
-<button class="tab" data-tab="bookings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>Bronlar</span></button>
-<button class="tab" data-tab="favorites"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Sevimli</span></button>
-<button class="tab" data-tab="profile"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profil</span></button>
-</nav>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow" id="home-eyebrow">Xush kelibsiz</div>
+        <h1 class="greet-title">
+          <span id="home-greeting">Xayrli kun,</span><br>
+          <em id="home-user-name">mehmon</em>
+        </h1>
+      </div>
+      <div class="header-controls">
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <div class="theme-pill" id="theme-pill">☀️</div>
+        </button>
+        <button class="icon-btn" id="lang-btn" aria-label="Switch language">🇺🇿</button>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="search-input" placeholder="Restoran qidirish...">
+      </div>
+    </div>
+
+    <div class="chip-row" id="chip-row"></div>
+    <div class="trending-strip reveal" id="trending-strip"></div>
+    <div class="divider"></div>
+
+    <!-- Nearby -->
+    <div class="section reveal">
+      <div class="section-head">
+        <div class="section-title" id="nearby-title">Yaqin <em>atrofda</em></div>
+        <span id="rest-count" style="font-size:11px;color:var(--ink4);font-weight:700"></span>
+      </div>
+      <div class="card-list" id="rest-list">
+        <div class="skeleton" style="height:248px;border-radius:var(--r3)"></div>
+        <div class="skeleton" style="height:248px;border-radius:var(--r3)"></div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin-top:20px"></div>
+
+    <!-- Reels -->
+    <div class="section reveal" style="padding-bottom:0">
+      <div class="section-head">
+        <div class="section-title" id="reels-title">Atmosfera <em>reels</em></div>
+        <div class="live-badge"><div class="live-dot"></div><span id="live-label">Jonli</span></div>
+      </div>
+    </div>
+    <div class="reels-scroll" id="reels-scroll">
+      <div class="skeleton skel-reel"></div>
+      <div class="skeleton skel-reel"></div>
+      <div class="skeleton skel-reel"></div>
+      <div class="skeleton skel-reel"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Deals -->
+    <div class="section reveal" style="padding-bottom:0">
+      <div class="section-head">
+        <div class="section-title" id="deals-title">Chegirma <em>&amp; aksiya</em></div>
+        <span class="see-all" id="deals-see-all">Barchasi →</span>
+      </div>
+    </div>
+    <div class="deals-scroll" id="deals-scroll">
+      <div class="skeleton skel-deal"></div>
+      <div class="skeleton skel-deal"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Trending Tonight -->
+    <div class="section reveal" style="padding-bottom:0">
+      <div class="section-head">
+        <div class="section-title" id="tonight-title">Bugun <em>mashhur</em></div>
+        <span class="see-all">🔥</span>
+      </div>
+    </div>
+    <div class="tonight-scroll" id="tonight-scroll">
+      <div class="skeleton" style="width:196px;height:218px;border-radius:var(--r3);flex-shrink:0"></div>
+      <div class="skeleton" style="width:196px;height:218px;border-radius:var(--r3);flex-shrink:0"></div>
+    </div>
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- BOOKINGS PAGE -->
+  <div class="page" id="page-bookings">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow" id="bk-eyebrow">Mening</div>
+        <h1 class="greet-title"><em id="bk-title">Bronlarim</em></h1>
+      </div>
+    </div>
+    <div class="section"><div id="bookings-list"></div></div>
+  </div>
+
+  <!-- FAVORITES PAGE -->
+  <div class="page" id="page-favorites">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow" id="fav-eyebrow">Sevimli</div>
+        <h1 class="greet-title"><em id="fav-title">Joylar</em></h1>
+      </div>
+    </div>
+    <div class="section"><div id="fav-list" class="card-list"></div></div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="page-profile">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar">M</div>
+      <div class="profile-name"  id="profile-name">Mehmon</div>
+      <div class="profile-handle" id="profile-handle"></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num"   id="stat-bookings">0</div>
+        <div class="stat-label" id="stat-bk-label">Bron</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num"   id="stat-visited">0</div>
+        <div class="stat-label" id="stat-vis-label">Restoran</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num"   id="stat-favs">0</div>
+        <div class="stat-label" id="stat-fav-label">Sevimli</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="tabbar">
+    <button class="tab active" data-tab="home">
+      <div class="tab-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      </div>
+      <span id="nav-home">Asosiy</span>
+    </button>
+    <button class="tab" data-tab="bookings">
+      <div class="tab-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+      <span id="nav-bookings">Bronlar</span>
+    </button>
+    <button class="tab" data-tab="favorites">
+      <div class="tab-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </div>
+      <span id="nav-favorites">Sevimli</span>
+    </button>
+    <button class="tab" data-tab="profile">
+      <div class="tab-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <span id="nav-profile">Profil</span>
+    </button>
+  </nav>
 </div>
 
+<!-- LANG POPUP -->
+<div class="lang-popup" id="lang-popup">
+  <div class="lang-option active" data-lang="uz"><span class="lang-option-flag">🇺🇿</span>O'zbekcha</div>
+  <div class="lang-option"        data-lang="ru"><span class="lang-option-flag">🇷🇺</span>Русский</div>
+  <div class="lang-option"        data-lang="en"><span class="lang-option-flag">🇬🇧</span>English</div>
+</div>
+
+<!-- BOOKING SHEET -->
 <div class="sheet-backdrop" id="sheet-backdrop"></div>
-<div class="sheet" id="sheet"><div class="sheet-handle"></div><div class="sheet-header"><div style="flex:1"><div class="eyebrow" style="color:var(--accent)">Bron qilish</div><div class="sheet-title" id="sheet-title">Restoran</div></div><button style="width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--ink2)" id="sheet-close">✕</button></div><div class="sheet-body" id="sheet-body"></div><div class="sheet-foot" id="sheet-foot"></div></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div style="flex:1">
+      <div class="eyebrow" style="color:var(--accent)" id="sheet-eyebrow">Bron qilish</div>
+      <div class="sheet-title" id="sheet-title">Restoran</div>
+    </div>
+    <button style="width:34px;height:34px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--ink2);font-size:14px" id="sheet-close">✕</button>
+  </div>
+  <div class="sheet-body" id="sheet-body"></div>
+  <div class="sheet-foot" id="sheet-foot"></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-'use strict'
-const API=`${location.origin}/api`
-const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand();tg.disableVerticalSwipes?.()}
+'use strict';
+const API = `${location.origin}/api`;
+const tg  = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
-const S={token:localStorage.getItem('ot_token'),user:null,restaurants:[],filtered:[],bookings:[],favorites:JSON.parse(localStorage.getItem('ot_favs')||'[]'),coords:null,tab:'home',booking:{restaurant:null,step:1,zones:[],menu:[],zone:null,date:null,time:null,guests:2,preOrder:{},availability:[]}}
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
-const fmt=n=>n!=null?new Intl.NumberFormat('fr-FR').format(n).replace(/\s/g,'\u202F'):'—'
-const isoDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
-const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return d}
-const humanDate=iso=>{const d=new Date(iso);const ms=['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];return`${d.getDate()} ${ms[d.getMonth()]}`}
-function isOpen(wh){if(!wh)return null;const m=String(wh).match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);if(!m)return null;const[,oh,om,ch,cm]=m.map(Number);const now=new Date(),cur=now.getHours()*60+now.getMinutes(),open=oh*60+om;let close=ch*60+cm;if(close<=open)close+=1440;return cur>=open&&cur<=close}
+/* ─── I18N ────────────────────────────────────────────────────────────────── */
+const T = {
+  uz:{
+    welcome:"Xush kelibsiz",greet_m:"Xayrli tong,",greet_d:"Xayrli kun,",greet_e:"Xayrli oqshom,",greet_n:"Xayrli kech,",
+    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"Atmosfera",reels_em:"reels",
+    live:"Jonli",deals:"Chegirma",deals_em:"& aksiya",deals_all:"Barchasi →",tonight:"Bugun",tonight_em:"mashhur",
+    book:"Bron",book_now:"Bron qilish",not_found:"Topilmadi",not_found_sub:"Qidiruvni o'zgartiring",
+    nav_home:"Asosiy",nav_bk:"Bronlar",nav_fav:"Sevimli",nav_prof:"Profil",
+    bk_eye:"Mening",bk_ttl:"Bronlarim",fav_eye:"Sevimli",fav_ttl:"Joylar",
+    no_bk:"Bronlar yo'q",no_bk_s:"Restoran tanlang va bron qiling",
+    no_fav:"Sevimlilar bo'sh",no_fav_s:"❤️ bosib qo'shing",
+    stat_bk:"Bron",stat_vis:"Restoran",stat_fav:"Sevimli",open_now:"Ochiq",
+    zone_l:"Zona",date_l:"Sana",guests_l:"Mehmonlar",guests_s:"kishi",time_l:"Vaqt",
+    cont1:"Davom etish →",cont2:"Davom →",confirm_btn:"Tasdiqlash",
+    bk_ok:"Bron yaratildi!",cancel_bk:"Bekor qilish",cancel_q:"Bekor qilasizmi?",cancelled:"Bekor qilindi",
+    today:"Bugun",tomorrow:"Ertaga",days:["Yak","Du","Se","Chor","Pay","Ju","Sha"],
+    months:["Yan","Fev","Mar","Apr","May","Iyun","Iyul","Avg","Sen","Okt","Noy","Dek"],
+    status:{pending:"Kutilmoqda",confirmed:"Tasdiqlangan",cancelled:"Bekor",completed:"Tugallangan"},
+    chips:[["all","Barchasi"],["uzbek","O'zbek"],["european","Yevropa"],["italian","Italyan"],["asian","Osiyo"],["family","Oilaviy"]],
+    trending:[["🔥","Mashhur","128"],["⚡","Yangi","24"],["💎","Premium","16"],["🌿","Sog'lom","42"]],
+    sheet_eye:"Bron qilish",main_hall:"Asosiy zal",main_zone:"Asosiy",
+    err_load:"Yuklab bo'lmadi",err_load_s:"Internet yoki server xatosi"
+  },
+  ru:{
+    welcome:"Добро пожаловать",greet_m:"Доброе утро,",greet_d:"Добрый день,",greet_e:"Добрый вечер,",greet_n:"Доброй ночи,",
+    search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"и стиль",
+    live:"Live",deals:"Скидки",deals_em:"& акции",deals_all:"Все →",tonight:"Сегодня",tonight_em:"популярно",
+    book:"Бронь",book_now:"Забронировать",not_found:"Не найдено",not_found_sub:"Измените запрос",
+    nav_home:"Главная",nav_bk:"Брони",nav_fav:"Избранное",nav_prof:"Профиль",
+    bk_eye:"Мои",bk_ttl:"Брони",fav_eye:"Избранные",fav_ttl:"Места",
+    no_bk:"Нет броней",no_bk_s:"Выберите ресторан и забронируйте",
+    no_fav:"Избранное пусто",no_fav_s:"Нажмите ❤️ чтобы добавить",
+    stat_bk:"Бронь",stat_vis:"Ресторан",stat_fav:"Избранное",open_now:"Открыто",
+    zone_l:"Зона",date_l:"Дата",guests_l:"Гости",guests_s:"чел.",time_l:"Время",
+    cont1:"Продолжить →",cont2:"Далее →",confirm_btn:"Подтвердить",
+    bk_ok:"Бронь создана!",cancel_bk:"Отменить",cancel_q:"Отменить бронь?",cancelled:"Отменено",
+    today:"Сегодня",tomorrow:"Завтра",days:["Вс","Пн","Вт","Ср","Чт","Пт","Сб"],
+    months:["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"],
+    status:{pending:"Ожидание",confirmed:"Подтверждено",cancelled:"Отменено",completed:"Завершено"},
+    chips:[["all","Все"],["uzbek","Узбекская"],["european","Европейская"],["italian","Итальянская"],["asian","Азиатская"],["family","Семейная"]],
+    trending:[["🔥","Популярно","128"],["⚡","Новинки","24"],["💎","Премиум","16"],["🌿","ЗОЖ","42"]],
+    sheet_eye:"Бронирование",main_hall:"Основной зал",main_zone:"Основная",
+    err_load:"Ошибка загрузки",err_load_s:"Проверьте интернет"
+  },
+  en:{
+    welcome:"Welcome back",greet_m:"Good morning,",greet_d:"Good afternoon,",greet_e:"Good evening,",greet_n:"Good night,",
+    search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"reels",
+    live:"Live",deals:"Deals",deals_em:"& offers",deals_all:"See all →",tonight:"Trending",tonight_em:"tonight",
+    book:"Book",book_now:"Book a Table",not_found:"Not found",not_found_sub:"Try different filters",
+    nav_home:"Home",nav_bk:"Bookings",nav_fav:"Favorites",nav_prof:"Profile",
+    bk_eye:"My",bk_ttl:"Bookings",fav_eye:"Saved",fav_ttl:"Places",
+    no_bk:"No bookings yet",no_bk_s:"Choose a restaurant and book",
+    no_fav:"No favorites yet",no_fav_s:"Tap ❤️ to save a spot",
+    stat_bk:"Bookings",stat_vis:"Visited",stat_fav:"Favorites",open_now:"Open now",
+    zone_l:"Zone",date_l:"Date",guests_l:"Guests",guests_s:"guests",time_l:"Time",
+    cont1:"Continue →",cont2:"Next →",confirm_btn:"Confirm",
+    bk_ok:"Booking created!",cancel_bk:"Cancel",cancel_q:"Cancel this booking?",cancelled:"Booking cancelled",
+    today:"Today",tomorrow:"Tomorrow",days:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    status:{pending:"Pending",confirmed:"Confirmed",cancelled:"Cancelled",completed:"Completed"},
+    chips:[["all","All"],["uzbek","Uzbek"],["european","European"],["italian","Italian"],["asian","Asian"],["family","Family"]],
+    trending:[["🔥","Trending","128"],["⚡","New","24"],["💎","Premium","16"],["🌿","Healthy","42"]],
+    sheet_eye:"Book a Table",main_hall:"Main Hall",main_zone:"Main",
+    err_load:"Failed to load",err_load_s:"Check your connection"
+  }
+};
 
-let _tt;function toast(msg,type=''){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(type?' '+type:'');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800)}
+/* ─── STATE ───────────────────────────────────────────────────────────────── */
+const S = {
+  token: localStorage.getItem('ot_token'),
+  lang:  localStorage.getItem('ot_lang') || 'uz',
+  theme: localStorage.getItem('ot_theme') || 'auto',
+  user: null, restaurants: [], filtered: [], bookings: [],
+  favorites: JSON.parse(localStorage.getItem('ot_favs') || '[]'),
+  coords: null, tab: 'home', chip: 'all', q: '',
+  booking: { restaurant:null, step:1, zones:[], menu:[], zone:null, date:null, time:null, guests:2, preOrder:{}, availability:[] }
+};
 
-async function api(path,opts={}){const h={'Content-Type':'application/json',...(opts.headers||{})};if(S.token)h.Authorization=`Bearer ${S.token}`;const r=await fetch(API+path,{...opts,headers:h});const d=await r.json().catch(()=>null);if(!r.ok)throw new Error(d?.error||`HTTP ${r.status}`);return d}
+/* ─── HELPERS ─────────────────────────────────────────────────────────────── */
+const t   = k => (T[S.lang]||T.uz)[k] ?? k;
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const addDays = n => { const d = new Date(); d.setDate(d.getDate()+n); return d; };
+const humanDate = iso => { const d = new Date(iso); return `${d.getDate()} ${t('months')[d.getMonth()]}`; };
+function isOpen(wh) {
+  if (!wh) return null;
+  const m = String(wh).match(/(\d{1,2}):(\d{2})\s*[-–—]\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const [,oh,om,ch,cm] = m.map(Number);
+  const now = new Date(), cur = now.getHours()*60+now.getMinutes(), op = oh*60+om;
+  let cl = ch*60+cm; if(cl<=op) cl+=1440;
+  return cur>=op && cur<=cl;
+}
 
-function greeting(){const h=new Date().getHours();return h<6?'Xayrli kech,':h<12?'Xayrli tong,':h<18?'Xayrli kun,':h<22?'Xayrli oqshom,':'Xayrli kech,'}
+/* ─── TOAST ──────────────────────────────────────────────────────────────── */
+let _tt;
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast show'+(type?' '+type:'');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2800);
+}
 
-// Auth
-async function auth(){const u=tg?.initDataUnsafe?.user||{id:9999,first_name:'Demo',username:'demo'};try{const r=await api('/auth/telegram',{method:'POST',body:JSON.stringify({telegram_id:u.id,first_name:u.first_name||'',last_name:u.last_name||'',username:u.username||'',language:u.language_code||'uz'})});if(r.token){S.token=r.token;localStorage.setItem('ot_token',r.token)};S.user=r.user||u}catch{S.user=u}}
+/* ─── API ─────────────────────────────────────────────────────────────────── */
+async function api(path,opts={}){
+  const h={'Content-Type':'application/json',...(opts.headers||{})};
+  if(S.token) h.Authorization=`Bearer ${S.token}`;
+  const r=await fetch(API+path,{...opts,headers:h});
+  const d=await r.json().catch(()=>null);
+  if(!r.ok) throw new Error(d?.error||`HTTP ${r.status}`);
+  return d;
+}
 
-// Restaurants
-async function loadRestaurants(){try{let url='/restaurants';if(S.coords)url+=`?lat=${S.coords.lat}&lng=${S.coords.lng}`;const raw=await api(url);S.restaurants=Array.isArray(raw)?raw:(raw.restaurants||[]);S.restaurants.sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0)||(b.rating||0)-(a.rating||0));applyFilters()}catch(e){document.getElementById('rest-list').innerHTML='<div class="empty"><h3>Yuklab bo\'lmadi</h3><p>Internet yoki server xatosi</p></div>'}}
+/* ─── THEME ───────────────────────────────────────────────────────────────── */
+function applyTheme(force){
+  let scheme=force||S.theme;
+  if(scheme==='auto') scheme=tg?.colorScheme||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',scheme);
+  const pill=document.getElementById('theme-pill');
+  if(pill) pill.textContent=scheme==='dark'?'🌙':'☀️';
+}
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  S.theme=next; localStorage.setItem('ot_theme',next); applyTheme(next);
+}
+document.getElementById('theme-toggle').addEventListener('click',toggleTheme);
 
-function applyFilters(){const chip=S.chip||'all',q=(S.q||'').toLowerCase();let list=S.restaurants;if(chip!=='all')list=list.filter(r=>{const cs=Array.isArray(r.cuisine)?r.cuisine:(r.cuisine?[r.cuisine]:[]);return cs.some(c=>String(c).toLowerCase().includes(chip))});if(q)list=list.filter(r=>(r.name||'').toLowerCase().includes(q));S.filtered=list;renderRestaurants()}
+/* ─── LANGUAGE ────────────────────────────────────────────────────────────── */
+const FLAGS={uz:'🇺🇿',ru:'🇷🇺',en:'🇬🇧'};
+function applyLang(){
+  document.documentElement.lang=S.lang;
+  document.getElementById('lang-btn').textContent=FLAGS[S.lang];
+  const uname=S.user?.first_name||(S.lang==='uz'?'mehmon':S.lang==='ru'?'гость':'guest');
+  document.getElementById('home-eyebrow').textContent    =t('welcome');
+  document.getElementById('home-greeting').textContent   =greetingText();
+  document.getElementById('home-user-name').textContent  =uname;
+  document.getElementById('search-input').placeholder    =t('search');
+  document.getElementById('nearby-title').innerHTML      =`${t('nearby')} <em>${t('nearby_em')}</em>`;
+  document.getElementById('reels-title').innerHTML       =`${t('reels')} <em>${t('reels_em')}</em>`;
+  document.getElementById('live-label').textContent      =t('live');
+  document.getElementById('deals-title').innerHTML       =`${t('deals')} <em>${t('deals_em')}</em>`;
+  document.getElementById('deals-see-all').textContent   =t('deals_all');
+  document.getElementById('tonight-title').innerHTML     =`${t('tonight')} <em>${t('tonight_em')}</em>`;
+  document.getElementById('nav-home').textContent        =t('nav_home');
+  document.getElementById('nav-bookings').textContent    =t('nav_bk');
+  document.getElementById('nav-favorites').textContent   =t('nav_fav');
+  document.getElementById('nav-profile').textContent     =t('nav_prof');
+  document.getElementById('bk-eyebrow').textContent      =t('bk_eye');
+  document.getElementById('bk-title').textContent        =t('bk_ttl');
+  document.getElementById('fav-eyebrow').textContent     =t('fav_eye');
+  document.getElementById('fav-title').textContent       =t('fav_ttl');
+  document.getElementById('stat-bk-label').textContent   =t('stat_bk');
+  document.getElementById('stat-vis-label').textContent  =t('stat_vis');
+  document.getElementById('stat-fav-label').textContent  =t('stat_fav');
+  document.getElementById('sheet-eyebrow').textContent   =t('sheet_eye');
+  renderChips(); renderTrending(); applyFilters(); renderBookings(); renderFavorites();
+}
+function greetingText(){
+  const h=new Date().getHours();
+  return h<6?t('greet_n'):h<12?t('greet_m'):h<18?t('greet_d'):h<22?t('greet_e'):t('greet_n');
+}
 
-function renderRestaurants(){const el=document.getElementById('rest-list'),cnt=document.getElementById('rest-count');if(cnt)cnt.textContent=`${S.filtered.length} ta joy`;if(!S.filtered.length){el.innerHTML='<div class="empty"><h3>Topilmadi</h3><p>Qidiruvni o\'zgartiring</p></div>';return}
-el.className='card-list';el.innerHTML=S.filtered.map(r=>{
-const img=r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';const rating=r.rating?Number(r.rating).toFixed(1):'—';const o=isOpen(r.working_hours);const cuisines=Array.isArray(r.cuisine)?r.cuisine.slice(0,2):[];const isFav=S.favorites.includes(r.id)
-return`<div class="rest-card" data-id="${r.id}" onclick="openSheet(${r.id})"><div class="c-image"><img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800'">${o===true?'<div class="badge-open"><span class="dot"></span>Ochiq</div>':''}</div><div class="c-body"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><div class="c-name">${esc(r.name)}</div><div class="c-rating">⭐ ${rating}</div></div><div class="c-meta">${r.address?`<span>${esc(r.address)}</span>`:''}</div><div class="c-foot"><div style="display:flex;gap:6px">${cuisines.map(c=>`<span style="font-size:11px;font-weight:700;padding:4px 10px;background:var(--bg3);border-radius:100px">${esc(c)}</span>`).join('')}</div><button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">Bron</button></div></div></div>`}).join('')}
+/* ─── LANG POPUP ──────────────────────────────────────────────────────────── */
+document.getElementById('lang-btn').addEventListener('click',e=>{
+  e.stopPropagation();
+  const p=document.getElementById('lang-popup');
+  p.querySelectorAll('.lang-option').forEach(el=>el.classList.toggle('active',el.dataset.lang===S.lang));
+  p.classList.toggle('open');
+});
+document.getElementById('lang-popup').querySelectorAll('.lang-option').forEach(el=>{
+  el.addEventListener('click',()=>{
+    S.lang=el.dataset.lang; localStorage.setItem('ot_lang',S.lang);
+    document.getElementById('lang-popup').classList.remove('open');
+    applyLang();
+  });
+});
+document.addEventListener('click',()=>document.getElementById('lang-popup').classList.remove('open'));
 
-// Chips
-function renderChips(){const defs=[{id:'all',lbl:'Barchasi'},{id:'uzbek',lbl:"O'zbek"},{id:'european',lbl:'Yevropa'},{id:'italian',lbl:'Italyan'},{id:'asian',lbl:'Osiyo'}];const row=document.getElementById('chip-row');row.innerHTML=defs.map(d=>`<button class="chip${(S.chip||'all')===d.id?' active':''}" data-c="${d.id}">${d.lbl}</button>`).join('');row.querySelectorAll('.chip').forEach(el=>el.onclick=()=>{S.chip=el.dataset.c;renderChips();applyFilters()})}
+/* ─── AUTH ────────────────────────────────────────────────────────────────── */
+async function auth(){
+  const u=tg?.initDataUnsafe?.user||{id:9999,first_name:'Demo',username:'demo'};
+  try{
+    const r=await api('/auth/telegram',{method:'POST',body:JSON.stringify({
+      telegram_id:u.id,first_name:u.first_name||'',last_name:u.last_name||'',
+      username:u.username||'',language:u.language_code||'uz'
+    })});
+    if(r.token){S.token=r.token;localStorage.setItem('ot_token',r.token);}
+    S.user=r.user||u;
+  }catch{S.user=u;}
+}
 
-// Bookings
-async function loadBookings(){const el=document.getElementById('bookings-list');el.innerHTML='<div class="skeleton" style="height:120px;margin-bottom:14px"></div>';try{const raw=await api('/reservations/my');S.bookings=Array.isArray(raw)?raw:[];renderBookings()}catch{S.bookings=[];renderBookings()}}
-function renderBookings(){const el=document.getElementById('bookings-list');if(!S.bookings.length){el.innerHTML='<div class="empty"><h3>Bronlar yo\'q</h3><p>Restoran tanlang va bron qiling</p></div>';return}
-el.innerHTML=S.bookings.map(bk=>{const st=bk.status||'pending';return`<div class="booking-card status-${st}"><div class="bk-head"><div class="bk-name">${esc(bk.restaurant_name||'—')}</div><span class="bk-status ${st}">${({pending:'Kutilmoqda',confirmed:'Tasdiqlangan',cancelled:'Bekor',completed:'Tugallangan'})[st]||st}</span></div><div class="bk-details"><div class="bk-detail"><div class="bk-lbl">Sana</div><div class="bk-val">${humanDate(bk.date)}</div></div><div class="bk-detail"><div class="bk-lbl">Vaqt</div><div class="bk-val">${String(bk.time||'').slice(0,5)}</div></div><div class="bk-detail"><div class="bk-lbl">Mehmon</div><div class="bk-val">${bk.guests}</div></div></div>${['pending','confirmed'].includes(st)?`<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);padding-left:8px"><button style="padding:10px;border-radius:100px;font-size:11.5px;font-weight:800;border:1.5px solid var(--danger);color:var(--danger);width:100%;text-transform:uppercase;letter-spacing:.05em" onclick="cancelBooking(${bk.id})">Bekor qilish</button></div>`:''}</div>`}).join('');updateStats()}
-async function cancelBooking(id){if(!confirm('Bekor qilasizmi?'))return;try{await api(`/reservations/${id}`,{method:'DELETE'});toast('Bekor qilindi','success');loadBookings()}catch(e){toast(e.message,'error')}}
+/* ─── RESTAURANTS ─────────────────────────────────────────────────────────── */
+async function loadRestaurants(){
+  try{
+    let url='/restaurants';
+    if(S.coords) url+=`?lat=${S.coords.lat}&lng=${S.coords.lng}`;
+    const raw=await api(url);
+    S.restaurants=Array.isArray(raw)?raw:(raw.restaurants||[]);
+    S.restaurants.sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0)||(b.rating||0)-(a.rating||0));
+    applyFilters();
+  }catch{
+    document.getElementById('rest-list').innerHTML=`<div class="empty"><h3>${t('err_load')}</h3><p>${t('err_load_s')}</p></div>`;
+  }
+}
 
-// Favorites
-function renderFavorites(){const el=document.getElementById('fav-list');const favR=S.restaurants.filter(r=>S.favorites.includes(r.id));if(!favR.length){el.innerHTML='<div class="empty"><h3>Sevimlilar bo\'sh</h3><p>❤️ bosib qo\'shing</p></div>';return}
-el.className='card-list';el.innerHTML=favR.map(r=>{const img=r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';return`<div class="rest-card" onclick="openSheet(${r.id})"><div class="c-image"><img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy"></div><div class="c-body"><div class="c-name">${esc(r.name)}</div><div class="c-foot"><span></span><button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">Bron</button></div></div></div>`}).join('')}
+function applyFilters(){
+  const chip=S.chip||'all', q=(S.q||'').toLowerCase();
+  let list=S.restaurants;
+  if(chip!=='all') list=list.filter(r=>{const cs=Array.isArray(r.cuisine)?r.cuisine:(r.cuisine?[r.cuisine]:[]);return cs.some(c=>String(c).toLowerCase().includes(chip));});
+  if(q) list=list.filter(r=>(r.name||'').toLowerCase().includes(q));
+  S.filtered=list; renderRestaurants(); renderTonightSection();
+}
 
-// Profile
-function renderProfile(){const u=S.user||{};document.getElementById('profile-name').textContent=u.first_name||'Mehmon';document.getElementById('profile-handle').textContent=u.username?`@${u.username}`:'';document.getElementById('profile-avatar').textContent=(u.first_name||'M')[0].toUpperCase();updateStats()}
-function updateStats(){document.getElementById('stat-bookings').textContent=S.bookings.length;document.getElementById('stat-favs').textContent=S.favorites.length;document.getElementById('stat-visited').textContent=new Set(S.bookings.filter(b=>b.status==='completed').map(b=>b.restaurant_id)).size}
+function renderRestaurants(){
+  const el=document.getElementById('rest-list');
+  const cnt=document.getElementById('rest-count');
+  if(cnt) cnt.textContent=`${S.filtered.length} ta`;
+  if(!S.filtered.length){el.innerHTML=`<div class="empty"><h3>${t('not_found')}</h3><p>${t('not_found_sub')}</p></div>`;return;}
+  el.className='card-list';
+  el.innerHTML=S.filtered.map(r=>{
+    const img=r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';
+    const rating=r.rating?Number(r.rating).toFixed(1):'—';
+    const o=isOpen(r.working_hours);
+    const cs=Array.isArray(r.cuisine)?r.cuisine.slice(0,2):[];
+    return`<div class="rest-card" onclick="openSheet(${r.id})">
+      <div class="c-image">
+        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800'">
+        ${o===true?`<div class="badge-open"><span class="dot"></span>${t('open_now')}</div>`:''}
+        ${r.is_premium?`<div class="badge-premium">Premium</div>`:''}
+      </div>
+      <div class="c-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div class="c-name">${esc(r.name)}</div>
+          <div class="c-rating">⭐ ${rating}</div>
+        </div>
+        ${r.address?`<div class="c-meta"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${esc(r.address)}</span></div>`:''}
+        <div class="c-foot">
+          <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
+          <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-// Tabs
-function switchTab(tab){S.tab=tab;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(`page-${tab}`).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));if(tab==='bookings')loadBookings();if(tab==='favorites')renderFavorites();if(tab==='profile')renderProfile()}
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchTab(t.dataset.tab))
+/* ─── CHIPS ───────────────────────────────────────────────────────────────── */
+function renderChips(){
+  const row=document.getElementById('chip-row');
+  row.innerHTML=t('chips').map(([id,lbl])=>`<button class="chip${(S.chip||'all')===id?' active':''}" data-c="${id}">${lbl}</button>`).join('');
+  row.querySelectorAll('.chip').forEach(el=>el.addEventListener('click',()=>{S.chip=el.dataset.c;renderChips();applyFilters();}));
+}
 
-// Booking sheet
-async function openSheet(rid){const r=S.restaurants.find(x=>x.id===rid);if(!r)return;S.booking={restaurant:r,step:1,zones:[],menu:[],zone:null,date:isoDate(new Date()),time:null,guests:2,preOrder:{},availability:[]};document.getElementById('sheet-title').textContent=r.name;document.getElementById('sheet-body').innerHTML='<div style="padding:40px 0;text-align:center"><div class="spin"></div></div>';document.getElementById('sheet-foot').innerHTML='';document.getElementById('sheet-backdrop').classList.add('open');document.getElementById('sheet').classList.add('open')
-try{const[zones,menu]=await Promise.all([api(`/restaurants/${rid}/zones`).catch(()=>[]),api(`/restaurants/${rid}/menu`).catch(()=>[])]);S.booking.zones=Array.isArray(zones)?zones:[];S.booking.menu=Array.isArray(menu)?menu:[]}catch{};renderStep()}
-function closeSheet(){document.getElementById('sheet-backdrop').classList.remove('open');document.getElementById('sheet').classList.remove('open')}
-document.getElementById('sheet-close').onclick=closeSheet;document.getElementById('sheet-backdrop').onclick=closeSheet
-window.openSheet=openSheet
+/* ─── TRENDING ────────────────────────────────────────────────────────────── */
+function renderTrending(){
+  const el=document.getElementById('trending-strip');
+  el.innerHTML=t('trending').map(([e,l,c])=>`<div class="trend-pill"><span class="trend-pill-emoji">${e}</span><span>${l}</span><span class="trend-pill-count">${c}</span></div>`).join('');
+}
 
-function renderStep(){const b=S.booking,body=document.getElementById('sheet-body'),foot=document.getElementById('sheet-foot')
-if(b.step===1){const zones=b.zones.length?b.zones:[{id:null,name:'Asosiy zal',capacity:b.restaurant.capacity||50}];const dates=Array.from({length:14},(_,i)=>{const d=addDays(i);const iso=isoDate(d);const dow=i===0?'Bugun':i===1?'Ertaga':['Yak','Du','Se','Chor','Pay','Ju','Sha'][d.getDay()];const ms=['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];return{iso,dow:dow.slice(0,3),day:d.getDate(),mon:ms[d.getMonth()]}})
-body.innerHTML=`<div class="steps-bar"><div class="step-seg active"></div><div class="step-seg"></div><div class="step-seg"></div></div><div class="field-block"><div class="field-label">Zona</div><div class="zone-grid">${zones.map(z=>`<button class="zone-card${b.zone?.id===z.id?' active':''}" onclick="S.booking.zone=${z.id===null?'{id:null,name:\\'Asosiy\\'}':'{id:'+z.id+',name:\\''+esc(z.name)+'\\'}'};renderStep()"><div style="font-weight:800;font-size:14px">${esc(z.name)}</div><div style="font-size:11px;opacity:.6">${z.capacity||''} kishi</div></button>`).join('')}</div></div><div class="field-block"><div class="field-label">Sana</div><div class="date-row">${dates.map(d=>`<button class="date-card${b.date===d.iso?' active':''}" onclick="S.booking.date='${d.iso}';renderStep()"><div class="dc-dow">${d.dow}</div><div class="dc-day">${d.day}</div><div class="dc-mon">${d.mon}</div></button>`).join('')}</div></div><div class="field-block"><div class="field-label">Mehmonlar</div><div class="guests-control"><div style="display:flex;align-items:baseline;gap:6px"><div class="guests-num">${b.guests}</div><div style="font-size:13px;color:var(--ink3)">kishi</div></div><div style="display:flex;gap:10px"><button class="g-btn" onclick="if(S.booking.guests>1){S.booking.guests--;renderStep()}" ${b.guests<=1?'disabled':''}>−</button><button class="g-btn" onclick="if(S.booking.guests<20){S.booking.guests++;renderStep()}" ${b.guests>=20?'disabled':''}>+</button></div></div></div>`
-foot.innerHTML=`<button class="btn-primary" ${!b.zone?'disabled':''} onclick="S.booking.step=2;loadAvailability()">Davom etish →</button>`}
+/* ─── REELS DATA ─────────────────────────────────────────────────────────── */
+const REELS_MOCK=[
+  {id:1,name:"Kapalak",caption:{uz:"Tabiiy muhitda kecha",ru:"Вечер в природе",en:"Evening in nature"},type:"video",img:"https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&h=700&fit=crop",views:"2.1K",likes:"340"},
+  {id:2,name:"Navruz",caption:{uz:"Milliy ta'mlar",ru:"Национальные блюда",en:"Traditional cuisine"},type:"image",img:"https://images.unsplash.com/photo-1544025162-d76694265947?w=400&h=700&fit=crop",views:"1.8K",likes:"210"},
+  {id:3,name:"Terrassa",caption:{uz:"Shahar manzarasi",ru:"Вид на город",en:"City views"},type:"video",img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=700&fit=crop",views:"3.4K",likes:"512"},
+  {id:4,name:"Sabo",caption:{uz:"Yangi menyular",ru:"Новое меню",en:"New menu items"},type:"image",img:"https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=400&h=700&fit=crop",views:"980",likes:"142"},
+  {id:5,name:"Loft 12",caption:{uz:"Premium kechki ovqat",ru:"Премиум ужин",en:"Premium dinner"},type:"video",img:"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=700&fit=crop",views:"4.2K",likes:"680"},
+];
 
-else if(b.step===2){const slots=[];for(let h=10;h<=23;h++){slots.push(`${String(h).padStart(2,'0')}:00`);if(h<23)slots.push(`${String(h).padStart(2,'0')}:30`)};const busy=new Set((b.availability||[]).map(a=>typeof a==='string'?a.slice(0,5):(a.time||'').slice(0,5)))
-body.innerHTML=`<div class="steps-bar"><div class="step-seg done"></div><div class="step-seg active"></div><div class="step-seg"></div></div><div class="field-block"><div class="field-label">Vaqt · ${humanDate(b.date)}</div><div class="time-grid">${slots.map(s=>`<button class="time-card${b.time===s?' active':''}" ${busy.has(s)?'disabled':''} onclick="S.booking.time='${s}';renderStep()">${s}</button>`).join('')}</div></div>`
-foot.innerHTML=`<div style="display:flex;gap:10px"><button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px" onclick="S.booking.step=1;renderStep()">←</button><button class="btn-primary" style="flex:1" ${!b.time?'disabled':''} onclick="S.booking.step=3;renderStep()">Davom →</button></div>`}
+function renderReels(){
+  const el=document.getElementById('reels-scroll');
+  const items=S.restaurants.length
+    ?S.restaurants.slice(0,5).map((r,i)=>({
+        id:r.id,name:r.name,
+        caption:{uz:Array.isArray(r.cuisine)?r.cuisine.join(' · '):(r.cuisine||REELS_MOCK[i%5].caption.uz),
+                 ru:Array.isArray(r.cuisine)?r.cuisine.join(' · '):(r.cuisine||REELS_MOCK[i%5].caption.ru),
+                 en:Array.isArray(r.cuisine)?r.cuisine.join(' · '):(r.cuisine||REELS_MOCK[i%5].caption.en)},
+        type:i%2===0?'video':'image',
+        img:r.image_url||REELS_MOCK[i%5].img,
+        views:`${(Math.floor(Math.random()*40+5)*100).toLocaleString()}`,
+        likes:`${Math.floor(Math.random()*500+50)}`
+      }))
+    :REELS_MOCK;
 
-else if(b.step===3){body.innerHTML=`<div class="steps-bar"><div class="step-seg done"></div><div class="step-seg done"></div><div class="step-seg active"></div></div><div style="text-align:center;padding:20px 0"><div style="font-family:var(--fd);font-size:28px;margin-bottom:8px">${esc(b.restaurant.name)}</div><div style="color:var(--ink3)">${humanDate(b.date)} · ${b.time} · ${b.guests} kishi</div><div style="color:var(--ink3);margin-top:4px">${esc(b.zone?.name||'Asosiy')}</div></div>`
-foot.innerHTML=`<div style="display:flex;gap:10px"><button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px" onclick="S.booking.step=2;renderStep()">←</button><button class="btn-primary" style="flex:1" id="submit-btn" onclick="submitBooking()">Tasdiqlash · ${b.time}</button></div>`}}
+  el.innerHTML=items.map(item=>`
+    <div class="reel-card" onclick="openSheet(${item.id})">
+      <img class="reel-thumb" src="${esc(item.img)}" alt="${esc(item.name)}" loading="lazy"
+           onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=700&fit=crop'">
+      <div class="reel-gradient"></div>
+      <div class="reel-media-badge ${item.type}">${item.type==='video'?'▶ Video':'📷 Photo'}</div>
+      ${item.type==='video'?`<div class="reel-play"><svg width="15" height="15" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>`:''}
+      <div class="reel-meta">
+        <div class="reel-name">${esc(item.name)}</div>
+        <div class="reel-caption">${esc((item.caption[S.lang])||item.caption.uz)}</div>
+        <div class="reel-stats">
+          <div class="reel-stat"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>${esc(item.views)}</div>
+          <div class="reel-stat"><svg width="10" height="10" viewBox="0 0 24 24" fill="rgba(255,255,255,.8)" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>${esc(item.likes)}</div>
+        </div>
+        <div class="reel-book-btn">${t('book_now')}</div>
+      </div>
+    </div>`).join('');
+}
 
-async function loadAvailability(){try{const av=await api(`/restaurants/${S.booking.restaurant.id}/availability?date=${S.booking.date}`);S.booking.availability=Array.isArray(av)?av:[]}catch{S.booking.availability=[]};renderStep()}
+/* ─── DEALS DATA ─────────────────────────────────────────────────────────── */
+const DEALS_MOCK=[
+  {id:1,title:{uz:"Kechki set-menyu",ru:"Вечернее сет-меню",en:"Evening Set Menu"},desc:{uz:"2 kishi uchun 4 xil taom",ru:"4 блюда для двоих",en:"4-course dinner for 2"},discount:"30%",expire:{uz:"2 kun qoldi",ru:"2 дня",en:"2 days left"},isNew:true,type:"image",img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=240&fit=crop"},
+  {id:2,title:{uz:"Tushlik chegirmasi",ru:"Скидка на обед",en:"Lunch Special"},desc:{uz:"12:00–15:00 oralig'ida",ru:"Каждый день 12–15",en:"Mon–Fri 12:00–15:00"},discount:"20%",expire:{uz:"Har kuni",ru:"Каждый день",en:"Every day"},isNew:false,type:"image",img:"https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=300&h=240&fit=crop"},
+  {id:3,title:{uz:"Bepul desert",ru:"Бесплатный десерт",en:"Free Dessert"},desc:{uz:"2 ta taom buyurtma qilsangiz",ru:"При заказе 2 блюд",en:"With any 2 mains"},discount:"🎁",expire:{uz:"Juma kuni",ru:"По пятницам",en:"Fridays only"},isNew:false,type:"video",img:"https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&h=240&fit=crop"},
+];
 
-async function submitBooking(){const b=S.booking,btn=document.getElementById('submit-btn');btn.disabled=true;btn.innerHTML='<span class="spin"></span>'
-try{await api('/reservations',{method:'POST',body:JSON.stringify({restaurant_id:b.restaurant.id,zone_id:b.zone?.id||null,date:b.date,time:b.time,guests:b.guests})});toast('Bron yaratildi!','success');closeSheet();loadBookings();switchTab('bookings')}catch(e){toast(e.message||'Xatolik','error');btn.disabled=false;btn.innerHTML=`Tasdiqlash · ${b.time}`}}
+function renderDeals(){
+  const el=document.getElementById('deals-scroll');
+  const deals=DEALS_MOCK.map((d,i)=>{const r=S.restaurants[i]||null;return{...d,img:(r?.image_url)||d.img,rid:r?.id||d.id};});
+  el.innerHTML=deals.map(d=>`
+    <div class="deal-card" onclick="openSheet(${d.rid})">
+      <div class="deal-thumb">
+        <img src="${esc(d.img)}" alt="" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300'">
+        <div class="deal-thumb-grad"></div>
+        <div class="deal-disc">${esc(d.discount)}</div>
+        ${d.type==='video'?`<div class="deal-play"><svg width="20" height="20" viewBox="0 0 24 24" fill="white" opacity=".9"><polygon points="5,3 19,12 5,21"/></svg></div>`:''}
+      </div>
+      <div class="deal-body">
+        <div>
+          <div class="deal-title">${esc(d.title[S.lang]||d.title.uz)}</div>
+          <div class="deal-desc">${esc(d.desc[S.lang]||d.desc.uz)}</div>
+        </div>
+        <div class="deal-footer">
+          <div class="deal-expire"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${esc(d.expire[S.lang]||d.expire.uz)}</div>
+          <button class="deal-cta" onclick="event.stopPropagation();openSheet(${d.rid})">${t('book')}</button>
+        </div>
+      </div>
+      ${d.isNew?`<div class="deal-new">NEW</div>`:''}
+    </div>`).join('');
+}
 
-// Lang
-function cycleLang(){const flags=['🇺🇿','🇷🇺','🇬🇧'],cur=document.getElementById('lang-btn').textContent,idx=(flags.indexOf(cur)+1)%3;document.getElementById('lang-btn').textContent=flags[idx]}
-document.getElementById('lang-btn').onclick=cycleLang
+/* ─── TONIGHT ─────────────────────────────────────────────────────────────── */
+function renderTonightSection(){
+  const el=document.getElementById('tonight-scroll');
+  const items=[...S.filtered].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,5);
+  if(!items.length){el.innerHTML='';return;}
+  el.innerHTML=items.map(r=>{
+    const img=r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400';
+    const pop=Math.min(100,Math.round((r.rating||3)/5*100));
+    const o=isOpen(r.working_hours);
+    return`<div class="tonight-card" onclick="openSheet(${r.id})">
+      <img class="tonight-thumb" src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'">
+      <div class="tonight-body">
+        <div class="tonight-name">${esc(r.name)}</div>
+        <div class="tonight-meta">⭐ ${r.rating?Number(r.rating).toFixed(1):'—'}${o===true?`<span style="color:var(--success)">● ${t('open_now')}</span>`:''}</div>
+        <div class="tonight-pop"><div class="pop-bar"><div class="pop-fill" style="width:${pop}%"></div></div><div class="pop-label">${pop}%</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
 
-// Search
-let st;document.getElementById('search-input').oninput=e=>{clearTimeout(st);st=setTimeout(()=>{S.q=e.target.value.trim();applyFilters()},250)}
+/* ─── BOOKINGS ────────────────────────────────────────────────────────────── */
+async function loadBookings(){
+  const el=document.getElementById('bookings-list');
+  el.innerHTML=`<div class="skeleton" style="height:108px;margin-bottom:12px;border-radius:var(--r3)"></div><div class="skeleton" style="height:108px;border-radius:var(--r3)"></div>`;
+  try{const raw=await api('/reservations/my');S.bookings=Array.isArray(raw)?raw:[];renderBookings();}
+  catch{S.bookings=[];renderBookings();}
+}
+function renderBookings(){
+  const el=document.getElementById('bookings-list');
+  if(!S.bookings.length){el.innerHTML=`<div class="empty"><h3>${t('no_bk')}</h3><p>${t('no_bk_s')}</p></div>`;updateStats();return;}
+  el.innerHTML=S.bookings.map(bk=>{
+    const st=bk.status||'pending';
+    return`<div class="booking-card status-${st}">
+      <div class="bk-head"><div class="bk-name">${esc(bk.restaurant_name||'—')}</div><span class="bk-status ${st}">${t('status')[st]||st}</span></div>
+      <div class="bk-details">
+        <div class="bk-detail"><div class="bk-lbl">${t('date_l')}</div><div class="bk-val">${humanDate(bk.date)}</div></div>
+        <div class="bk-detail"><div class="bk-lbl">${t('time_l')}</div><div class="bk-val">${String(bk.time||'').slice(0,5)}</div></div>
+        <div class="bk-detail"><div class="bk-lbl">${t('guests_l')}</div><div class="bk-val">${bk.guests}</div></div>
+      </div>
+      ${['pending','confirmed'].includes(st)?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line);padding-left:8px"><button style="padding:10px;border-radius:100px;font-size:11px;font-weight:800;border:1.5px solid var(--danger);color:var(--danger);width:100%;text-transform:uppercase;letter-spacing:.05em" onclick="cancelBooking(${bk.id})">${t('cancel_bk')}</button></div>`:''}
+    </div>`;
+  }).join('');
+  updateStats();
+}
+async function cancelBooking(id){
+  if(!confirm(t('cancel_q'))) return;
+  try{await api(`/reservations/${id}`,{method:'DELETE'});toast(t('cancelled'),'success');loadBookings();}
+  catch(e){toast(e.message,'error');}
+}
 
-// Theme
-function applyTheme(){const scheme=tg?.colorScheme||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',scheme)}
+/* ─── FAVORITES ───────────────────────────────────────────────────────────── */
+function renderFavorites(){
+  const el=document.getElementById('fav-list');
+  const favR=S.restaurants.filter(r=>S.favorites.includes(r.id));
+  if(!favR.length){el.innerHTML=`<div class="empty"><h3>${t('no_fav')}</h3><p>${t('no_fav_s')}</p></div>`;return;}
+  el.className='card-list';
+  el.innerHTML=favR.map(r=>{
+    const img=r.image_url||'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';
+    return`<div class="rest-card" onclick="openSheet(${r.id})">
+      <div class="c-image"><img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy"></div>
+      <div class="c-body"><div class="c-name">${esc(r.name)}</div><div class="c-foot"><span></span><button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button></div></div>
+    </div>`;
+  }).join('');
+}
 
-// Geo
-function requestGeo(){if(!navigator.geolocation){S.coords={lat:41.2995,lng:69.2401};return};navigator.geolocation.getCurrentPosition(p=>{S.coords={lat:p.coords.latitude,lng:p.coords.longitude};loadRestaurants()},()=>{S.coords={lat:41.2995,lng:69.2401}},{timeout:5000})}
+/* ─── PROFILE ─────────────────────────────────────────────────────────────── */
+function renderProfile(){
+  const u=S.user||{};
+  document.getElementById('profile-name').textContent  =u.first_name||(S.lang==='uz'?'Mehmon':S.lang==='ru'?'Гость':'Guest');
+  document.getElementById('profile-handle').textContent=u.username?`@${u.username}`:'';
+  document.getElementById('profile-avatar').textContent=(u.first_name||'M')[0].toUpperCase();
+  updateStats();
+}
+function updateStats(){
+  document.getElementById('stat-bookings').textContent=S.bookings.length;
+  document.getElementById('stat-favs').textContent    =S.favorites.length;
+  document.getElementById('stat-visited').textContent =new Set(S.bookings.filter(b=>b.status==='completed').map(b=>b.restaurant_id)).size;
+}
 
-// Init
-async function init(){applyTheme();if(tg?.onEvent)tg.onEvent('themeChanged',applyTheme);document.getElementById('home-greeting').textContent=greeting();renderChips();await auth();document.getElementById('home-user-name').textContent=S.user?.first_name||'mehmon';requestGeo();await loadRestaurants()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
+/* ─── TABS ────────────────────────────────────────────────────────────────── */
+function switchTab(tab){
+  S.tab=tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`page-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
+  if(tab==='bookings') loadBookings();
+  if(tab==='favorites') renderFavorites();
+  if(tab==='profile') renderProfile();
+}
+document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
+
+/* ─── BOOKING SHEET ───────────────────────────────────────────────────────── */
+async function openSheet(rid){
+  const restaurant=S.restaurants.find(x=>x.id===rid)||{id:rid,name:'Restoran',capacity:50};
+  S.booking={restaurant,step:1,zones:[],menu:[],zone:null,date:isoDate(new Date()),time:null,guests:2,preOrder:{},availability:[]};
+  document.getElementById('sheet-title').textContent=restaurant.name;
+  document.getElementById('sheet-body').innerHTML='<div style="padding:48px 0;text-align:center"><div class="spin"></div></div>';
+  document.getElementById('sheet-foot').innerHTML='';
+  document.getElementById('sheet-backdrop').classList.add('open');
+  document.getElementById('sheet').classList.add('open');
+  try{
+    const[zones,menu]=await Promise.all([api(`/restaurants/${rid}/zones`).catch(()=>[]),api(`/restaurants/${rid}/menu`).catch(()=>[])]);
+    S.booking.zones=Array.isArray(zones)?zones:[];
+    S.booking.menu=Array.isArray(menu)?menu:[];
+  }catch{}
+  renderStep();
+}
+window.openSheet=openSheet;
+
+function closeSheet(){
+  document.getElementById('sheet-backdrop').classList.remove('open');
+  document.getElementById('sheet').classList.remove('open');
+}
+document.getElementById('sheet-close').addEventListener('click',closeSheet);
+document.getElementById('sheet-backdrop').addEventListener('click',closeSheet);
+
+function renderStep(){
+  const b=S.booking, body=document.getElementById('sheet-body'), foot=document.getElementById('sheet-foot');
+
+  if(b.step===1){
+    const zones=b.zones.length?b.zones:[{id:null,name:t('main_hall'),capacity:b.restaurant.capacity||50}];
+    const dates=Array.from({length:14},(_,i)=>{const d=addDays(i);const iso=isoDate(d);const dow=i===0?t('today'):i===1?t('tomorrow'):t('days')[d.getDay()];return{iso,dow:dow.slice(0,3),day:d.getDate(),mon:t('months')[d.getMonth()]};});
+    body.innerHTML=`
+      <div class="steps-bar"><div class="step-seg active"></div><div class="step-seg"></div><div class="step-seg"></div></div>
+      <div class="field-block">
+        <div class="field-label">${t('zone_l')}</div>
+        <div class="zone-grid">${zones.map(z=>`<button class="zone-card${b.zone?.id===z.id?' active':''}" onclick='selectZone(${JSON.stringify(z)})'><div style="font-weight:800;font-size:13px">${esc(z.name)}</div><div style="font-size:11px;opacity:.6;margin-top:2px">${z.capacity||''} ${t('guests_s')}</div></button>`).join('')}</div>
+      </div>
+      <div class="field-block">
+        <div class="field-label">${t('date_l')}</div>
+        <div class="date-row">${dates.map(d=>`<button class="date-card${b.date===d.iso?' active':''}" onclick="S.booking.date='${d.iso}';renderStep()"><div class="dc-dow">${d.dow}</div><div class="dc-day">${d.day}</div><div class="dc-mon">${d.mon}</div></button>`).join('')}</div>
+      </div>
+      <div class="field-block">
+        <div class="field-label">${t('guests_l')}</div>
+        <div class="guests-control">
+          <div style="display:flex;align-items:baseline;gap:6px"><div class="guests-num">${b.guests}</div><div style="font-size:12px;color:var(--ink3)">${t('guests_s')}</div></div>
+          <div style="display:flex;gap:10px">
+            <button class="g-btn" onclick="if(S.booking.guests>1){S.booking.guests--;renderStep()}" ${b.guests<=1?'disabled':''}>−</button>
+            <button class="g-btn" onclick="if(S.booking.guests<20){S.booking.guests++;renderStep()}" ${b.guests>=20?'disabled':''}>+</button>
+          </div>
+        </div>
+      </div>`;
+    foot.innerHTML=`<button class="btn-primary" ${!b.zone?'disabled':''} onclick="S.booking.step=2;loadAvailability()">${t('cont1')}</button>`;
+  }
+
+  else if(b.step===2){
+    const slots=[]; for(let h=10;h<=23;h++){slots.push(`${String(h).padStart(2,'0')}:00`);if(h<23)slots.push(`${String(h).padStart(2,'0')}:30`);}
+    const busy=new Set((b.availability||[]).map(a=>typeof a==='string'?a.slice(0,5):(a.time||'').slice(0,5)));
+    body.innerHTML=`
+      <div class="steps-bar"><div class="step-seg done"></div><div class="step-seg active"></div><div class="step-seg"></div></div>
+      <div class="field-block">
+        <div class="field-label">${t('time_l')} · ${humanDate(b.date)}</div>
+        <div class="time-grid">${slots.map(s=>`<button class="time-card${b.time===s?' active':''}" ${busy.has(s)?'disabled':''} onclick="S.booking.time='${s}';renderStep()">${s}</button>`).join('')}</div>
+      </div>`;
+    foot.innerHTML=`<div style="display:flex;gap:9px"><button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px;box-shadow:none" onclick="S.booking.step=1;renderStep()">←</button><button class="btn-primary" style="flex:1" ${!b.time?'disabled':''} onclick="S.booking.step=3;renderStep()">${t('cont2')}</button></div>`;
+  }
+
+  else if(b.step===3){
+    body.innerHTML=`
+      <div class="steps-bar"><div class="step-seg done"></div><div class="step-seg done"></div><div class="step-seg active"></div></div>
+      <div style="text-align:center;padding:20px 0 16px"><div style="font-family:var(--fd);font-size:24px;margin-bottom:8px">${esc(b.restaurant.name)}</div><div style="color:var(--ink3);font-size:13.5px">${humanDate(b.date)} · ${b.time} · ${b.guests} ${t('guests_s')}</div><div style="color:var(--ink4);font-size:12.5px;margin-top:4px">${esc(b.zone?.name||t('main_zone'))}</div></div>
+      <div style="background:var(--bg3);border-radius:var(--r2);padding:15px 17px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px">
+          <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('date_l')}</div><div style="font-weight:800;font-size:14px">${humanDate(b.date)}</div></div>
+          <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('time_l')}</div><div style="font-weight:800;font-size:14px">${b.time}</div></div>
+          <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('guests_l')}</div><div style="font-weight:800;font-size:14px">${b.guests} ${t('guests_s')}</div></div>
+          <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('zone_l')}</div><div style="font-weight:800;font-size:14px">${esc(b.zone?.name||t('main_zone'))}</div></div>
+        </div>
+      </div>`;
+    foot.innerHTML=`<div style="display:flex;gap:9px"><button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px;box-shadow:none" onclick="S.booking.step=2;renderStep()">←</button><button class="btn-primary" style="flex:1" id="submit-btn" onclick="submitBooking()">${t('confirm_btn')} · ${b.time}</button></div>`;
+  }
+}
+
+window.selectZone=function(z){S.booking.zone=typeof z==='string'?JSON.parse(z):z;renderStep();};
+
+async function loadAvailability(){
+  try{const av=await api(`/restaurants/${S.booking.restaurant.id}/availability?date=${S.booking.date}`);S.booking.availability=Array.isArray(av)?av:[];}
+  catch{S.booking.availability=[];}
+  renderStep();
+}
+async function submitBooking(){
+  const b=S.booking, btn=document.getElementById('submit-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spin"></span>';
+  try{
+    await api('/reservations',{method:'POST',body:JSON.stringify({restaurant_id:b.restaurant.id,zone_id:b.zone?.id||null,date:b.date,time:b.time,guests:b.guests})});
+    toast(t('bk_ok'),'success'); closeSheet(); loadBookings(); switchTab('bookings');
+  }catch(e){
+    toast(e.message||'Xatolik','error'); btn.disabled=false; btn.innerHTML=`${t('confirm_btn')} · ${b.time}`;
+  }
+}
+
+/* ─── SEARCH ──────────────────────────────────────────────────────────────── */
+let _st;
+document.getElementById('search-input').addEventListener('input',e=>{
+  clearTimeout(_st); _st=setTimeout(()=>{S.q=e.target.value.trim();applyFilters();},250);
+});
+
+/* ─── GEO ─────────────────────────────────────────────────────────────────── */
+function requestGeo(){
+  if(!navigator.geolocation){S.coords={lat:41.2995,lng:69.2401};return;}
+  navigator.geolocation.getCurrentPosition(
+    p=>{S.coords={lat:p.coords.latitude,lng:p.coords.longitude};loadRestaurants();},
+    ()=>{S.coords={lat:41.2995,lng:69.2401};},
+    {timeout:5000}
+  );
+}
+
+/* ─── SCROLL REVEAL ───────────────────────────────────────────────────────── */
+function initReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+  },{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+/* ─── INIT ────────────────────────────────────────────────────────────────── */
+async function init(){
+  applyTheme();
+  if(tg?.onEvent) tg.onEvent('themeChanged',()=>{if(S.theme==='auto') applyTheme();});
+
+  const savedLang=localStorage.getItem('ot_lang');
+  if(savedLang) S.lang=savedLang;
+  else if(tg?.initDataUnsafe?.user?.language_code){
+    const lc=tg.initDataUnsafe.user.language_code;
+    S.lang=lc.startsWith('ru')?'ru':lc.startsWith('en')?'en':'uz';
+  }
+
+  applyLang();
+  renderChips();
+  renderTrending();
+
+  await auth();
+  document.getElementById('home-user-name').textContent=S.user?.first_name||(S.lang==='uz'?'mehmon':S.lang==='ru'?'гость':'guest');
+
+  requestGeo();
+  await loadRestaurants();
+
+  renderReels();
+  renderDeals();
+  renderTonightSection();
+  initReveal();
+}
+
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
 </script>
 </body>
 </html>
