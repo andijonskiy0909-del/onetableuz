@@ -1,6 +1,8 @@
 const db = require('../config/db')
 const logger = require('../config/logger')
+const AppError = require('../utils/AppError')
 
+// ── Find available table ──
 async function findAvailableTable(client, restaurantId, zoneId, date, time, guests) {
   const booked = await client.query(`
     SELECT DISTINCT table_id FROM reservations
@@ -21,8 +23,8 @@ async function findAvailableTable(client, restaurantId, zoneId, date, time, gues
   }
 
   if (bookedIds.length > 0) {
-    const placeholders = bookedIds.map((_, i) => `$${params.length + i + 1}`).join(',')
-    q += ` AND t.id NOT IN (${placeholders})`
+    const ph = bookedIds.map((_, i) => `$${params.length + i + 1}`).join(',')
+    q += ` AND t.id NOT IN (${ph})`
     params.push(...bookedIds)
   }
 
@@ -31,6 +33,7 @@ async function findAvailableTable(client, restaurantId, zoneId, date, time, gues
   return r.rows[0] || null
 }
 
+// ── Alternative times ──
 async function findAlternativeTimes(restaurantId, date, time, guests) {
   const slots = []
   for (let h = 10; h <= 21; h++) {
@@ -50,7 +53,7 @@ async function findAlternativeTimes(restaurantId, date, time, guests) {
     `SELECT time FROM availability WHERE restaurant_id = $1 AND date = $2 AND is_blocked = true`,
     [restaurantId, date]
   )
-  const blockedTimes = blocked.rows.map(r => String(r.time).slice(0, 5))
+  const blockedSet = new Set(blocked.rows.map(r => String(r.time).slice(0, 5)))
 
   const bookedCounts = await db.query(`
     SELECT time, COUNT(DISTINCT table_id)::int AS n
@@ -66,46 +69,64 @@ async function findAlternativeTimes(restaurantId, date, time, guests) {
   const baseMin = th * 60 + tm
 
   return slots
-    .filter(s => !blockedTimes.includes(s) && (bookedMap[s] || 0) < total)
+    .filter(s => !blockedSet.has(s) && (bookedMap[s] || 0) < total)
     .map(s => {
       const [h, m] = s.split(':').map(Number)
       return { time: s, diff: Math.abs(h * 60 + m - baseMin) }
     })
     .sort((a, b) => a.diff - b.diff)
-    .slice(0, 3)
+    .slice(0, 5)
     .map(s => s.time)
 }
 
-async function createReservation(userId, data) {
+// ── Create reservation ──
+async function createReservation(userId, data, io) {
   const { restaurant_id, zone_id, date, time, guests, comment, special_request, pre_order } = data
   const client = await db.connect()
+
   try {
     await client.query('BEGIN')
 
+    // Validate restaurant
     const resto = await client.query(
-      `SELECT id, name FROM restaurants WHERE id = $1 AND is_active = true AND status = 'approved'`,
+      `SELECT id, name, min_guests, max_guests, deposit_required, deposit_amount, working_hours
+       FROM restaurants WHERE id = $1 AND is_active = true AND status = 'approved'`,
       [restaurant_id]
     )
-    if (!resto.rows.length) throw Object.assign(new Error('Restoran topilmadi'), { status: 404 })
+    if (!resto.rows.length) throw AppError.notFound('Restoran topilmadi')
+    const rest = resto.rows[0]
 
+    // Validate guests
+    if (guests < (rest.min_guests || 1)) throw AppError.badRequest(`Minimal mehmonlar soni: ${rest.min_guests || 1}`)
+    if (guests > (rest.max_guests || 20)) throw AppError.badRequest(`Maksimal mehmonlar soni: ${rest.max_guests || 20}`)
+
+    // Validate date (not past)
+    const bookDate = new Date(date)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    if (bookDate < today) throw AppError.badRequest('O\'tgan sana tanlash mumkin emas')
+
+    // Check blocked
     const blocked = await client.query(
       `SELECT id FROM availability WHERE restaurant_id = $1 AND date = $2 AND time = $3 AND is_blocked = true`,
       [restaurant_id, date, time]
     )
     if (blocked.rows.length) {
       const alts = await findAlternativeTimes(restaurant_id, date, time, guests)
-      throw Object.assign(new Error('Bu vaqt bloklangan'), { status: 400, alternatives: alts })
+      throw AppError.badRequest('Bu vaqt bloklangan', { alternatives: alts })
     }
 
+    // Find table
     let table = await findAvailableTable(client, restaurant_id, zone_id, date, time, guests)
     if (!table && zone_id) {
       table = await findAvailableTable(client, restaurant_id, null, date, time, guests)
     }
     if (!table) {
       const alts = await findAlternativeTimes(restaurant_id, date, time, guests)
-      throw Object.assign(new Error("Bu vaqtda boʻsh stol yoʻq"), { status: 400, alternatives: alts })
+      throw AppError.badRequest('Bu vaqtda bo\'sh stol yo\'q', { alternatives: alts })
     }
 
+    // Pre-order calc
     let preOrderTotal = 0
     const preOrderList = Array.isArray(pre_order) ? pre_order : []
     if (preOrderList.length) {
@@ -115,39 +136,59 @@ async function createReservation(userId, data) {
           `SELECT id, price FROM menu_items WHERE id = ANY($1::bigint[]) AND restaurant_id = $2 AND is_available = true`,
           [ids, restaurant_id]
         )
-        const map = Object.fromEntries(items.rows.map(m => [m.id, Number(m.price)]))
+        const priceMap = Object.fromEntries(items.rows.map(m => [m.id, Number(m.price)]))
         preOrderTotal = preOrderList.reduce((s, i) => {
           const id = i.menu_item_id || i.id
           const qty = Number(i.quantity || i.qty || 1)
-          return s + (map[id] || 0) * qty
+          return s + (priceMap[id] || 0) * qty
         }, 0)
       }
     }
 
+    // Deposit
+    const depositAmount = rest.deposit_required ? Number(rest.deposit_amount || 0) : 0
+
+    // Calculate end time (default 2 hours)
+    const [h, m] = time.split(':').map(Number)
+    const endH = Math.min(h + 2, 23)
+    const endTime = `${String(endH).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+
     const result = await client.query(`
       INSERT INTO reservations (
         user_id, restaurant_id, zone_id, table_id,
-        date, time, guests, comment, special_request,
-        pre_order, pre_order_total, status, payment_status, expires_at
+        date, time, end_time, guests, comment, special_request,
+        pre_order, pre_order_total, deposit_amount,
+        status, payment_status, expires_at
       ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'pending','unpaid', NOW() + INTERVAL '30 minutes'
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,
+        'pending', $14, NOW() + INTERVAL '30 minutes'
       ) RETURNING *
     `, [
       userId, restaurant_id,
       zone_id || table.zone_id || null,
-      table.id, date, time, guests,
+      table.id, date, time, endTime, guests,
       comment || null, special_request || null,
-      JSON.stringify(preOrderList), preOrderTotal
+      JSON.stringify(preOrderList), preOrderTotal,
+      depositAmount,
+      depositAmount > 0 ? 'unpaid' : 'not_required'
     ])
 
     await client.query('COMMIT')
-    logger.info(`[booking] #${result.rows[0].id} table=${table.table_number} time=${time}`)
 
-    return {
+    const reservation = {
       ...result.rows[0],
       table_number: table.table_number,
-      restaurant_name: resto.rows[0].name
+      restaurant_name: rest.name
     }
+
+    logger.info(`[booking] #${reservation.id} table=${table.table_number} time=${time} guests=${guests}`)
+
+    // Socket notification
+    if (io) {
+      io.to(`restaurant_${restaurant_id}`).emit('new_reservation', reservation)
+    }
+
+    return reservation
   } catch (err) {
     await client.query('ROLLBACK')
     throw err
@@ -156,10 +197,11 @@ async function createReservation(userId, data) {
   }
 }
 
+// ── Expire pending reservations ──
 async function expireReservations() {
   try {
     const r = await db.query(`
-      UPDATE reservations SET status = 'cancelled'
+      UPDATE reservations SET status = 'cancelled', cancelled_by = 'system', cancel_reason = 'Muddati tugadi'
       WHERE status = 'pending' AND expires_at < NOW()
       RETURNING id
     `)
@@ -171,4 +213,27 @@ async function expireReservations() {
   }
 }
 
-module.exports = { createReservation, findAvailableTable, findAlternativeTimes, expireReservations }
+// ── Auto-complete past reservations ──
+async function completeReservations() {
+  try {
+    const r = await db.query(`
+      UPDATE reservations SET status = 'completed', completed_at = NOW()
+      WHERE status = 'confirmed'
+        AND (date < CURRENT_DATE OR (date = CURRENT_DATE AND end_time < CURRENT_TIME))
+      RETURNING id
+    `)
+    if (r.rows.length) logger.info(`[cron] completed ${r.rows.length} reservations`)
+    return r.rows
+  } catch (e) {
+    logger.error('completeReservations:', e.message)
+    return []
+  }
+}
+
+module.exports = {
+  createReservation,
+  findAvailableTable,
+  findAlternativeTimes,
+  expireReservations,
+  completeReservations
+}
