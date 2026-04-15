@@ -2058,7 +2058,7 @@ video.reel-media { object-position: center; }
 'use strict';
 
 /* ===== CONFIG ===== */
-const API = 'https://cooperative-insight-production-11df.up.railway.app/api';
+const API = `${location.origin}/api`;
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 
