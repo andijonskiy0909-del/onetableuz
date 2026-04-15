@@ -8,7 +8,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN
 const WEBHOOK_URL = (process.env.WEBHOOK_URL || '').replace(/\/$/, '')
 const WEBAPP_URL = (process.env.WEBAPP_URL || '').replace(/\/$/, '')
 const API_URL = (process.env.API_URL || '').replace(/\/$/, '')
-const DASHBOARD_URL = WEBHOOK_URL ? `${WEBHOOK_URL}/dashboard` : ''
+
 
 if (!BOT_TOKEN) {
   console.warn('[bot] BOT_TOKEN not set — bot disabled')
@@ -35,7 +35,7 @@ const i18n = {
     btn_open: '🍽 Restoranlar',
     btn_bookings: '📅 Bronlarim',
     btn_ai: '🤖 AI Yordamchi',
-    btn_dashboard: '🏪 Dashboard',
+    
     help: '/start — Boshlash\n/mybookings — Bronlarim\n/ai — AI\n/help — Yordam',
     review_ask: n => `⭐ <b>${n}</b> ni baholang:`,
     review_comment: '💬 Sharh? (yoki o\'tkazib yuboring)',
@@ -51,7 +51,7 @@ const i18n = {
     btn_open: '🍽 Рестораны',
     btn_bookings: '📅 Мои брони',
     btn_ai: '🤖 AI',
-    btn_dashboard: '🏪 Dashboard',
+   
     help: '/start — Старт\n/mybookings — Брони\n/ai — AI\n/help — Помощь',
     review_ask: n => `⭐ Оцените <b>${n}</b>:`,
     review_comment: '💬 Комментарий?',
@@ -67,7 +67,7 @@ const i18n = {
     btn_open: '🍽 Restaurants',
     btn_bookings: '📅 Bookings',
     btn_ai: '🤖 AI',
-    btn_dashboard: '🏪 Dashboard',
+    
     help: '/start — Start\n/mybookings — Bookings\n/ai — AI\n/help — Help',
     review_ask: n => `⭐ Rate <b>${n}</b>:`,
     review_comment: '💬 Comment?',
@@ -93,7 +93,7 @@ function mainKB(uid) {
     rows.push([{ text: T(uid, 'btn_bookings'), web_app: { url: `${WEBAPP_URL}?page=bookings` } }])
   }
   rows.push([{ text: T(uid, 'btn_ai'), callback_data: 'ai' }])
-  if (DASHBOARD_URL) rows.push([{ text: T(uid, 'btn_dashboard'), url: DASHBOARD_URL }])
+  
   rows.push([
     { text: '🇺🇿', callback_data: 'lang_uz' },
     { text: '🇷🇺', callback_data: 'lang_ru' },
