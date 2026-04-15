@@ -51,22 +51,25 @@ exports.ownerRegister = asyncHandler(async (req, res) => {
 
     const o = await client.query(`
       INSERT INTO owners (full_name, email, phone, password_hash, role)
-      VALUES ($1,$2,$3,$4,'owner') RETURNING id, full_name, email, phone, role, created_at
+      VALUES ($1,$2,$3,$4,'owner')
+      RETURNING id, full_name, email, phone, role, created_at
     `, [full_name.trim(), email.toLowerCase().trim(), phone || null, hash])
+
     const owner = o.rows[0]
 
-    // Create slug from restaurant name
-    const slug = restaurant_name.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
-      + '-' + Date.now().toString(36)
-
     const r = await client.query(`
-      INSERT INTO restaurants (owner_id, name, slug, status, is_active)
-      VALUES ($1, $2, $3, 'approved', true) RETURNING *
-    `, [owner.id, restaurant_name.trim(), slug])
+      INSERT INTO restaurants (owner_id, name, status, is_active)
+      VALUES ($1, $2, 'approved', true)
+      RETURNING *
+    `, [owner.id, restaurant_name.trim()])
+
     const restaurant = r.rows[0]
 
-    await client.query('UPDATE owners SET restaurant_id = $1 WHERE id = $2', [restaurant.id, owner.id])
+    await client.query(
+      'UPDATE owners SET restaurant_id = $1 WHERE id = $2',
+      [restaurant.id, owner.id]
+    )
+
     owner.restaurant_id = restaurant.id
 
     await client.query('COMMIT')
@@ -75,6 +78,7 @@ exports.ownerRegister = asyncHandler(async (req, res) => {
     res.status(201).json({ token, owner, restaurant })
   } catch (e) {
     await client.query('ROLLBACK')
+    logger.error('OWNER REGISTER ERROR: ' + e.message)
     throw e
   } finally {
     client.release()
