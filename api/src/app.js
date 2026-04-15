@@ -47,17 +47,44 @@ app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d' }))
 
 // ── Static: webapp + dashboard ───────────────────────────────
 const WEBAPP_DIR = path.join(__dirname, '..', '..', 'webapp')
-app.use('/app', express.static(WEBAPP_DIR))
-app.get('/app*', (req, res) => {
+
+// static assets only, index auto-open qilmasin
+app.use('/webapp', express.static(WEBAPP_DIR, { index: false }))
+
+app.get('/app', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'index.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('WebApp not found')
 })
-app.use('/dashboard', express.static(WEBAPP_DIR))
-app.get('/dashboard*', (req, res) => {
+
+app.get('/app/*', (req, res) => {
+  const fp = path.join(WEBAPP_DIR, 'index.html')
+  if (fs.existsSync(fp)) res.sendFile(fp)
+  else res.status(404).send('WebApp not found')
+})
+
+app.get('/dashboard', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'dashboard.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('Dashboard not found')
+})
+
+app.get('/dashboard/*', (req, res) => {
+  const fp = path.join(WEBAPP_DIR, 'dashboard.html')
+  if (fs.existsSync(fp)) res.sendFile(fp)
+  else res.status(404).send('Dashboard not found')
+})
+
+app.get('/admin', (req, res) => {
+  const fp = path.join(WEBAPP_DIR, 'admin.html')
+  if (fs.existsSync(fp)) res.sendFile(fp)
+  else res.status(404).send('Admin not found')
+})
+
+app.get('/admin/*', (req, res) => {
+  const fp = path.join(WEBAPP_DIR, 'admin.html')
+  if (fs.existsSync(fp)) res.sendFile(fp)
+  else res.status(404).send('Admin not found')
 })
 
 // ── Bot webhook ──────────────────────────────────────────────
