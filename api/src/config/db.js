@@ -9,7 +9,11 @@ const pool = new Pool({
 })
 
 pool.on('error', (err) => {
-  console.error('[db] unexpected pool error:', err.message)
+  console.error('[db] pool error:', err.message)
+})
+
+pool.on('connect', () => {
+  // silent
 })
 
 module.exports = {
