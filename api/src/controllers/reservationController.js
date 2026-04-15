@@ -1,84 +1,75 @@
 const db = require('../config/db')
 const bookingService = require('../services/bookingService')
-const logger = require('../config/logger')
+const asyncHandler = require('../utils/asyncHandler')
+const AppError = require('../utils/AppError')
 
-exports.create = async (req, res) => {
-  try {
-    const reservation = await bookingService.createReservation(req.user.id, req.body)
+exports.create = asyncHandler(async (req, res) => {
+  const io = req.app.get('io')
+  const reservation = await bookingService.createReservation(req.user.id, req.body, io)
+  res.status(201).json(reservation)
+})
 
-    const io = req.app.get('io')
-    if (io) io.to(`restaurant_${reservation.restaurant_id}`).emit('new_reservation', reservation)
+exports.myList = asyncHandler(async (req, res) => {
+  const { status, page = 1, limit = 50 } = req.query
+  const offset = (Number(page) - 1) * Number(limit)
 
-    res.status(201).json(reservation)
-  } catch (e) {
-    logger.error('reservations.create:', e.message)
-    const status = e.status || 500
-    res.status(status).json({
-      error: e.message || 'Xatolik',
-      alternatives: e.alternatives || []
-    })
+  let where = 'WHERE res.user_id = $1'
+  const params = [req.user.id]
+
+  if (status && status !== 'all') {
+    params.push(status)
+    where += ` AND res.status = $${params.length}`
   }
-}
 
-exports.myList = async (req, res) => {
-  try {
-    const r = await db.query(`
-      SELECT res.*, r.name AS restaurant_name, r.image_url AS restaurant_image,
-             z.name AS zone_name, t.table_number
-      FROM reservations res
-      JOIN restaurants r ON r.id = res.restaurant_id
-      LEFT JOIN zones z ON z.id = res.zone_id
-      LEFT JOIN tables t ON t.id = res.table_id
-      WHERE res.user_id = $1
-      ORDER BY res.date DESC, res.time DESC
-    `, [req.user.id])
-    res.json(r.rows)
-  } catch (e) {
-    res.status(500).json({ error: 'Server xatolik' })
-  }
-}
+  const r = await db.query(`
+    SELECT res.*, r.name AS restaurant_name, r.image_url AS restaurant_image,
+           r.slug AS restaurant_slug, r.address AS restaurant_address,
+           z.name AS zone_name, t.table_number
+    FROM reservations res
+    JOIN restaurants r ON r.id = res.restaurant_id
+    LEFT JOIN zones z ON z.id = res.zone_id
+    LEFT JOIN tables t ON t.id = res.table_id
+    ${where}
+    ORDER BY res.date DESC, res.time DESC
+    LIMIT $${params.length + 1} OFFSET $${params.length + 2}
+  `, [...params, Number(limit), offset])
 
-exports.cancel = async (req, res) => {
-  try {
-    const r = await db.query(`
-      UPDATE reservations SET status = 'cancelled'
-      WHERE id = $1 AND user_id = $2 AND status IN ('pending', 'confirmed')
-      RETURNING *
-    `, [req.params.id, req.user.id])
-    if (!r.rows.length) return res.status(404).json({ error: 'Topilmadi' })
-    const io = req.app.get('io')
-    if (io) io.to(`restaurant_${r.rows[0].restaurant_id}`).emit('reservation_updated', r.rows[0])
-    res.json({ ok: true })
-  } catch (e) {
-    res.status(500).json({ error: 'Server xatolik' })
-  }
-}
+  res.json(r.rows)
+})
 
-// Bot uchun: sharh soʻralmagan tugallangan bronlar
-exports.pastUnreviewed = async (req, res) => {
-  try {
-    const r = await db.query(`
-      SELECT res.id, res.restaurant_id, u.telegram_id, r.name AS restaurant_name
-      FROM reservations res
-      JOIN users u ON u.id = res.user_id
-      JOIN restaurants r ON r.id = res.restaurant_id
-      WHERE res.status IN ('completed', 'confirmed')
-        AND res.review_asked = false
-        AND (res.date < CURRENT_DATE OR (res.date = CURRENT_DATE AND res.time < CURRENT_TIME))
-        AND NOT EXISTS (SELECT 1 FROM reviews rv WHERE rv.reservation_id = res.id)
-      LIMIT 20
-    `)
-    res.json(r.rows)
-  } catch (e) {
-    res.status(500).json({ error: 'Server xatolik' })
-  }
-}
+exports.cancel = asyncHandler(async (req, res) => {
+  const r = await db.query(`
+    UPDATE reservations SET status = 'cancelled', cancelled_by = 'user', cancel_reason = $3
+    WHERE id = $1 AND user_id = $2 AND status IN ('pending', 'confirmed')
+    RETURNING *
+  `, [req.params.id, req.user.id, req.body.reason || null])
 
-exports.markReviewAsked = async (req, res) => {
-  try {
-    await db.query('UPDATE reservations SET review_asked = true WHERE id = $1', [req.params.id])
-    res.json({ ok: true })
-  } catch (e) {
-    res.status(500).json({ error: 'Server xatolik' })
-  }
-}
+  if (!r.rows.length) throw AppError.notFound('Bron topilmadi')
+
+  const io = req.app.get('io')
+  if (io) io.to(`restaurant_${r.rows[0].restaurant_id}`).emit('reservation_updated', r.rows[0])
+
+  res.json({ ok: true, reservation: r.rows[0] })
+})
+
+// Bot review cron endpoints
+exports.pastUnreviewed = asyncHandler(async (req, res) => {
+  const r = await db.query(`
+    SELECT res.id, res.restaurant_id, u.telegram_id, r.name AS restaurant_name
+    FROM reservations res
+    JOIN users u ON u.id = res.user_id
+    JOIN restaurants r ON r.id = res.restaurant_id
+    WHERE res.status IN ('completed', 'confirmed')
+      AND res.review_asked = false
+      AND (res.date < CURRENT_DATE OR (res.date = CURRENT_DATE AND res.time < CURRENT_TIME - INTERVAL '2 hours'))
+      AND NOT EXISTS (SELECT 1 FROM reviews rv WHERE rv.reservation_id = res.id)
+      AND u.telegram_id IS NOT NULL
+    LIMIT 20
+  `)
+  res.json(r.rows)
+})
+
+exports.markReviewAsked = asyncHandler(async (req, res) => {
+  await db.query('UPDATE reservations SET review_asked = true WHERE id = $1', [req.params.id])
+  res.json({ ok: true })
+})
