@@ -1,35 +1,35 @@
-// ✅ TUZATILDI: '../config/logger' → '../logger'
-const logger = require('../logger')
+const logger = require('../config/logger')
 
 function errorHandler(err, req, res, next) {
-  logger.error(`${req.method} ${req.path} — ${err.message}`)
+  // Multer errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ error: 'Fayl hajmi juda katta' })
+  }
+  if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ error: 'Kutilmagan fayl maydoni' })
+  }
 
-  // Postgres errors
-  if (err.code === '23505') return res.status(409).json({ error: 'Bu ma\'lumot allaqachon mavjud' })
-  if (err.code === '23503') return res.status(400).json({ error: 'Bog\'liq ma\'lumot topilmadi' })
-  if (err.code === '23514') return res.status(400).json({ error: 'Ma\'lumot chegaradan chiqib ketdi' })
-
-  // JWT errors
-  if (err.name === 'JsonWebTokenError')  return res.status(401).json({ error: 'Token noto\'g\'ri' })
-  if (err.name === 'TokenExpiredError')  return res.status(401).json({ error: 'Token muddati tugagan' })
-  if (err.name === 'ValidationError')    return res.status(400).json({ error: err.message })
-
-  // Custom errors (bizning throw { status, message })
-  if (err.status && err.message) {
+  // Operational errors (our AppError)
+  if (err.isOperational) {
     return res.status(err.status).json({
       error: err.message,
-      ...(err.alternatives ? { alternatives: err.alternatives } : {}),
-      ...(err.suggest ? { suggest: err.suggest } : {})
+      ...(err.data ? { data: err.data } : {})
     })
   }
 
-  const status = err.status || 500
-  const message = process.env.NODE_ENV === 'production' ? 'Server xatoligi' : err.message
-  res.status(status).json({ error: message })
+  // Postgres unique constraint
+  if (err.code === '23505') {
+    return res.status(409).json({ error: 'Bu ma\'lumot allaqachon mavjud' })
+  }
+
+  // Postgres foreign key
+  if (err.code === '23503') {
+    return res.status(400).json({ error: 'Bog\'liq ma\'lumot topilmadi' })
+  }
+
+  // Unexpected
+  logger.error('Unhandled error:', err.message, err.stack?.split('\n').slice(0, 3).join(' | '))
+  res.status(500).json({ error: 'Server xatoligi' })
 }
 
-function notFoundHandler(req, res) {
-  res.status(404).json({ error: `${req.method} ${req.path} — Topilmadi` })
-}
-
-module.exports = { errorHandler, notFoundHandler }
+module.exports = errorHandler
