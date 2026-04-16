@@ -1212,18 +1212,21 @@ function renderZones() {
     <button class="btn btn-primary" onclick="openZoneModal()">+ Zona</button>
   </div>
   ${S.zones.length ? `<div class="grid-cards stagger">${S.zones.map(z => `
-    <div class="item-card">
-      <div class="ic-head">
-        <div class="ic-name">${esc(z.name)}</div>
-        <div style="display:flex;gap:4px">
-          <button class="row-action" onclick="openZoneModal(${z.id})">✏</button>
-          <button class="row-action danger" onclick="delZone(${z.id})">🗑</button>
+    <div class="item-card" style="padding:0;overflow:hidden">
+      ${z.image_url?`<img src="${esc(z.image_url)}" class="ic-img" style="height:110px;border-radius:0" loading="lazy">`:''}
+      <div style="padding:14px">
+        <div class="ic-head">
+          <div class="ic-name">${esc(z.name)}</div>
+          <div style="display:flex;gap:4px">
+            <button class="row-action" onclick="openZoneModal(${z.id})">✏</button>
+            <button class="row-action danger" onclick="delZone(${z.id})">🗑</button>
+          </div>
         </div>
-      </div>
-      ${z.description ? `<div class="ic-desc">${esc(z.description)}</div>` : ''}
-      <div class="ic-foot">
-        <div><strong style="font-family:var(--fd);font-size:18px">${z.capacity||0}</strong> kishilik</div>
-        <span class="pill ${z.is_available!==false?'confirmed':'cancelled'}">${z.is_available!==false?'Faol':"Yopiq"}</span>
+        ${z.description ? `<div class="ic-desc">${esc(z.description)}</div>` : ''}
+        <div class="ic-foot">
+          <div><strong style="font-family:var(--fd);font-size:18px">${z.capacity||0}</strong> kishilik</div>
+          <span class="pill ${z.is_available!==false?'confirmed':'cancelled'}">${z.is_available!==false?'Faol':"Yopiq"}</span>
+        </div>
       </div>
     </div>`).join('')}</div>`
   : `<div class="empty" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)"><div class="icon">🏗</div><h3>Zonalar yo'q</h3></div>`}`;
@@ -1236,13 +1239,25 @@ window.openZoneModal = (id=null) => {
       <div class="field"><label class="field-label">Nomi</label><input class="field-input" name="name" required value="${esc(z?.name||'')}"></div>
       <div class="field"><label class="field-label">Tavsif</label><input class="field-input" name="description" value="${esc(z?.description||'')}"></div>
       <div class="field"><label class="field-label">Sig'imi</label><input class="field-input" name="capacity" type="number" required value="${z?.capacity||''}"></div>
+      <div class="field"><label class="field-label">Zona rasmi (mini-appda bron jarayonida ko'rinadi)</label>
+        <div id="zi-prev">${z?.image_url?`<div class="upload-preview"><img src="${esc(z.image_url)}"><button type="button" class="up-remove" onclick="$('#zi-url').value='';$('#zi-prev').innerHTML='';$('#zi-dz').style.display=''">✕</button></div>`:''}</div>
+        <div class="dropzone" id="zi-dz" style="${z?.image_url?'display:none':''}"><div class="dz-icon">🖼</div><div class="dz-title">Zona rasmi</div><input type="file" accept="image/*" id="zi-file"></div>
+        <input type="hidden" name="image_url" id="zi-url" value="${esc(z?.image_url||'')}">
+      </div>
     </form>`,
     footer: `<button class="btn btn-ghost" onclick="closeModal()">Bekor</button><button class="btn btn-primary" onclick="saveZone(${id||'null'})">Saqlash</button>`
   });
+  const fi = document.getElementById('zi-file');
+  if (fi) fi.onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const dz = document.getElementById('zi-dz'); dz.innerHTML='<span class="spin"></span>';
+    try { const r=await uploadFile(f,'image'); $('#zi-url').value=r.url; $('#zi-prev').innerHTML=`<div class="upload-preview"><img src="${r.url}"></div>`; dz.style.display='none'; }
+    catch(err) { toast(err.message,'error'); }
+  };
 };
 window.saveZone = async id => {
   const fd = new FormData($('#zf'));
-  const body = { name:fd.get('name'), description:fd.get('description'), capacity:Number(fd.get('capacity')) };
+  const body = { name:fd.get('name'), description:fd.get('description'), capacity:Number(fd.get('capacity')), image_url:fd.get('image_url')||null };
   try {
     if (id) await api(`/owner/zones/${id}`,{method:'PUT',body:JSON.stringify(body)});
     else     await api('/owner/zones',{method:'POST',body:JSON.stringify(body)});
@@ -1270,32 +1285,52 @@ function renderTables() {
     <div style="margin-bottom:28px">
       <div class="eyebrow" style="margin-bottom:12px">${esc(z)} · ${tbls.length} ta</div>
       <div class="grid-cards stagger">${tbls.map(t => `
-        <div class="item-card">
-          <div class="ic-head"><div class="ic-name">Stol #${esc(t.table_number)}</div><button class="row-action danger" onclick="delTable(${t.id})">🗑</button></div>
-          <div class="ic-foot">
-            <div><strong style="font-family:var(--fd);font-size:18px">${t.capacity}</strong> kishilik</div>
-            <span class="pill ${t.is_available!==false?'confirmed':'cancelled'}">${t.is_available!==false?"Bo'sh":'Band'}</span>
+        <div class="item-card" style="padding:0;overflow:hidden">
+          ${t.image_url?`<img src="${esc(t.image_url)}" class="ic-img" style="height:110px;border-radius:0" loading="lazy">`:''}
+          <div style="padding:14px">
+            <div class="ic-head"><div class="ic-name">Stol #${esc(t.table_number)}</div><div style="display:flex;gap:4px"><button class="row-action" onclick="openTableModal(${t.id})">✏</button><button class="row-action danger" onclick="delTable(${t.id})">🗑</button></div></div>
+            <div class="ic-foot">
+              <div><strong style="font-family:var(--fd);font-size:18px">${t.capacity}</strong> kishilik</div>
+              <span class="pill ${t.is_available!==false?'confirmed':'cancelled'}">${t.is_available!==false?"Bo'sh":'Band'}</span>
+            </div>
           </div>
         </div>`).join('')}</div>
     </div>`).join('')
   : `<div class="empty" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)"><div class="icon">🪑</div><h3>Stollar yo'q</h3><p>Avval zona yarating</p></div>`}`;
 }
-window.openTableModal = () => {
+window.openTableModal = (id=null) => {
   if (!S.zones.length) { toast('Avval zona yarating','error'); return; }
+  const tb = id ? S.tables.find(t=>t.id===id) : null;
   openModal({
-    title: 'Yangi <em>stol</em>',
+    title: tb ? '<em>Stol tahrirlash</em>' : 'Yangi <em>stol</em>',
     body: `<form id="tf">
-      <div class="field"><label class="field-label">Zona</label><select class="field-input" name="zone_id">${S.zones.map(z=>`<option value="${z.id}">${esc(z.name)}</option>`).join('')}</select></div>
-      <div class="field"><label class="field-label">Stol raqami</label><input class="field-input" name="table_number" required></div>
-      <div class="field"><label class="field-label">Sig'imi</label><input class="field-input" name="capacity" type="number" required value="4"></div>
+      <div class="field"><label class="field-label">Zona</label><select class="field-input" name="zone_id">${S.zones.map(z=>`<option value="${z.id}" ${tb?.zone_id===z.id?'selected':''}>${esc(z.name)}</option>`).join('')}</select></div>
+      <div class="field"><label class="field-label">Stol raqami</label><input class="field-input" name="table_number" required value="${esc(tb?.table_number||'')}"></div>
+      <div class="field"><label class="field-label">Sig'imi</label><input class="field-input" name="capacity" type="number" required value="${tb?.capacity||4}"></div>
+      <div class="field"><label class="field-label">Stol rasmi (mini-appda ko'rinadi)</label>
+        <div id="ti-prev">${tb?.image_url?`<div class="upload-preview"><img src="${esc(tb.image_url)}"><button type="button" class="up-remove" onclick="$('#ti-url').value='';$('#ti-prev').innerHTML='';$('#ti-dz').style.display=''">✕</button></div>`:''}</div>
+        <div class="dropzone" id="ti-dz" style="${tb?.image_url?'display:none':''}"><div class="dz-icon">📷</div><div class="dz-title">Stol rasmi</div><div class="dz-sub">Bron qilishda ko'rinadi</div><input type="file" accept="image/*" id="ti-file"></div>
+        <input type="hidden" name="image_url" id="ti-url" value="${esc(tb?.image_url||'')}">
+      </div>
     </form>`,
-    footer: `<button class="btn btn-ghost" onclick="closeModal()">Bekor</button><button class="btn btn-primary" onclick="saveTable()">Saqlash</button>`
+    footer: `<button class="btn btn-ghost" onclick="closeModal()">Bekor</button><button class="btn btn-primary" onclick="saveTable(${id||'null'})">Saqlash</button>`
   });
+  const fi = document.getElementById('ti-file');
+  if (fi) fi.onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    const dz = document.getElementById('ti-dz'); dz.innerHTML='<span class="spin"></span>';
+    try { const r=await uploadFile(f,'image'); $('#ti-url').value=r.url; $('#ti-prev').innerHTML=`<div class="upload-preview"><img src="${r.url}"></div>`; dz.style.display='none'; }
+    catch(err) { toast(err.message,'error'); }
+  };
 };
-window.saveTable = async () => {
+window.saveTable = async (id=null) => {
   const fd = new FormData($('#tf'));
-  try { await api('/owner/tables',{method:'POST',body:JSON.stringify({zone_id:Number(fd.get('zone_id')),table_number:fd.get('table_number'),capacity:Number(fd.get('capacity'))})}); toast('Saqlandi','success'); closeModal(); await loadAll(); renderTables(); }
-  catch(e) { toast(e.message,'error'); }
+  const body = {zone_id:Number(fd.get('zone_id')),table_number:fd.get('table_number'),capacity:Number(fd.get('capacity')),image_url:fd.get('image_url')||null};
+  try {
+    if (id) await api(`/owner/tables/${id}`,{method:'PUT',body:JSON.stringify(body)});
+    else await api('/owner/tables',{method:'POST',body:JSON.stringify(body)});
+    toast('Saqlandi','success'); closeModal(); await loadAll(); renderTables();
+  } catch(e) { toast(e.message,'error'); }
 };
 window.delTable = async id => {
   if (!confirm("O'chirish?")) return;
