@@ -151,21 +151,27 @@ exports.updateReservation = asyncHandler(async (req, res) => {
   const validStatuses = ['pending', 'confirmed', 'cancelled', 'completed', 'noshow']
   if (!validStatuses.includes(status)) throw AppError.badRequest('Yaroqsiz holat')
 
-  const extra = {}
-  if (status === 'confirmed') extra.confirmed_at = 'NOW()'
-  if (status === 'completed') extra.completed_at = 'NOW()'
+  // ✅ SQL injection xavfi tuzatildi — endi parametrlashtirilgan
+  const setClauses = ['status = $1']
+  const params = [status]
+  let pi = 2
+
+  if (status === 'confirmed') setClauses.push(`confirmed_at = NOW()`)
+  if (status === 'completed') setClauses.push(`completed_at = NOW()`)
   if (status === 'cancelled') {
-    extra.cancelled_by = "'owner'"
-    extra.cancel_reason = req.body.reason ? `'${req.body.reason.replace(/'/g, "''")}'` : 'NULL'
+    setClauses.push(`cancelled_by = 'owner'`)
+    if (req.body.reason) {
+      setClauses.push(`cancel_reason = $${pi++}`)
+      params.push(req.body.reason)
+    }
   }
 
-  const setClauses = [`status = $1`]
-  Object.entries(extra).forEach(([k, v]) => setClauses.push(`${k} = ${v}`))
+  params.push(req.params.id, req.owner.restaurant_id)
 
   const r = await db.query(`
     UPDATE reservations SET ${setClauses.join(', ')}
-    WHERE id = $2 AND restaurant_id = $3 RETURNING *
-  `, [status, req.params.id, req.owner.restaurant_id])
+    WHERE id = $${pi++} AND restaurant_id = $${pi} RETURNING *
+  `, params)
 
   if (!r.rows.length) throw AppError.notFound('Bron topilmadi')
 
@@ -223,30 +229,53 @@ exports.deleteMenu = asyncHandler(async (req, res) => {
 // ── Zones CRUD ───────────────────────────────────────────────
 exports.listZones = asyncHandler(async (req, res) => {
   if (!req.owner.restaurant_id) return res.json([])
-  const r = await db.query('SELECT * FROM zones WHERE restaurant_id = $1 ORDER BY sort_order, id', [req.owner.restaurant_id])
+  const r = await db.query('SELECT * FROM zones WHERE restaurant_id = $1 ORDER BY sort_order NULLS LAST, id', [req.owner.restaurant_id])
   res.json(r.rows)
 })
 
+// ✅ FIX: image_url endi saqlanadi
 exports.createZone = asyncHandler(async (req, res) => {
   if (!req.owner.restaurant_id) throw AppError.badRequest('Restoran yo\'q')
-  const { name, description, capacity } = req.body || {}
+  const { name, description, capacity, image_url, sort_order } = req.body || {}
   if (!name) throw AppError.badRequest('Zona nomi kerak')
 
   const r = await db.query(`
-    INSERT INTO zones (restaurant_id, name, description, capacity, is_available)
-    VALUES ($1,$2,$3,$4,true) RETURNING *
-  `, [req.owner.restaurant_id, name, description || null, Number(capacity) || 20])
+    INSERT INTO zones (restaurant_id, name, description, capacity, image_url, sort_order, is_available)
+    VALUES ($1,$2,$3,$4,$5,$6,true) RETURNING *
+  `, [
+    req.owner.restaurant_id,
+    name,
+    description || null,
+    Number(capacity) || 20,
+    image_url || null,
+    Number(sort_order) || 0
+  ])
 
   res.status(201).json(r.rows[0])
 })
 
+// ✅ FIX: image_url va sort_order endi yangilanadi
 exports.updateZone = asyncHandler(async (req, res) => {
-  const { name, description, capacity, is_available } = req.body || {}
+  const { name, description, capacity, image_url, sort_order, is_available } = req.body || {}
   const r = await db.query(`
-    UPDATE zones SET name = COALESCE($1, name), description = COALESCE($2, description),
-      capacity = COALESCE($3, capacity), is_available = COALESCE($4, is_available)
-    WHERE id = $5 AND restaurant_id = $6 RETURNING *
-  `, [name, description, capacity != null ? Number(capacity) : null, is_available, req.params.id, req.owner.restaurant_id])
+    UPDATE zones SET
+      name = COALESCE($1, name),
+      description = COALESCE($2, description),
+      capacity = COALESCE($3, capacity),
+      image_url = COALESCE($4, image_url),
+      sort_order = COALESCE($5, sort_order),
+      is_available = COALESCE($6, is_available)
+    WHERE id = $7 AND restaurant_id = $8 RETURNING *
+  `, [
+    name,
+    description,
+    capacity != null ? Number(capacity) : null,
+    image_url,
+    sort_order != null ? Number(sort_order) : null,
+    is_available,
+    req.params.id,
+    req.owner.restaurant_id
+  ])
 
   if (!r.rows.length) throw AppError.notFound('Topilmadi')
   res.json(r.rows[0])
@@ -263,35 +292,61 @@ exports.listTables = asyncHandler(async (req, res) => {
   const r = await db.query(`
     SELECT t.*, z.name AS zone_name FROM tables t
     LEFT JOIN zones z ON z.id = t.zone_id
-    WHERE t.restaurant_id = $1 ORDER BY z.sort_order, t.table_number
+    WHERE t.restaurant_id = $1
+    ORDER BY z.sort_order NULLS LAST, t.sort_order NULLS LAST, t.id
   `, [req.owner.restaurant_id])
   res.json(r.rows)
 })
 
+// ✅ FIX: image_url va sort_order endi saqlanadi
 exports.createTable = asyncHandler(async (req, res) => {
   if (!req.owner.restaurant_id) throw AppError.badRequest('Restoran yo\'q')
-  const { zone_id, table_number, capacity, min_guests, shape } = req.body || {}
+  const { zone_id, table_number, capacity, min_guests, shape, image_url, sort_order } = req.body || {}
   if (!table_number) throw AppError.badRequest('Stol raqami kerak')
 
   const r = await db.query(`
-    INSERT INTO tables (restaurant_id, zone_id, table_number, capacity, min_guests, shape, is_available)
-    VALUES ($1,$2,$3,$4,$5,$6,true) RETURNING *
-  `, [req.owner.restaurant_id, zone_id || null, String(table_number), Number(capacity) || 4,
-      Number(min_guests) || 1, shape || 'round'])
+    INSERT INTO tables (restaurant_id, zone_id, table_number, capacity, min_guests, shape, image_url, sort_order, is_available)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,true) RETURNING *
+  `, [
+    req.owner.restaurant_id,
+    zone_id || null,
+    String(table_number),
+    Number(capacity) || 4,
+    Number(min_guests) || 1,
+    shape || 'round',
+    image_url || null,
+    Number(sort_order) || 0
+  ])
 
   res.status(201).json(r.rows[0])
 })
 
+// ✅ FIX: table_number, image_url, sort_order endi yangilanadi
 exports.updateTable = asyncHandler(async (req, res) => {
-  const { capacity, min_guests, is_available, shape, zone_id } = req.body || {}
+  const { table_number, capacity, min_guests, is_available, shape, zone_id, image_url, sort_order } = req.body || {}
   const r = await db.query(`
     UPDATE tables SET
-      capacity = COALESCE($1, capacity), min_guests = COALESCE($2, min_guests),
-      is_available = COALESCE($3, is_available), shape = COALESCE($4, shape),
-      zone_id = COALESCE($5, zone_id)
-    WHERE id = $6 AND restaurant_id = $7 RETURNING *
-  `, [capacity ? Number(capacity) : null, min_guests ? Number(min_guests) : null,
-      is_available, shape, zone_id, req.params.id, req.owner.restaurant_id])
+      table_number = COALESCE($1, table_number),
+      capacity = COALESCE($2, capacity),
+      min_guests = COALESCE($3, min_guests),
+      is_available = COALESCE($4, is_available),
+      shape = COALESCE($5, shape),
+      zone_id = COALESCE($6, zone_id),
+      image_url = COALESCE($7, image_url),
+      sort_order = COALESCE($8, sort_order)
+    WHERE id = $9 AND restaurant_id = $10 RETURNING *
+  `, [
+    table_number != null ? String(table_number) : null,
+    capacity != null ? Number(capacity) : null,
+    min_guests != null ? Number(min_guests) : null,
+    is_available,
+    shape,
+    zone_id,
+    image_url,
+    sort_order != null ? Number(sort_order) : null,
+    req.params.id,
+    req.owner.restaurant_id
+  ])
 
   if (!r.rows.length) throw AppError.notFound('Topilmadi')
   res.json(r.rows[0])
@@ -311,15 +366,36 @@ exports.listReels = asyncHandler(async (req, res) => {
 
 exports.createReel = asyncHandler(async (req, res) => {
   if (!req.owner.restaurant_id) throw AppError.badRequest('Restoran yo\'q')
-  const { url, thumbnail_url, caption, type } = req.body || {}
+  const { url, thumbnail_url, caption, type, is_published } = req.body || {}
   if (!url) throw AppError.badRequest('URL kerak')
 
   const r = await db.query(`
     INSERT INTO reels (restaurant_id, url, thumbnail_url, caption, type, is_published)
-    VALUES ($1,$2,$3,$4,$5,true) RETURNING *
-  `, [req.owner.restaurant_id, url, thumbnail_url || null, caption || null, type || 'video'])
+    VALUES ($1,$2,$3,$4,$5,$6) RETURNING *
+  `, [
+    req.owner.restaurant_id,
+    url,
+    thumbnail_url || null,
+    caption || null,
+    type || 'video',
+    is_published !== false  // undefined yoki true → published
+  ])
 
   res.status(201).json(r.rows[0])
+})
+
+// ✅ YANGI: reel yangilash (publish/unpublish toggle)
+exports.updateReel = asyncHandler(async (req, res) => {
+  const { caption, thumbnail_url, is_published } = req.body || {}
+  const r = await db.query(`
+    UPDATE reels SET
+      caption = COALESCE($1, caption),
+      thumbnail_url = COALESCE($2, thumbnail_url),
+      is_published = COALESCE($3, is_published)
+    WHERE id = $4 AND restaurant_id = $5 RETURNING *
+  `, [caption, thumbnail_url, is_published, req.params.id, req.owner.restaurant_id])
+  if (!r.rows.length) throw AppError.notFound('Topilmadi')
+  res.json(r.rows[0])
 })
 
 exports.deleteReel = asyncHandler(async (req, res) => {
