@@ -50,6 +50,7 @@ router.delete('/tables/:id', c.deleteTable)
 // Reels
 router.get('/reels', c.listReels)
 router.post('/reels', c.createReel)
+router.put('/reels/:id', c.updateReel)      // ✅ YANGI — publish/unpublish toggle
 router.delete('/reels/:id', c.deleteReel)
 
 // Reviews
