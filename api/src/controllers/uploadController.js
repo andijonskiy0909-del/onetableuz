@@ -3,7 +3,19 @@ const fs = require('fs')
 const AppError = require('../utils/AppError')
 const asyncHandler = require('../utils/asyncHandler')
 
-const getBaseUrl = (req) => `${req.protocol}://${req.get('host')}`
+// ✅ Proxy ortida ishlagan holat uchun to'g'ri protokolni aniqlash
+function getBaseUrl(req) {
+  // 1-prioritet: .env dan aniq URL
+  if (process.env.PUBLIC_BASE_URL) {
+    return process.env.PUBLIC_BASE_URL.replace(/\/+$/, '')
+  }
+  // 2-prioritet: X-Forwarded-Proto (Nginx, Cloudflare, Railway, Render)
+  const proto = req.get('x-forwarded-proto') || req.protocol || 'https'
+  const host = req.get('x-forwarded-host') || req.get('host')
+  // Agar Telegram ichida ishlayotgan bo'lsa, har doim HTTPS
+  const finalProto = host && host.includes('localhost') ? proto : 'https'
+  return `${finalProto}://${host}`
+}
 
 exports.single = asyncHandler(async (req, res) => {
   if (!req.file) throw AppError.badRequest('Fayl yuborilmadi')
