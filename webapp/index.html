@@ -845,7 +845,7 @@ async function loadReels() {
   try {
     const raw = await api('/reels');
     let list = Array.isArray(raw) ? raw : (raw.reels||[]);
-    // Only show published reels
+    // Show published reels (is_published===true OR is_published===undefined/null — only hide explicit false)
     S.reels = list.filter(r => r.is_published !== false && r.url);
   } catch { S.reels = []; }
   renderReelsHomeStrip();
@@ -1285,8 +1285,8 @@ function renderStep() {
     <div class="field-block">
       <div class="field-label">${t('zone_l')}</div>
       <div class="zone-grid">${zones.map(z=>`
-       <button class="zone-card${b.zone?.id===z.id?' active':''}" onclick="selectZone(${z.id ?? 'null'})">
-          ${z.image_url && b.zone?.id!==z.id ? `<img class="zone-card-img" src="${esc(z.image_url)}" loading="lazy">` : ''}
+        <button class="zone-card${b.zone?.id===z.id?' active':''}" onclick="selectZone(${z.id===null?'null':Number(z.id)})">
+          ${z.image_url ? `<img class="zone-card-img" src="${esc(z.image_url)}" loading="lazy" onerror="this.style.display='none'">` : ''}
           <div style="font-weight:800;font-size:13px">${esc(z.name)}</div>
           <div style="font-size:11px;opacity:.6;margin-top:2px">${z.capacity||''} ${t('guests_s')}</div>
         </button>`).join('')}
@@ -1407,10 +1407,16 @@ function renderStep() {
   }
 }
 
-window.selectZone = function(z) {
-  const zone = typeof z==='string' ? JSON.parse(z) : z;
+window.selectZone = function(zoneId) {
+  // zoneId is a number or null — look up full zone object (with image_url) from the zones array
+  const allZones = S.booking.zones.length
+    ? S.booking.zones
+    : [{id:null, name:'Asosiy zal', capacity: S.booking.restaurant?.capacity||50}];
+  const zone = zoneId === null
+    ? allZones.find(z => z.id === null) || allZones[0]
+    : allZones.find(z => z.id === zoneId) || {id: zoneId};
   S.booking.zone = zone;
-  S.booking.table = null; // reset table when zone changes
+  S.booking.table = null;
   renderStep();
 };
 window.selectTable = function(id) {
@@ -1422,13 +1428,13 @@ window.selectTable = function(id) {
 window.goToNextAfterTime = function() {
   const b = S.booking;
   if (!b.time) return;
-  // Check deposit requirement
   const rd = b.restaurantData;
   const depCheck = checkDepositRequired(rd, b);
   b.depositRequired = depCheck.required;
   b.depositAmount = depCheck.amount || 0;
   b.depositReason = depCheck.reason || '';
-  b.step = b.depositRequired ? 3 : 3; // step 3 = deposit (if needed) or confirm
+  // step 3 = deposit (if required) or confirmation (if no deposit)
+  b.step = 3;
   renderStep();
 };
 
@@ -1551,7 +1557,11 @@ async function init() {
   requestGeo();
   await loadRestaurants();
   await loadReels();
-  renderTonightSection(); renderReelsHomeStrip(); initReveal(); handleDeepLink();
+  // Re-render strip now that both restaurants AND reels are loaded (restaurants needed for names)
+  renderReelsHomeStrip();
+  renderTonightSection();
+  initReveal();
+  handleDeepLink();
 }
 
 if (document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
