@@ -48,7 +48,6 @@ app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d' }))
 // ── Static: webapp + dashboard ───────────────────────────────
 const WEBAPP_DIR = path.join(__dirname, '..', '..', 'webapp')
 
-// static assets only, index auto-open qilmasin
 app.use('/webapp', express.static(WEBAPP_DIR, { index: false }))
 
 app.get('/app', (req, res) => {
@@ -56,31 +55,26 @@ app.get('/app', (req, res) => {
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('WebApp not found')
 })
-
 app.get('/app/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'index.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('WebApp not found')
 })
-
 app.get('/dashboard', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'dashboard.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('Dashboard not found')
 })
-
 app.get('/dashboard/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'dashboard.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('Dashboard not found')
 })
-
 app.get('/admin', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'admin.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
   else res.status(404).send('Admin not found')
 })
-
 app.get('/admin/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'admin.html')
   if (fs.existsSync(fp)) res.sendFile(fp)
@@ -122,6 +116,38 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server xatolik' })
 })
 
+// ── ✅ AUTO MIGRATION ────────────────────────────────────────
+// Server start'da kerakli ustunlarni qo'shadi (IF NOT EXISTS — xavfsiz)
+async function runMigrations() {
+  const migrations = [
+    // zones
+    `ALTER TABLE zones ADD COLUMN IF NOT EXISTS image_url TEXT`,
+    `ALTER TABLE zones ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0`,
+    `ALTER TABLE zones ADD COLUMN IF NOT EXISTS is_available BOOLEAN DEFAULT true`,
+    // tables
+    `ALTER TABLE tables ADD COLUMN IF NOT EXISTS image_url TEXT`,
+    `ALTER TABLE tables ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0`,
+    `ALTER TABLE tables ADD COLUMN IF NOT EXISTS is_available BOOLEAN DEFAULT true`,
+    `ALTER TABLE tables ADD COLUMN IF NOT EXISTS min_guests INTEGER DEFAULT 1`,
+    `ALTER TABLE tables ADD COLUMN IF NOT EXISTS shape VARCHAR(20) DEFAULT 'round'`,
+    // reels
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS is_published BOOLEAN DEFAULT true`,
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS thumbnail_url TEXT`,
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'video'`,
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS caption TEXT`,
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0`,
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0`
+  ]
+  for (const sql of migrations) {
+    try {
+      await db.query(sql)
+    } catch (e) {
+      logger.warn(`Migration skip: ${e.message}`)
+    }
+  }
+  logger.info('✅ Auto-migrations applied')
+}
+
 // ── Start ────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000
 
@@ -138,10 +164,16 @@ server.listen(PORT, async () => {
     logger.error('schema:', e.message)
   }
 
+  // ✅ Qo'shimcha migratsiyalar (IF NOT EXISTS)
+  try {
+    await runMigrations()
+  } catch (e) {
+    logger.error('migration:', e.message)
+  }
+
   setInterval(expireReservations, 5 * 60 * 1000)
   logger.info('✅ Cron started')
 
-  // Attach bot (optional, same process)
   try {
     if (process.env.BOT_TOKEN) {
       const bot = require('../../bot/index.js')
