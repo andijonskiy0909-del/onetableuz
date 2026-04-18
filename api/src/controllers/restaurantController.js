@@ -79,10 +79,28 @@ exports.getMenu = asyncHandler(async (req, res) => {
 })
 
 exports.getZones = asyncHandler(async (req, res) => {
+  // ✅ is_available filter OLIB TASHLANDI — dashboard yangi yaratganda bu ustun NULL bo'lishi mumkin
   const r = await db.query(
-    'SELECT * FROM zones WHERE restaurant_id = $1 AND is_available = true ORDER BY sort_order, id',
+    `SELECT * FROM zones
+     WHERE restaurant_id = $1 AND (is_available IS NULL OR is_available = true)
+     ORDER BY sort_order NULLS LAST, id`,
     [req.params.id]
   )
+  res.json(r.rows)
+})
+
+// ✅ YANGI ENDPOINT — stollarni olish
+exports.getTables = asyncHandler(async (req, res) => {
+  const { zone_id } = req.query
+  let query = `SELECT * FROM tables
+               WHERE restaurant_id = $1 AND (is_available IS NULL OR is_available = true)`
+  const params = [req.params.id]
+  if (zone_id) {
+    params.push(zone_id)
+    query += ` AND zone_id = $${params.length}`
+  }
+  query += ` ORDER BY sort_order NULLS LAST, table_number NULLS LAST, id`
+  const r = await db.query(query, params)
   res.json(r.rows)
 })
 
@@ -104,7 +122,6 @@ exports.getAvailability = asyncHandler(async (req, res) => {
   const { date } = req.query
   if (!date) return res.json([])
 
-  // Get busy times (times where tables are booked)
   const booked = await db.query(`
     SELECT time, COUNT(DISTINCT table_id)::int AS booked_count
     FROM reservations
@@ -113,19 +130,16 @@ exports.getAvailability = asyncHandler(async (req, res) => {
   `, [req.params.id, date])
 
   const totalTables = await db.query(
-    `SELECT COUNT(*)::int AS c FROM tables WHERE restaurant_id = $1 AND is_available = true`,
+    `SELECT COUNT(*)::int AS c FROM tables WHERE restaurant_id = $1 AND (is_available IS NULL OR is_available = true)`,
     [req.params.id]
   )
   const total = totalTables.rows[0].c || 1
 
-  // Get blocked times
   const blocked = await db.query(
     `SELECT time FROM availability WHERE restaurant_id = $1 AND date = $2 AND is_blocked = true`,
     [req.params.id, date]
   )
-  const blockedSet = new Set(blocked.rows.map(r => String(r.time).slice(0, 5)))
 
-  // Build busy times list
   const busyTimes = []
   booked.rows.forEach(r => {
     const t = String(r.time).slice(0, 5)
@@ -141,12 +155,15 @@ exports.getAvailability = asyncHandler(async (req, res) => {
 
 exports.getReels = asyncHandler(async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 20, 50)
+  // ✅ status shartini yumshatdim — 'approved' bo'lmasa ham ko'rinsin (developmentda)
   const r = await db.query(`
     SELECT re.*, r.name AS restaurant_name, r.cuisine, r.rating, r.working_hours,
            r.image_url AS restaurant_image, r.slug AS restaurant_slug
     FROM reels re
     JOIN restaurants r ON r.id = re.restaurant_id
-    WHERE re.is_published = true AND r.is_active = true AND r.status = 'approved'
+    WHERE re.is_published = true
+      AND r.is_active = true
+      AND (r.status = 'approved' OR r.status IS NULL)
     ORDER BY re.created_at DESC
     LIMIT $1
   `, [limit])
@@ -160,6 +177,7 @@ exports.getReels = asyncHandler(async (req, res) => {
     caption: row.caption,
     views: row.views,
     likes: row.likes,
+    is_published: row.is_published,
     restaurant: {
       name: row.restaurant_name,
       slug: row.restaurant_slug,
