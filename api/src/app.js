@@ -48,36 +48,50 @@ app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d' }))
 // ── Static: webapp + dashboard ───────────────────────────────
 const WEBAPP_DIR = path.join(__dirname, '..', '..', 'webapp')
 
-app.use('/webapp', express.static(WEBAPP_DIR, { index: false }))
+// ✅ no-cache for HTML so Telegram doesn't keep stale mini-app
+app.use('/webapp', express.static(WEBAPP_DIR, {
+  index: false,
+  etag: false,
+  setHeaders: (res, p) => {
+    if (p.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+    }
+  }
+}))
+
+const sendNoCacheHtml = (res, fp) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+  res.sendFile(fp)
+}
 
 app.get('/app', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'index.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('WebApp not found')
 })
 app.get('/app/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'index.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('WebApp not found')
 })
 app.get('/dashboard', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'dashboard.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('Dashboard not found')
 })
 app.get('/dashboard/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'dashboard.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('Dashboard not found')
 })
 app.get('/admin', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'admin.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('Admin not found')
 })
 app.get('/admin/*', (req, res) => {
   const fp = path.join(WEBAPP_DIR, 'admin.html')
-  if (fs.existsSync(fp)) res.sendFile(fp)
+  if (fs.existsSync(fp)) sendNoCacheHtml(res, fp)
   else res.status(404).send('Admin not found')
 })
 
@@ -116,8 +130,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server xatolik' })
 })
 
-// ── ✅ AUTO MIGRATION ────────────────────────────────────────
-// Server start'da kerakli ustunlarni qo'shadi (IF NOT EXISTS — xavfsiz)
+// ── ✅ AUTO MIGRATION (kengaytirilgan) ───────────────────────
 async function runMigrations() {
   const migrations = [
     // zones
@@ -136,16 +149,40 @@ async function runMigrations() {
     `ALTER TABLE reels ADD COLUMN IF NOT EXISTS type VARCHAR(20) DEFAULT 'video'`,
     `ALTER TABLE reels ADD COLUMN IF NOT EXISTS caption TEXT`,
     `ALTER TABLE reels ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0`,
-    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0`
+    `ALTER TABLE reels ADD COLUMN IF NOT EXISTS likes INTEGER DEFAULT 0`,
+    // ✅ reservations — deposit + boshqa optional ustunlar
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS deposit_required BOOLEAN DEFAULT false`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS deposit_amount NUMERIC DEFAULT 0`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS deposit_status VARCHAR(30) DEFAULT 'not_required'`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS deposit_reference TEXT`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS deposit_screenshot TEXT`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS pre_order JSONB DEFAULT '[]'::jsonb`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS pre_order_total NUMERIC DEFAULT 0`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS cancelled_by VARCHAR(20)`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS cancel_reason TEXT`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS review_asked BOOLEAN DEFAULT false`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS confirmed_at TIMESTAMP`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP`,
+    `ALTER TABLE reservations ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'unpaid'`,
+    // ✅ restaurants — qo'shimcha
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS deposit_required BOOLEAN DEFAULT false`,
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS deposit_amount NUMERIC DEFAULT 0`,
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS logo_url TEXT`,
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_demo BOOLEAN DEFAULT false`,
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT false`,
+    `ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS premium_until TIMESTAMP`
   ]
+  let ok = 0, fail = 0
   for (const sql of migrations) {
     try {
       await db.query(sql)
+      ok++
     } catch (e) {
+      fail++
       logger.warn(`Migration skip: ${e.message}`)
     }
   }
-  logger.info('✅ Auto-migrations applied')
+  logger.info(`✅ Auto-migrations: ${ok} ok, ${fail} skipped`)
 }
 
 // ── Start ────────────────────────────────────────────────────
@@ -164,7 +201,6 @@ server.listen(PORT, async () => {
     logger.error('schema:', e.message)
   }
 
-  // ✅ Qo'shimcha migratsiyalar (IF NOT EXISTS)
   try {
     await runMigrations()
   } catch (e) {
