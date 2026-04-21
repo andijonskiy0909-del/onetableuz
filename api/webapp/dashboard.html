@@ -430,9 +430,10 @@ textarea.field-input{resize:vertical;min-height:80px}
 
 <script>
 const APP_ORIGIN = window.location.origin;
-const API = (localStorage.getItem('ot_api_base') || `${APP_ORIGIN}/api`).replace(/\/$/,'');
-const SOCKET_URL = (localStorage.getItem('ot_socket_url') || APP_ORIGIN).replace(/\/$/,'');
-
+const BACKEND_URL = 'https://onetableuz-production.up.railway.app';
+const API = (localStorage.getItem('ot_api_base') || `${BACKEND_URL}/api`).replace(/\/$/,'');
+const SOCKET_URL = (localStorage.getItem('ot_socket_url') || BACKEND_URL).replace(/\/$/,'');
+  
 const state = {
   token: localStorage.getItem('ot_owner_token') || null,
   owner: JSON.parse(localStorage.getItem('ot_owner_data') || 'null'),
