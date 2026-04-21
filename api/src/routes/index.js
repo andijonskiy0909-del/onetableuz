@@ -8,5 +8,6 @@ router.use('/reviews', require('./reviews'))
 router.use('/uploads', require('./uploads'))
 router.use('/owner', require('./owner'))
 router.use('/admin', require('./admin'))
+router.use('/holds', require('./holds'));
 
 module.exports = router
