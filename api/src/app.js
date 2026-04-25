@@ -71,6 +71,8 @@ app.use('/uploads', express.static(UPLOAD_DIR, {
 // ── Static: webapp ───────────────────────────────────────────
 const WEBAPP_DIR = path.join(__dirname, '..', '..', 'webapp')
 if (fs.existsSync(WEBAPP_DIR)) {
+
+  // ── /app — Mini App (index.html) ──
   app.use('/app', express.static(WEBAPP_DIR))
   app.get('/app*', (req, res) => {
     const fp = path.join(WEBAPP_DIR, 'index.html')
@@ -78,15 +80,26 @@ if (fs.existsSync(WEBAPP_DIR)) {
     else res.status(404).send('WebApp not found')
   })
 
-  app.use('/dashboard', express.static(WEBAPP_DIR))
-  app.get('/dashboard*', (req, res) => {
+  // ── /dashboard — Dashboard (dashboard.html) ──
+  // express.static YO'Q — aks holda index.html qaytariladi
+  app.get('/dashboard', (req, res) => {
+    const fp = path.join(WEBAPP_DIR, 'dashboard.html')
+    if (fs.existsSync(fp)) res.sendFile(fp)
+    else res.status(404).send('Dashboard not found')
+  })
+  app.get('/dashboard/*', (req, res) => {
     const fp = path.join(WEBAPP_DIR, 'dashboard.html')
     if (fs.existsSync(fp)) res.sendFile(fp)
     else res.status(404).send('Dashboard not found')
   })
 
-  // Admin panel
+  // ── /admin — Admin panel (admin.html) ──
   app.get('/admin', (req, res) => {
+    const fp = path.join(WEBAPP_DIR, 'admin.html')
+    if (fs.existsSync(fp)) res.sendFile(fp)
+    else res.status(404).send('Admin panel not found')
+  })
+  app.get('/admin/*', (req, res) => {
     const fp = path.join(WEBAPP_DIR, 'admin.html')
     if (fs.existsSync(fp)) res.sendFile(fp)
     else res.status(404).send('Admin panel not found')
