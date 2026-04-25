@@ -840,7 +840,18 @@ function renderChips() {
 }
 
 function renderTrending() {
-  document.getElementById('trending-strip').innerHTML = t('trending').map(([e,l,c]) => `<div class="trend-pill"><span>${e}</span><span>${l}</span><span style="color:var(--ink3)">${c}</span></div>`).join('');
+  // Compute real counts from loaded restaurant data
+  const all = S.restaurants;
+  const premiumCount = all.filter(r => r.is_premium).length;
+  const topRated = all.filter(r => (r.rating||0) >= 4).length;
+  const total = all.length;
+  const openNow = all.filter(r => isOpen(r.working_hours) === true).length;
+  // Override i18n trending array with real counts
+  const realTrending = t('trending').map(([emoji, label], idx) => {
+    const counts = [total, openNow, premiumCount, topRated];
+    return [emoji, label, String(counts[idx] || 0)];
+  });
+  document.getElementById('trending-strip').innerHTML = realTrending.map(([e,l,c]) => `<div class="trend-pill"><span>${e}</span><span>${l}</span><span style="color:var(--ink3)">${c}</span></div>`).join('');
 }
 
 /* ═══════════════════════════════════════════════
