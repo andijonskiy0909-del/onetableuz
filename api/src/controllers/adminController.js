@@ -51,7 +51,7 @@ exports.listUsers = asyncHandler(async (req, res) => {
 
   const total = await db.query(`SELECT COUNT(*)::int AS c FROM users ${where}`, params)
   const r = await db.query(`
-    SELECT u.*,
+    SELECT u.*, u.trust_score, u.total_bookings, u.noshow_count,
       (SELECT COUNT(*)::int FROM reservations WHERE user_id = u.id) AS booking_count,
       (SELECT COUNT(*)::int FROM reviews WHERE user_id = u.id) AS review_count,
       (SELECT COUNT(*)::int FROM favorites WHERE user_id = u.id) AS favorite_count
