@@ -1,6 +1,7 @@
 const { verify } = require('../utils/jwt')
 const db = require('../config/db')
 const AppError = require('../utils/AppError')
+const crypto = require('crypto')
 
 // ── User auth (Mini App customers) ──
 async function authUser(req, res, next) {
@@ -76,9 +77,61 @@ async function authAdmin(req, res, next) {
   }
 }
 
-function extractToken(req) {
-  const header = req.headers.authorization || ''
-  return header.startsWith('Bearer ') ? header.slice(7) : null
+// ── Telegram WebApp initData validation ──
+// Validates data from Telegram Mini App to prevent spoofing
+function authTelegramWebApp(req, res, next) {
+  try {
+    const initData = req.headers['x-telegram-init-data'] || req.body?.initData
+    if (!initData) return next() // Allow non-Telegram clients in dev
+
+    const botToken = process.env.BOT_TOKEN
+    if (!botToken) return next() // Skip validation if no bot token
+
+    const parsed = new URLSearchParams(initData)
+    const hash = parsed.get('hash')
+    if (!hash) throw AppError.unauthorized('Invalid initData: no hash')
+
+    parsed.delete('hash')
+    const entries = [...parsed.entries()].sort(([a], [b]) => a.localeCompare(b))
+    const dataCheckString = entries.map(([k, v]) => `${k}=${v}`).join('\n')
+
+    const secretKey = crypto.createHmac('sha256', 'WebAppData').update(botToken).digest()
+    const computedHash = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex')
+
+    if (computedHash !== hash) throw AppError.unauthorized('Invalid Telegram initData')
+
+    // Parse user data from validated initData
+    const userStr = parsed.get('user')
+    if (userStr) {
+      try { req.telegramUser = JSON.parse(userStr) } catch {}
+    }
+
+    // Check auth_date is not too old (5 minutes)
+    const authDate = Number(parsed.get('auth_date'))
+    if (authDate && Date.now() / 1000 - authDate > 300) {
+      throw AppError.unauthorized('Telegram initData expired')
+    }
+
+    next()
+  } catch (e) {
+    if (e.isOperational) return res.status(e.status).json({ error: e.message })
+    res.status(401).json({ error: 'Telegram auth xatolik' })
+  }
 }
 
-module.exports = { authUser, authUserOptional, authOwner, authAdmin }
+// ── Extract token from Authorization header OR HttpOnly cookie ──
+function extractToken(req) {
+  // 1. Try Authorization header first
+  const header = req.headers.authorization || ''
+  if (header.startsWith('Bearer ')) return header.slice(7)
+
+  // 2. Fallback to HttpOnly cookie
+  if (req.cookies?.ot_token) return req.cookies.ot_token
+  if (req.cookies?.ot_owner_token) return req.cookies.ot_owner_token
+  if (req.cookies?.ot_admin_token) return req.cookies.ot_admin_token
+
+  return null
+}
+
+module.exports = { authUser, authUserOptional, authOwner, authAdmin, authTelegramWebApp }
+
