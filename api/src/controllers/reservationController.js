@@ -4,6 +4,23 @@ const asyncHandler = require('../utils/asyncHandler')
 const AppError = require('../utils/AppError')
 const { sendTelegramMessage } = require('../utils/telegram')
 
+function safeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function formatReservationTime(time) {
+  if (!time) return '—'
+  return String(time).slice(0, 5)
+}
+
+function formatReservationDate(date) {
+  if (!date) return '—'
+  return String(date).slice(0, 10)
+}
+
 async function getReservationDetails(reservationId) {
   const result = await db.query(`
     SELECT 
@@ -32,36 +49,31 @@ async function getReservationDetails(reservationId) {
   return result.rows[0] || null
 }
 
-function formatReservationTime(time) {
-  if (!time) return '—'
-  return String(time).slice(0, 5)
-}
-
 function buildCreatedMessage(booking) {
   return `
 ✅ <b>Bron qabul qilindi!</b>
 
-🍽 <b>Restoran:</b> ${booking.restaurant_name}
-📅 <b>Sana:</b> ${booking.date}
+🍽 <b>Restoran:</b> ${safeHtml(booking.restaurant_name)}
+📅 <b>Sana:</b> ${formatReservationDate(booking.date)}
 ⏰ <b>Vaqt:</b> ${formatReservationTime(booking.time)}
 👥 <b>Mehmonlar:</b> ${booking.guests} kishi
-${booking.zone_name ? `📍 <b>Zona:</b> ${booking.zone_name}\n` : ''}${booking.table_number ? `🪑 <b>Stol:</b> ${booking.table_number}\n` : ''}
+${booking.zone_name ? `📍 <b>Zona:</b> ${safeHtml(booking.zone_name)}\n` : ''}${booking.table_number ? `🪑 <b>Stol:</b> ${safeHtml(booking.table_number)}\n` : ''}
 📌 <b>Holat:</b> Kutilmoqda
 
 Restoran tasdiqlagandan keyin sizga yana xabar yuboramiz.
 `
 }
 
-function buildCancelledMessage(booking) {
+function buildUserCancelledMessage(booking) {
   return `
 ❌ <b>Bron bekor qilindi</b>
 
-🍽 <b>Restoran:</b> ${booking.restaurant_name}
-📅 <b>Sana:</b> ${booking.date}
+🍽 <b>Restoran:</b> ${safeHtml(booking.restaurant_name)}
+📅 <b>Sana:</b> ${formatReservationDate(booking.date)}
 ⏰ <b>Vaqt:</b> ${formatReservationTime(booking.time)}
 👥 <b>Mehmonlar:</b> ${booking.guests} kishi
 
-Boshqa vaqt tanlab qayta bron qilishingiz mumkin.
+Siz bronni bekor qildingiz. Boshqa vaqt tanlab qayta bron qilishingiz mumkin.
 `
 }
 
@@ -106,7 +118,7 @@ async function sendReservationCancelledNotification(reservationId) {
       return
     }
 
-    await sendTelegramMessage(booking.telegram_id, buildCancelledMessage(booking))
+    await sendTelegramMessage(booking.telegram_id, buildUserCancelledMessage(booking))
   } catch (err) {
     console.error('[Telegram] bron bekor qilindi xabarida xato:', err.message)
   }
