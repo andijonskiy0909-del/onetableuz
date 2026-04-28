@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0E0C0A">
+<meta name="theme-color" content="#F8F6F1">
 <title>OneTable · Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,32 +14,32 @@
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <style>
 :root{
---bg:#0E0C0A;--bg2:#16130F;--bg3:#1B1814;--bg4:#221E18;--bg5:#2A2520;
---ink:#FAF7F2;--ink2:#E0D9CB;--ink3:#8B8178;--ink4:#5C544B;--ink5:#3A342D;
---line:#2A241D;--line2:#1F1B16;--line3:#3A332B;
---accent:#C9624F;--accent2:#D87765;--accent-s:#2D1814;--accent-g:rgba(201,98,79,0.18);
---gold:#D4A05B;--gold-s:#2B2014;
---green:#6B9B6F;--green-s:#1A2418;
---rose:#C8635F;--rose-s:#281612;
---blue:#5C8FB8;--blue-s:#131F28;
---plum:#9B6B8E;--plum-s:#1E1419;
---teal:#5BA8A0;--teal-s:#112220;
---r:12px;--r2:18px;--r3:24px;
+--bg:#F8F6F1;--bg2:#FFFFFF;--bg3:#FFFFFF;--bg4:#F1ECE3;--bg5:#ECE6DA;
+--ink:#171717;--ink2:#3E3A35;--ink3:#7A736A;--ink4:#B4AAA0;--ink5:#DED7CA;
+--line:#E7DFD2;--line2:#F0E9DE;--line3:#D6CBB8;
+--accent:#2E7D57;--accent2:#3E8D66;--accent-s:#EAF4EE;--accent-g:rgba(46,125,87,0.12);
+--gold:#CDAA63;--gold-s:#F6EEDC;
+--green:#2E7D57;--green-s:#EAF4EE;
+--rose:#A54848;--rose-s:#F8E8E8;
+--blue:#426B93;--blue-s:#E8F0F8;
+--plum:#80618A;--plum-s:#F1E8F4;
+--teal:#2E8278;--teal-s:#E4F3F1;
+--r:14px;--r2:22px;--r3:28px;
 --fd:'Fraunces',Georgia,serif;--fb:'Manrope',sans-serif;--fm:'JetBrains Mono',monospace;
 --ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1);
---side-w:252px;--top-h:68px;
+--side-w:264px;--top-h:72px;
 }
-[data-theme="light"]{
---bg:#FAF7F2;--bg2:#FFF;--bg3:#FFF;--bg4:#F2ECE0;--bg5:#E7E0D2;
---ink:#1C1917;--ink2:#44403C;--ink3:#8B8178;--ink4:#B8AFA4;--ink5:#DCD5C8;
---line:#E7E0D2;--line2:#F0EADC;--line3:#D4CCB8;
---accent:#7B2D26;--accent2:#652019;--accent-s:#F5E6E4;--accent-g:rgba(123,45,38,0.12);
---gold:#B8813A;--gold-s:#FBF2E3;
---green:#4A6741;--green-s:#E8EDE4;
---rose:#9B2C2C;--rose-s:#FBEAEA;
---blue:#2C5577;--blue-s:#E6EEF5;
---plum:#6B4862;--plum-s:#F2E8EE;
---teal:#2A6B63;--teal-s:#E3F0EE;
+[data-theme="dark"]{
+--bg:#12110F;--bg2:#191713;--bg3:#1F1C17;--bg4:#2A251E;--bg5:#332D24;
+--ink:#FAF7F2;--ink2:#E0D9CB;--ink3:#9E9589;--ink4:#655D53;--ink5:#40382F;
+--line:#2D281F;--line2:#241F19;--line3:#40382F;
+--accent:#65C18C;--accent2:#44A872;--accent-s:#17281E;--accent-g:rgba(101,193,140,0.16);
+--gold:#E0BC72;--gold-s:#2E2515;
+--green:#65C18C;--green-s:#17281E;
+--rose:#D46A67;--rose-s:#301A18;
+--blue:#7AA5D0;--blue-s:#172332;
+--plum:#C294BE;--plum-s:#2A1C29;
+--teal:#72C7BD;--teal-s:#152A28;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -351,6 +351,57 @@ textarea.field-input{resize:vertical;min-height:80px}
 
 @media(max-width:1100px){.hero-stats{grid-template-columns:repeat(2,1fr)}.dashboard-grid,.analytics-grid{grid-template-columns:1fr}.deposit-meta{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:820px){.auth{grid-template-columns:1fr}.auth-hero{display:none}.auth-form{padding:32px 24px}.app.active{grid-template-columns:1fr}.sidebar{position:fixed;left:-260px;transition:left .3s var(--ease)}.sidebar.open{left:0}.page-wrap{padding:20px 16px}.page-head h1{font-size:30px}.hero-stats{grid-template-columns:1fr 1fr}}
+
+/* Light-first restaurant operations refresh */
+body{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(46,125,87,.09), transparent 28%),
+    radial-gradient(circle at 96% 0%, rgba(205,170,99,.12), transparent 30%),
+    var(--bg);
+}
+.auth-hero{
+  background:
+    radial-gradient(circle at 15% 15%, rgba(46,125,87,.18), transparent 30%),
+    linear-gradient(135deg,#FFFDF8,#F1ECE3)!important;
+}
+.auth-statement h1,.auth-statement p,.auth-hero .brand-name{color:var(--ink)!important}
+.auth-hero .brand-mark{background:linear-gradient(135deg,var(--accent),var(--gold));color:#fff}
+.sidebar,.topbar,.panel,.stat-card,.item-card,.deposit-card,.modal,.auth-form{
+  box-shadow:0 18px 60px -42px rgba(20,20,20,.28);
+}
+.sidebar{
+  background:rgba(255,255,255,.78);
+  backdrop-filter:blur(22px);
+}
+[data-theme="dark"] .sidebar{background:rgba(25,23,19,.84)}
+.nav-item{border:1px solid transparent}
+.nav-item.active{
+  background:linear-gradient(135deg,var(--accent-s),var(--gold-s));
+  border-color:var(--line);
+  color:var(--ink);
+}
+.nav-item.active::before{background:linear-gradient(var(--accent),var(--gold))}
+.topbar{background:rgba(248,246,241,.84)!important}
+[data-theme="dark"] .topbar{background:rgba(18,17,15,.82)!important}
+.stat-card,.panel,.item-card,.deposit-card{
+  background:rgba(255,255,255,.82);
+  backdrop-filter:blur(16px);
+  border-color:rgba(231,223,210,.86);
+}
+[data-theme="dark"] .stat-card,[data-theme="dark"] .panel,[data-theme="dark"] .item-card,[data-theme="dark"] .deposit-card{
+  background:rgba(31,28,23,.88);
+  border-color:var(--line);
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover:not(:disabled){filter:brightness(.98)}
+.page-head h1{letter-spacing:-.045em}
+.stat-card .stat-value{letter-spacing:-.04em}
+.data-table th{background:var(--bg4)}
+.data-table tr:hover td{background:var(--accent-s)}
+.pill.pending,.pill.awaiting_payment,.pill.pending_deposit{background:var(--gold-s);color:var(--gold)}
+.pill.confirmed,.pill.approved{background:var(--green-s);color:var(--green)}
+.pill.payment_submitted,.pill.under_review{background:var(--teal-s);color:var(--teal)}
+
 </style>
 </head>
 <body>
@@ -414,12 +465,12 @@ textarea.field-input{resize:vertical;min-height:80px}
     <a class="nav-item" data-page="zones">🏗 Zonalar</a>
     <a class="nav-item" data-page="tables">🪑 Stollar</a>
     <a class="nav-item" data-page="media">🖼 Media</a>
-    <a class="nav-item" data-page="reels">▶ Reels</a>
+    <a class="nav-item" data-page="premium">⭐ Premium katalog</a>
     <div class="nav-sec">Sozlamalar</div>
     <a class="nav-item" data-page="restaurant">🏠 Profil</a>
     <a class="nav-item" data-page="deposit-settings">🔐 Depozit sozlamalari</a>
     <a class="nav-item" data-page="location">📍 Lokatsiya</a>
-    <a class="nav-item" data-page="premium">⭐ Premium</a>
+    <a class="nav-item" data-page="premium">⭐ Premium joylashuv</a>
   </nav>
   <div class="sidebar-foot">
     <div class="sidebar-user">
@@ -478,7 +529,7 @@ const S = {
   analytics: null,
   premium: null,
   page: 'overview',
-  theme: localStorage.getItem('ot_theme') || 'dark',
+  theme: localStorage.getItem('ot_theme') || 'light',
   filters: { status: 'all', depositStatus: 'pending' },
   restTab: 'general',
   socket: null,
@@ -561,7 +612,7 @@ window.closeModal = closeModal;
 ═══════════════════════════════════════════════════════════ */
 function applyTheme() {
   document.documentElement.setAttribute('data-theme', S.theme);
-  $('meta[name=theme-color]').content = S.theme === 'dark' ? '#0E0C0A' : '#FAF7F2';
+  $('meta[name=theme-color]').content = S.theme === 'dark' ? '#12110F' : '#F8F6F1';
   $('#theme-toggle').textContent = S.theme === 'dark' ? '☀' : '☾';
   Object.values(S.charts).forEach(c => c?.update?.());
 }
@@ -765,9 +816,9 @@ function renderOverview() {
             <div class="qa-icon">+</div>
             <div class="qa-text"><div class="qa-title">Yangi zona</div><div class="qa-desc">VIP, terassa...</div></div>
           </button>
-          <button class="qa-row" onclick="navigate('reels')">
-            <div class="qa-icon" style="background:var(--plum-s);color:var(--plum)">▶</div>
-            <div class="qa-text"><div class="qa-title">Reels yuklash</div><div class="qa-desc">Video kontent</div></div>
+          <button class="qa-row" onclick="navigate('premium')">
+            <div class="qa-icon gold">⭐</div>
+            <div class="qa-text"><div class="qa-title">Premium katalog</div><div class="qa-desc">Ko'rinish va joylashuv</div></div>
           </button>
         </div>
       </div>
@@ -1719,7 +1770,7 @@ function renderPremium() {
   const ip = S.restaurant?.is_premium;
   $('#page-wrap').innerHTML = `
   <div class="page-head"><div><div class="eyebrow">Obuna</div><h1>OneTable <em>Premium</em></h1></div></div>
-  <div style="background:linear-gradient(135deg,#1B1814,#2A1814);border:1px solid var(--accent);border-radius:var(--r3);padding:40px;margin-bottom:24px">
+  <div style="background:linear-gradient(135deg,var(--bg2),var(--gold-s));border:1px solid var(--line);border-radius:var(--r3);padding:40px;margin-bottom:24px;box-shadow:0 24px 70px -34px rgba(20,20,20,.28)">
     <div style="display:inline-flex;padding:5px 12px;background:var(--accent);color:var(--ink);border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">${ip?'✓ Faol':'Yangi'}</div>
     <h2 style="font-family:var(--fd);font-size:38px;font-weight:300;line-height:1;margin-bottom:16px">Restoraningizni<br><em style="font-style:italic;color:var(--accent);font-weight:200">ko'rinarli qiling</em></h2>
     <p style="color:var(--ink2);max-width:460px;margin-bottom:28px">Premium restoranlar ro'yxat boshida, verified belgisi, to'liq analitika va priority qo'llab-quvvatlash.</p>
