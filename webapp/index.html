@@ -3,57 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#FBF8F1">
+<meta name="theme-color" content="#FAF7F0">
 <title>OneTable — Toshkent restoranlari</title>
-<script>
-(function(){
-  var p = window.location.pathname.replace(/\/+$/, '').toLowerCase();
-  if (p === '/dashboard' || p === '/admin' || p === '/owner') {
-    window.location.replace('/dashboard.html');
-  }
-})();
-</script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FFF8EF;--bg2:#FFFFFF;--bg3:#F7E9DA;--bg4:#EED8C1;
-  --ink:#251812;--ink2:#4B352B;--ink3:#7E6759;--ink4:#B49F8F;
-  --line:rgba(105,57,31,0.11);--line2:rgba(105,57,31,0.06);
-  --accent:#B85C38;--accent2:#D06E43;--accentRgb:184,92,56;
-  --gold:#C99A49;--goldRgb:201,154,73;--goldLight:rgba(201,154,73,0.16);
-  --success:#3E7A4D;--danger:#A33A34;
-  --cream:#FFF1DD;--black:#1C1411;
+  --bg:#FAF7F0;--bg2:#FFF;--bg3:#F3EDE0;--bg4:#EDE6D5;
+  --ink:#1A1714;--ink2:#3D3830;--ink3:#857A6E;--ink4:#C0B5A8;
+  --line:#E8DFD0;--line2:#F0E9DC;
+  --accent:#7B2D26;--accent2:#9B3D34;--accentRgb:123,45,38;
+  --gold:#A8722A;--goldRgb:168,114,42;--goldLight:#F5E9D0;
+  --success:#3A6835;--danger:#8B2828;
   --r:10px;--r2:16px;--r3:22px;--r4:28px;
-  --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;
+  --fd:'Fraunces',Georgia,serif;--fb:'Manrope',system-ui,sans-serif;
   --fm:'Courier New',monospace;
   --tabbar-h:72px;
   --safe-b:env(safe-area-inset-bottom,0px);
   --safe-t:env(safe-area-inset-top,0px);
-  --sh1:0 6px 18px rgba(78,42,24,.07);
-  --sh2:0 18px 46px -18px rgba(78,42,24,.18), 0 8px 18px -14px rgba(78,42,24,.14);
-  --sh3:0 28px 70px -24px rgba(78,42,24,.24), 0 10px 28px -20px rgba(78,42,24,.18);
-  --sh-glow:0 0 0 1px rgba(255,255,255,.68), 0 4px 20px rgba(var(--accentRgb),.11);
+  --sh1:0 2px 12px rgba(0,0,0,.05);
+  --sh2:0 8px 28px -8px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.04);
+  --sh3:0 24px 60px -12px rgba(0,0,0,.18), 0 8px 24px -8px rgba(0,0,0,.1);
+  --sh-glow:0 0 0 1px rgba(255,255,255,.6), 0 4px 20px rgba(var(--accentRgb),.08);
   --tt:.35s cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
-  --glass-bg:rgba(255,255,255,.86);
-  --glass-border:rgba(255,255,255,.92);
+  --glass-bg:rgba(255,255,255,.65);
+  --glass-border:rgba(255,255,255,.85);
 }
 [data-theme="dark"]{
-  --bg:#15110E;--bg2:#1E1814;--bg3:#2A211B;--bg4:#352A22;
-  --ink:#FFF4E6;--ink2:#EAD7C5;--ink3:#B89E8A;--ink4:#776255;
-  --line:rgba(255,238,218,0.09);--line2:rgba(255,238,218,0.05);
-  --accent:#E17A4B;--accent2:#F08D5E;--accentRgb:225,122,75;
-  --gold:#E0B45E;--goldRgb:224,180,94;--goldLight:rgba(224,180,94,0.15);
-  --success:#62A66E;--danger:#D15A50;
-  --cream:#2A211B;--black:#0C0907;
-  --sh1:0 4px 16px rgba(0,0,0,.30);
-  --sh2:0 18px 50px -12px rgba(0,0,0,.48),0 2px 8px rgba(0,0,0,.22);
-  --sh3:0 28px 70px -14px rgba(0,0,0,.65),0 8px 24px -10px rgba(0,0,0,.42);
+  --bg:#0A0807;--bg2:#16110D;--bg3:#1F1813;--bg4:#2A2018;
+  --ink:#F2EDE3;--ink2:#CFC7BB;--ink3:#8A8078;--ink4:#4A4540;
+  --line:#2A231A;--line2:#1E1A14;
+  --accent:#D4866E;--accent2:#E09A82;--accentRgb:212,134,110;
+  --gold:#D4A045;--goldRgb:212,160,69;--goldLight:#2A2010;
+  --success:#6FA860;--danger:#D47070;
+  --sh1:0 2px 12px rgba(0,0,0,.4);
+  --sh2:0 8px 28px -8px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3);
+  --sh3:0 24px 60px -12px rgba(0,0,0,.7), 0 8px 24px -8px rgba(0,0,0,.4);
   --sh-glow:0 0 0 1px rgba(255,255,255,.08), 0 4px 24px rgba(var(--accentRgb),.18);
-  --glass-bg:rgba(30,24,20,.84);
-  --glass-border:rgba(255,244,230,.09);
+  --glass-bg:rgba(22,17,13,.72);
+  --glass-border:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -64,184 +54,79 @@ a{color:inherit;text-decoration:none}
 img,video{display:block;max-width:100%}
 
 /* ════════════════════════════════════════════════════════
-   SPLASH SCREEN — Premium dark mode + neon pulse + spring
+   SPLASH SCREEN — warm premium intro, no green
    ════════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(ellipse at center, #0a3520 0%, #050a07 60%, #000 100%);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(214,126,80,.20) 0%, transparent 32%),
+    radial-gradient(circle at 82% 78%, rgba(201,154,73,.22) 0%, transparent 34%),
+    linear-gradient(145deg,#FFF8EF 0%,#F7E6D2 52%,#EBCFB4 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
-  transition:opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
+  transition:opacity .62s cubic-bezier(.4,0,.2,1), transform .62s cubic-bezier(.4,0,.2,1);
 }
-#splash.hide{opacity:0;transform:scale(1.05);pointer-events:none}
-
-/* Floating ambient orbs in background — green + gold (pitch colors) */
-#splash::before, #splash::after{
-  content:'';position:absolute;border-radius:50%;
-  filter:blur(80px);opacity:.5;
-  animation:floatOrb 8s ease-in-out infinite;
-}
+#splash.hide{opacity:0;transform:scale(1.025);pointer-events:none}
 #splash::before{
-  width:400px;height:400px;background:#0F6B3A;
-  top:-100px;left:-100px;
-  animation-delay:0s;
+  content:'';position:absolute;inset:auto auto -110px -90px;
+  width:290px;height:290px;border-radius:50%;
+  background:rgba(184,92,56,.18);filter:blur(56px);
+  animation:splashDrift 5s ease-in-out infinite;
 }
 #splash::after{
-  width:350px;height:350px;background:#D8A84E;
-  bottom:-80px;right:-80px;
-  animation-delay:-4s;
+  content:'';position:absolute;inset:-120px -80px auto auto;
+  width:310px;height:310px;border-radius:50%;
+  background:rgba(201,154,73,.20);filter:blur(64px);
+  animation:splashDrift 6s ease-in-out infinite reverse;
 }
-@keyframes floatOrb{
-  0%,100%{transform:translate(0,0) scale(1)}
-  50%{transform:translate(40px,-30px) scale(1.15)}
+@keyframes splashDrift{
+  0%,100%{transform:translate3d(0,0,0) scale(1)}
+  50%{transform:translate3d(18px,-16px,0) scale(1.08)}
 }
-
-.splash-greet{
-  font-family:var(--fd);
-  font-size:14px;
-  font-weight:400;
-  letter-spacing:.4em;
-  text-transform:uppercase;
-  color:rgba(216,168,78,.85);
-  margin-bottom:48px;
-  opacity:0;
-  animation:greetIn .8s cubic-bezier(.34,1.56,.64,1) .3s forwards;
+.splash-mark{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:28px 30px 30px;
+  border-radius:32px;
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.74);
+  box-shadow:0 24px 70px -38px rgba(82,45,28,.42), inset 0 1px 0 rgba(255,255,255,.70);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  animation:splashMarkIn .72s cubic-bezier(.34,1.56,.64,1) .12s both;
 }
-@keyframes greetIn{
-  0%{opacity:0;transform:translateY(20px) scale(.9)}
+@keyframes splashMarkIn{
+  0%{opacity:0;transform:translateY(18px) scale(.96)}
   100%{opacity:1;transform:translateY(0) scale(1)}
 }
-
-.splash-logo-wrap{
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  width:180px;height:180px;
-  opacity:0;
-  animation:logoSpring 1.2s cubic-bezier(.34,1.56,.64,1) .5s forwards;
-}
-@keyframes logoSpring{
-  0%{opacity:0;transform:scale(.3) rotate(-8deg)}
-  60%{opacity:1;transform:scale(1.1) rotate(2deg)}
-  100%{opacity:1;transform:scale(1) rotate(0)}
-}
-
-/* Premium pulsing layered glows — green + gold */
-.splash-logo-wrap::before, .splash-logo-wrap::after{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  pointer-events:none;
-}
-.splash-logo-wrap::before{
-  background:radial-gradient(circle, rgba(15,107,58,.7) 0%, transparent 60%);
-  animation:neonPulse1 2.5s ease-in-out infinite;
-  filter:blur(20px);
-}
-.splash-logo-wrap::after{
-  background:radial-gradient(circle, rgba(216,168,78,.5) 0%, transparent 65%);
-  animation:neonPulse2 3s ease-in-out infinite;
-  filter:blur(30px);
-  transform:scale(1.4);
-}
-@keyframes neonPulse1{
-  0%,100%{opacity:.5;transform:scale(1)}
-  50%{opacity:1;transform:scale(1.2)}
-}
-@keyframes neonPulse2{
-  0%,100%{opacity:.4;transform:scale(1.4)}
-  50%{opacity:.8;transform:scale(1.7)}
-}
-
-.splash-logo{
-  position:relative;z-index:2;
-  width:120px;height:120px;
-  border-radius:24px;
-  background:linear-gradient(135deg, #0F6B3A 0%, #1E8A4D 100%);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:
-    0 0 60px rgba(15,107,58,.6),
-    0 0 100px rgba(216,168,78,.3),
-    inset 0 2px 0 rgba(255,255,255,.2),
-    inset 0 -2px 8px rgba(0,0,0,.3);
-  animation:logoBreathe 3s ease-in-out infinite;
-}
-@keyframes logoBreathe{
-  0%,100%{box-shadow:0 0 60px rgba(15,107,58,.6),0 0 100px rgba(216,168,78,.3),inset 0 2px 0 rgba(255,255,255,.2),inset 0 -2px 8px rgba(0,0,0,.3)}
-  50%{box-shadow:0 0 90px rgba(15,107,58,.9),0 0 140px rgba(216,168,78,.5),inset 0 2px 0 rgba(255,255,255,.3),inset 0 -2px 8px rgba(0,0,0,.3)}
-}
-
-.splash-logo-text{
-  font-family:var(--fd);
-  font-size:64px;
-  font-weight:500;
-  font-style:italic;
-  color:#FBF8F1;
-  text-shadow:0 2px 12px rgba(0,0,0,.4);
-  letter-spacing:-.02em;
-}
-
-.splash-brand{
-  margin-top:36px;
+.splash-wordmark{
   font-family:var(--fd);
   font-size:42px;
-  font-weight:400;
-  letter-spacing:-.03em;
-  color:#FBF8F1;
-  opacity:0;
-  animation:brandIn .9s cubic-bezier(.34,1.56,.64,1) .9s forwards;
+  line-height:.95;
+  font-weight:500;
+  letter-spacing:-.045em;
+  color:#2B1810;
 }
-.splash-brand em{
-  font-style:italic;font-weight:500;
-  background:linear-gradient(135deg, #D8A84E 0%, #E2B85A 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-@keyframes brandIn{
-  0%{opacity:0;transform:translateY(15px)}
-  100%{opacity:1;transform:translateY(0)}
-}
-
-.splash-tagline{
-  margin-top:14px;
+.splash-wordmark em{font-style:italic;color:#B85C38;font-weight:400}
+.splash-line{
+  margin-top:12px;
   font-size:12px;
-  font-weight:400;
-  letter-spacing:.18em;
+  font-weight:900;
+  letter-spacing:.22em;
   text-transform:uppercase;
-  color:rgba(245,239,228,.6);
-  opacity:0;
-  animation:taglineIn .9s ease-out 1.3s forwards;
+  color:#7B5C4B;
 }
-@keyframes taglineIn{
-  0%{opacity:0;transform:translateY(10px)}
-  100%{opacity:.8;transform:translateY(0)}
-}
-
 .splash-loader{
-  position:absolute;
-  bottom:60px;left:50%;
-  transform:translateX(-50%);
-  width:140px;height:2px;
-  background:rgba(216,168,78,.15);
-  border-radius:2px;overflow:hidden;
-  opacity:0;
-  animation:loaderIn .6s ease-out 1.6s forwards;
+  position:relative;z-index:2;
+  margin-top:24px;
+  width:128px;height:3px;border-radius:100px;overflow:hidden;
+  background:rgba(82,45,28,.10);
 }
 .splash-loader::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg, transparent 0%, #D8A84E 50%, transparent 100%);
-  animation:loaderSlide 1.8s ease-in-out infinite;
+  background:linear-gradient(90deg, transparent 0%, #B85C38 42%, #C99A49 58%, transparent 100%);
+  animation:loaderSlide 1.45s ease-in-out infinite;
 }
-@keyframes loaderIn{0%{opacity:0}100%{opacity:1}}
-@keyframes loaderSlide{
-  0%{transform:translateX(-100%)}
-  100%{transform:translateX(100%)}
-}
-
-
-/* Sticky top navigation: My Bookings and Catalog are always visible */
-.quick-top-nav{position:sticky;top:0;z-index:70;display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:8px;padding:calc(var(--safe-t) + 10px) 16px 10px;background:linear-gradient(180deg,var(--bg) 0%,rgba(255,248,239,.96) 78%,rgba(255,248,239,0) 100%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-[data-theme="dark"] .quick-top-nav{background:linear-gradient(180deg,var(--bg) 0%,rgba(21,17,14,.96) 78%,rgba(21,17,14,0) 100%)}
-.quick-nav-btn{min-height:44px;border-radius:18px;background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--sh1);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--ink2);font-size:12px;font-weight:800;transition:transform .22s var(--spring),background .22s ease,border-color .22s ease,color .22s ease,box-shadow .22s ease}
-.quick-nav-btn span{font-size:15px;line-height:1}.quick-nav-btn b{font-size:11.5px;letter-spacing:.01em;white-space:nowrap}.quick-nav-btn.priority{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:rgba(var(--accentRgb),.34);box-shadow:0 12px 26px -12px rgba(var(--accentRgb),.62)}
-.quick-nav-btn.active:not(.priority){background:var(--ink);color:var(--bg);border-color:var(--ink)}.quick-nav-btn:active{transform:scale(.95)}
+@keyframes loaderSlide{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
 /* ════════════════════════════════════════════════════════
    APP — main layout with cascade reveal animation
@@ -323,6 +208,29 @@ img,video{display:block;max-width:100%}
 .search input{flex:1;border:none;background:none;font-size:14.5px}
 .search input::placeholder{color:var(--ink4)}
 
+.smart-filter-panel{
+  margin:8px 20px 10px;
+  padding:12px;
+  border-radius:var(--r3);
+  background:rgba(255,255,255,.78);
+  border:1px solid var(--glass-border);
+  box-shadow:var(--sh2);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+[data-theme="dark"] .smart-filter-panel{background:rgba(30,24,20,.80);border-color:var(--glass-border)}
+.smart-filter-title{font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 9px 4px}
+.smart-filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.smart-field{min-width:0;height:44px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg2);display:flex;align-items:center;gap:8px;padding:0 12px;transition:border-color .22s ease, box-shadow .22s ease, transform .22s var(--spring)}
+.smart-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(var(--accentRgb),.11);transform:translateY(-1px)}
+.smart-field span{font-size:15px;flex-shrink:0}.smart-field input{width:100%;border:0;background:transparent;font-size:13px;font-weight:700;color:var(--ink)}
+.smart-field input::placeholder{font-weight:600;color:var(--ink4)}
+.smart-filter-actions{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.smart-search-btn{height:42px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 24px -12px rgba(var(--accentRgb),.65);padding:0 18px;transition:transform .22s var(--spring),opacity .22s ease}
+.smart-search-btn:active{transform:scale(.96)}.smart-reset-btn{height:42px;border-radius:16px;background:var(--bg3);color:var(--ink3);font-size:12px;font-weight:800;padding:0 14px;border:1px solid var(--line)}
+.smart-filter-note{font-size:11.5px;color:var(--ink3);font-weight:650;line-height:1.35;margin-top:9px;padding:8px 10px;border-radius:14px;background:var(--bg3);display:none}
+.smart-filter-note.show{display:block}.dish-matches{margin-top:11px;border-top:1px solid var(--line2);padding-top:10px;display:flex;flex-direction:column;gap:6px}.dish-match{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--bg3);font-size:12px}.dish-match b{font-weight:900;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dish-match span{font-weight:900;color:var(--accent);white-space:nowrap}.filter-loading{opacity:.72;pointer-events:none}
+
+
 .chip-row{display:flex;gap:8px;padding:10px 20px 8px;overflow-x:auto;scrollbar-width:none}
 .chip-row::-webkit-scrollbar{display:none}
 .chip{
@@ -348,6 +256,16 @@ img,video{display:block;max-width:100%}
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:livePulse 1.6s ease-in-out infinite}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 
+.trend-pill{
+  flex-shrink:0;display:flex;align-items:center;gap:7px;
+  padding:7px 13px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r3);
+  font-size:12px;font-weight:700;color:var(--ink2);
+  box-shadow:var(--sh1);
+}
 
 /* ════════════════════════════════════════════════════════
    GLASSMORPHISM CARDS — premium with shimmer borders
@@ -387,10 +305,31 @@ img,video{display:block;max-width:100%}
 .c-meta{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3);margin-top:3px}
 .c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--line2)}
 .c-rating{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--ink);padding:4px 9px;background:var(--bg3);border-radius:100px}
-.book-btn{padding:10px 18px;background:var(--accent);color:#fff;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .25s var(--spring);box-shadow:0 6px 16px -4px rgba(var(--accentRgb),.45)}
-.book-btn:active{transform:scale(.92);opacity:.92}
+.book-btn{padding:9px 17px;background:var(--ink);color:var(--bg);border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:all .25s var(--spring);box-shadow:0 4px 12px -2px rgba(0,0,0,.25)}
+.book-btn:active{transform:scale(.88);opacity:.85}
 .cuisine-tag{font-size:10.5px;font-weight:700;padding:3px 9px;background:var(--bg3);border-radius:100px;color:var(--ink3)}
 .loc-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--accent);padding:4px 10px;background:rgba(var(--accentRgb),.08);border-radius:100px;text-decoration:none}
+
+.tonight-card{
+  flex-shrink:0;width:196px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--r3);
+  overflow:hidden;
+  box-shadow:var(--sh2);
+  cursor:pointer;
+  transition:transform .35s var(--spring);
+}
+.tonight-card:active{transform:scale(.94)}
+.tonight-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.tonight-body{padding:11px 13px 14px}
+.tonight-name{font-family:var(--fd);font-size:14.5px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.tonight-meta{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);font-weight:600}
+.tonight-pop{display:flex;align-items:center;gap:5px;margin-top:7px}
+.pop-bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.pop-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--gold));border-radius:2px;transition:width 1.2s ease}
+.pop-label{font-size:9.5px;color:var(--accent);font-weight:800}
 
 /* ════════════════════════════════════════════════════════
    TABBAR — premium glassmorphism with floating accent
@@ -508,7 +447,6 @@ img,video{display:block;max-width:100%}
 @keyframes tablesSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .table-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .table-card-item{
-  position:relative;
   background:var(--glass-bg);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border:1.5px solid var(--glass-border);
@@ -519,10 +457,7 @@ img,video{display:block;max-width:100%}
   box-shadow:var(--sh1);
 }
 .table-card-item:active{transform:scale(.93)}
-.table-card-item.active{border:2px solid var(--accent);background:linear-gradient(180deg,rgba(var(--accentRgb),.14),var(--glass-bg));color:var(--ink);box-shadow:0 12px 28px -10px rgba(var(--accentRgb),.58);transform:translateY(-2px)}
-.table-card-item.active::after{content:'\2713';position:absolute;top:7px;right:7px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 6px 14px -6px rgba(var(--accentRgb),.70);z-index:3}
-.table-card-item.active .tc-num{color:var(--accent);font-weight:800}
-.table-card-item.active .tc-cap{color:var(--ink2);opacity:1}
+.table-card-item.active{border-color:var(--ink);background:var(--ink);color:var(--bg);box-shadow:0 8px 20px -6px rgba(0,0,0,.25)}
 .table-card-item-img{width:100%;height:64px;object-fit:cover;display:block;background:var(--bg3)}
 .table-card-item-img-placeholder{width:100%;height:64px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.5}
 .table-card-item .tc-body{padding:8px 4px 9px}
@@ -530,7 +465,7 @@ img,video{display:block;max-width:100%}
 .table-card-item .tc-cap{font-size:10px;opacity:.65;margin-top:2px}
 .table-skip-btn{grid-column:1 / -1;padding:10px;border:1.5px dashed var(--line);border-radius:var(--r2);font-size:11.5px;font-weight:700;color:var(--ink3);background:transparent;cursor:pointer;transition:all .2s}
 .table-skip-btn:active{background:var(--bg3)}
-.table-skip-btn.active{border-color:var(--accent);background:rgba(var(--accentRgb),.12);color:var(--accent);box-shadow:0 8px 22px -12px rgba(var(--accentRgb),.55)}
+.table-skip-btn.active{border-color:var(--ink);background:var(--ink);color:var(--bg)}
 .no-tables-msg{padding:16px;background:var(--bg3);border-radius:var(--r2);text-align:center;font-size:12px;color:var(--ink3);font-weight:600}
 
 .date-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
@@ -686,27 +621,17 @@ img,video{display:block;max-width:100%}
 <body>
 
 <!-- ════════════════════════════════════════════════════════
-     SPLASH SCREEN — 5 second premium intro
+     SPLASH SCREEN — short premium intro
      ════════════════════════════════════════════════════════ -->
 <div id="splash">
-  <div class="splash-greet">Xush kelibsiz</div>
-  <div class="splash-logo-wrap">
-    <div class="splash-logo">
-      <div class="splash-logo-text">O</div>
-    </div>
+  <div class="splash-mark">
+    <div class="splash-wordmark">One<em>Table</em></div>
+    <div class="splash-line">Qulay · Tez · Sifatli</div>
   </div>
-  <div class="splash-brand">One<em>Table</em></div>
-  <div class="splash-tagline">Mijoz uchun oson · Restoran uchun aqlli</div>
   <div class="splash-loader"></div>
 </div>
 
 <div id="app">
-
-<div class="quick-top-nav">
-  <button class="quick-nav-btn active" data-tab="home"><span>🏠</span><b id="quick-home-label">Asosiy</b></button>
-  <button class="quick-nav-btn priority" data-tab="bookings"><span>📅</span><b id="quick-bookings-label">Bronlarim</b></button>
-  <button class="quick-nav-btn" data-tab="catalog"><span>🍽</span><b id="quick-catalog-label">Katalog</b></button>
-</div>
 
 <!-- HOME -->
 <div class="page active" id="page-home">
@@ -725,6 +650,24 @@ img,video{display:block;max-width:100%}
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="search-input" placeholder="Restoran qidirish...">
     </div>
+  </div>
+  <div class="smart-filter-panel" id="smart-filter-panel">
+    <div class="smart-filter-title" id="smart-filter-title">Narx va taom bo'yicha qidirish</div>
+    <div class="smart-filter-grid">
+      <label class="smart-field">
+        <span>💵</span>
+        <input type="number" inputmode="numeric" id="price-filter-input" min="0" step="1000" placeholder="Masalan: 80000">
+      </label>
+      <label class="smart-field">
+        <span>🍽</span>
+        <input type="text" id="dish-filter-input" placeholder="Osh, steak, sushi...">
+      </label>
+    </div>
+    <div class="smart-filter-actions">
+      <button class="smart-reset-btn" id="smart-reset-btn" type="button">Tozalash</button>
+      <button class="smart-search-btn" id="smart-search-btn" type="button">Qidirish</button>
+    </div>
+    <div class="smart-filter-note" id="smart-filter-note"></div>
   </div>
   <div class="chip-row" id="chip-row"></div>
   <div class="section reveal">
@@ -746,31 +689,6 @@ img,video{display:block;max-width:100%}
     <div><div class="eyebrow" id="bk-eyebrow">Mening</div><h1 class="greet-title"><em id="bk-title">Bronlarim</em></h1></div>
   </div>
   <div class="section"><div id="bookings-list"></div></div>
-</div>
-
-<!-- CATALOG -->
-<div class="page" id="page-catalog">
-  <div class="topbar">
-    <div>
-      <div class="eyebrow" id="catalog-eyebrow">Tanlangan</div>
-      <h1 class="greet-title"><em id="catalog-title">Katalog</em></h1>
-    </div>
-  </div>
-  <div class="catalog-hero">
-    <div>
-      <div class="catalog-kicker">OneTable tanlovi</div>
-      <h2 id="catalog-hero-title">Tez bron qilish uchun tanlangan joylar</h2>
-      <p id="catalog-hero-text">Restoran toping, stol tanlang va bronlaringizni kuzatib boring.</p>
-    </div>
-    <button class="catalog-quick" onclick="switchTab('bookings')">Bronlarim</button>
-  </div>
-  <div class="section">
-    <div class="section-head">
-      <div class="section-title" id="catalog-list-title">Restoran <em>katalogi</em></div>
-      <span id="catalog-count" style="font-size:11px;color:var(--ink4);font-weight:700"></span>
-    </div>
-    <div class="card-list" id="catalog-list"></div>
-  </div>
 </div>
 
 <!-- FAVORITES -->
@@ -806,13 +724,9 @@ img,video{display:block;max-width:100%}
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
     <span id="nav-home">Asosiy</span>
   </button>
-  <button class="tab tab-bookings-strong" data-tab="bookings">
+  <button class="tab" data-tab="bookings">
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-    <span id="nav-bookings">Bronlarim</span>
-  </button>
-  <button class="tab" data-tab="catalog">
-    <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="19" r="2"/></svg></div>
-    <span id="nav-catalog">Katalog</span>
+    <span id="nav-bookings">Bronlar</span>
   </button>
   <button class="tab" data-tab="favorites">
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
@@ -862,7 +776,7 @@ img,video{display:block;max-width:100%}
 'use strict';
 
 /* ════════════════════════════════════════════════════════
-   SPLASH SCREEN — exactly 5 seconds, then fade out
+   SPLASH SCREEN — short premium intro
    ════════════════════════════════════════════════════════ */
 window.addEventListener('load', () => {
   setTimeout(() => {
@@ -871,7 +785,7 @@ window.addEventListener('load', () => {
     splash.classList.add('hide');
     app.classList.add('show');
     setTimeout(() => splash.remove(), 800);
-  }, 5000); // EXACTLY 5 seconds
+  }, 1800); // premium short intro
 });
 
 const API = `${location.origin}/api`;
@@ -882,14 +796,14 @@ if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 const T = {
   uz:{
     welcome:"Xush kelibsiz",greet_m:"Xayrli tong,",greet_d:"Xayrli kun,",greet_e:"Xayrli oqshom,",greet_n:"Xayrli kech,",
-    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"",reels_em:"",
-    live:"",tonight:"",tonight_em:"",
+    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"Atmosfera",reels_em:"reels",
+    live:"Jonli",tonight:"Bugun",tonight_em:"mashhur",
     book:"Bron",book_now:"Bron qilish",not_found:"Topilmadi",not_found_sub:"Qidiruvni o'zgartiring",
-    nav_home:"Asosiy",nav_bk:"Bronlarim",nav_catalog:"Katalog",nav_reels:"",nav_fav:"Sevimli",nav_prof:"Profil",
+    nav_home:"Asosiy",nav_bk:"Bronlar",nav_reels:"Reels",nav_fav:"Sevimli",nav_prof:"Profil",
     bk_eye:"Mening",bk_ttl:"Bronlarim",fav_eye:"Sevimli",fav_ttl:"Joylar",
     no_bk:"Bronlar yo'q",no_bk_s:"Restoran tanlang va bron qiling",
     no_fav:"Sevimlilar bo'sh",no_fav_s:"❤️ bosib qo'shing",
-    no_reels:"",no_reels_s:"",
+    no_reels:"Hozircha reels yo'q",no_reels_s:"Restoranlar yangi videolar yuklasa bu yerda paydo bo'ladi",
     stat_bk:"Bron",stat_vis:"Restoran",stat_fav:"Sevimli",open_now:"Ochiq",
     zone_l:"Zona tanlang",table_l:"Stol tanlang",table_any:"Farqi yo'q",date_l:"Sana",guests_l:"Mehmonlar",guests_s:"kishi",time_l:"Vaqt",
     no_tables:"Bu zona uchun stollar kiritilmagan",
@@ -904,11 +818,12 @@ const T = {
     months:["Yan","Fev","Mar","Apr","May","Iyun","Iyul","Avg","Sen","Okt","Noy","Dek"],
     status:{pending:"Kutilmoqda",confirmed:"Tasdiqlangan",cancelled:"Bekor",completed:"Tugallangan",pending_deposit:"Depozit kutilmoqda"},
     chips:[["all","Barchasi"],["uzbek","O'zbek"],["european","Yevropa"],["italian","Italyan"],["asian","Osiyo"],["family","Oilaviy"]],
-    trending:[],
+    trending:[["🔥","Mashhur","128"],["⚡","Yangi","24"],["💎","Premium","16"],["🌿","Sog'lom","42"]],
     sheet_eye:"Bron qilish",main_hall:"Asosiy zal",main_zone:"Asosiy",
     err_load:"Yuklab bo'lmadi",err_load_s:"Internet yoki server xatosi",
     comments:"Izohlar",comment_placeholder:"Izoh qo'shing...",no_comments:"Hali izoh yo'q",no_comments_s:"Birinchi bo'lib izoh qoldiring",
     just_now:"hozir",min_ago:"daq oldin",hour_ago:"soat oldin",day_ago:"kun oldin",
+    smart_title:"Narx va taom bo'yicha qidirish",smart_price:"Masalan: 80000",smart_dish:"Osh, steak, sushi...",smart_search:"Qidirish",smart_reset:"Tozalash",smart_found:"Mos natija",smart_no:"Bu narx va taom bo'yicha natija topilmadi",smart_hint:"Narx yoki taom turini kiriting",dish_matches:"Mos taomlar",
     menu_lang:"Tilni o'zgartirish",menu_support:"Yordam",menu_about:"OneTable haqida",share_link:"Havola nusxalandi",
     map_view:"Xaritada ko'rish",copy_card:"📋 Nusxa olindi!",upload_ok:"Screenshot yuklandi",
   },
@@ -917,11 +832,11 @@ const T = {
     search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"и стиль",
     live:"Live",tonight:"Сегодня",tonight_em:"популярно",
     book:"Бронь",book_now:"Забронировать",not_found:"Не найдено",not_found_sub:"Измените запрос",
-    nav_home:"Главная",nav_bk:"Брони",nav_reels:"Reels",nav_fav:"Избранное",nav_prof:"Профиль",
+    nav_home:"Главная",nav_bk:"Брони",nav_fav:"Избранное",nav_prof:"Профиль",
     bk_eye:"Мои",bk_ttl:"Брони",fav_eye:"Избранные",fav_ttl:"Места",
     no_bk:"Нет броней",no_bk_s:"Выберите ресторан и забронируйте",
     no_fav:"Избранное пусто",no_fav_s:"Нажмите ❤️ чтобы добавить",
-    no_reels:"",no_reels_s:"",
+    no_reels:"Пока нет видео",no_reels_s:"Когда рестораны загрузят новые reels — они появятся здесь",
     stat_bk:"Бронь",stat_vis:"Ресторан",stat_fav:"Избранное",open_now:"Открыто",
     zone_l:"Выберите зону",table_l:"Выберите стол",table_any:"Любой стол",date_l:"Дата",guests_l:"Гости",guests_s:"чел.",time_l:"Время",
     no_tables:"В этой зоне нет добавленных столов",
@@ -941,6 +856,7 @@ const T = {
     err_load:"Ошибка загрузки",err_load_s:"Проверьте интернет",
     comments:"Комментарии",comment_placeholder:"Добавить комментарий...",no_comments:"Нет комментариев",no_comments_s:"Будьте первым",
     just_now:"сейчас",min_ago:"мин назад",hour_ago:"ч назад",day_ago:"д назад",
+    smart_title:"Поиск по цене и блюду",smart_price:"Например: 80000",smart_dish:"Плов, стейк, суши...",smart_search:"Найти",smart_reset:"Очистить",smart_found:"Подходящие результаты",smart_no:"По этой цене и блюду ничего не найдено",smart_hint:"Введите цену или тип блюда",dish_matches:"Подходящие блюда",
     menu_lang:"Сменить язык",menu_support:"Поддержка",menu_about:"О OneTable",share_link:"Ссылка скопирована",
     map_view:"Открыть на карте",copy_card:"📋 Скопировано!",upload_ok:"Скриншот загружен",
   },
@@ -949,11 +865,11 @@ const T = {
     search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"reels",
     live:"Live",tonight:"Trending",tonight_em:"tonight",
     book:"Book",book_now:"Book a Table",not_found:"Not found",not_found_sub:"Try different filters",
-    nav_home:"Home",nav_bk:"Bookings",nav_reels:"Reels",nav_fav:"Favorites",nav_prof:"Profile",
+    nav_home:"Home",nav_bk:"Bookings",nav_fav:"Favorites",nav_prof:"Profile",
     bk_eye:"My",bk_ttl:"Bookings",fav_eye:"Saved",fav_ttl:"Places",
     no_bk:"No bookings yet",no_bk_s:"Choose a restaurant and book",
     no_fav:"No favorites yet",no_fav_s:"Tap ❤️ to save",
-    no_reels:"",no_reels_s:"",
+    no_reels:"No reels yet",no_reels_s:"When restaurants upload new videos they'll appear here",
     stat_bk:"Bookings",stat_vis:"Visited",stat_fav:"Favorites",open_now:"Open now",
     zone_l:"Select a zone",table_l:"Select a table",table_any:"Any table",date_l:"Date",guests_l:"Guests",guests_s:"guests",time_l:"Time",
     no_tables:"No tables configured for this zone",
@@ -973,6 +889,7 @@ const T = {
     err_load:"Failed to load",err_load_s:"Check your connection",
     comments:"Comments",comment_placeholder:"Add a comment...",no_comments:"No comments yet",no_comments_s:"Be the first",
     just_now:"now",min_ago:"min ago",hour_ago:"h ago",day_ago:"d ago",
+    smart_title:"Search by price and dish",smart_price:"Example: 80000",smart_dish:"Plov, steak, sushi...",smart_search:"Search",smart_reset:"Clear",smart_found:"Matching results",smart_no:"No result for this price and dish",smart_hint:"Enter a price or dish type",dish_matches:"Matching dishes",
     menu_lang:"Change language",menu_support:"Support",menu_about:"About OneTable",share_link:"Link copied",
     map_view:"View on map",copy_card:"📋 Copied!",upload_ok:"Screenshot uploaded",
   }
@@ -984,6 +901,7 @@ const S = {
   lang: localStorage.getItem('ot_lang') || 'uz',
   theme: localStorage.getItem('ot_theme') || 'auto',
   user: null, restaurants: [], filtered: [], bookings: [],
+  menuCache: {}, menuMatches: {}, smartFilterActive: false, priceMax: null, dishQ: '', smartLoading: false,
   reels: [],
   reelLikes: JSON.parse(localStorage.getItem('ot_reel_likes') || '{}'),
   reelComments: JSON.parse(localStorage.getItem('ot_reel_comments') || '{}'),
@@ -1005,6 +923,7 @@ const S = {
 
 /* ─── HELPERS ─── */
 const t = k => (T[S.lang]||T.uz)[k] ?? k;
+const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => new Intl.NumberFormat('fr-FR').format(Number(n)||0).replace(/\s/g,' ');
 const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1086,15 +1005,12 @@ function applyLang() {
   document.getElementById('home-user-name').textContent = uname;
   document.getElementById('search-input').placeholder = t('search');
   document.getElementById('nearby-title').innerHTML = `${t('nearby')} <em>${t('nearby_em')}</em>`;
-  ['home','bookings','catalog','favorites','profile'].forEach((k,i) => {
-    const ids = ['nav-home','nav-bookings','nav-catalog','nav-favorites','nav-profile'];
-    const keys = ['nav_home','nav_bk','nav_catalog','nav_fav','nav_prof'];
-    document.getElementById(ids[i]).textContent = t(keys[i]);
-  });
-  document.getElementById('quick-home-label').textContent = t('nav_home');
-  document.getElementById('quick-bookings-label').textContent = t('nav_bk');
-  document.getElementById('quick-catalog-label').textContent = t('nav_catalog');
-  document.getElementById('catalog-title').textContent = t('nav_catalog');
+  [['nav-home','nav_home'],['nav-bookings','nav_bk'],['nav-favorites','nav_fav'],['nav-profile','nav_prof']].forEach(([id,key]) => setText(id, t(key)));
+  setText('smart-filter-title', t('smart_title'));
+  const pf = document.getElementById('price-filter-input'); if (pf) pf.placeholder = t('smart_price');
+  const df = document.getElementById('dish-filter-input'); if (df) df.placeholder = t('smart_dish');
+  setText('smart-search-btn', t('smart_search'));
+  setText('smart-reset-btn', t('smart_reset'));
   document.getElementById('bk-eyebrow').textContent = t('bk_eye');
   document.getElementById('bk-title').textContent = t('bk_ttl');
   document.getElementById('fav-eyebrow').textContent = t('fav_eye');
@@ -1108,7 +1024,7 @@ function applyLang() {
   document.getElementById('menu-lang').textContent = t('menu_lang');
   document.getElementById('menu-support').textContent = t('menu_support');
   document.getElementById('menu-about').textContent = t('menu_about');
-  renderChips(); applyFilters(); renderCatalog(); renderBookings(); renderFavorites();
+  renderChips(); applyFilters(); renderBookings(); renderFavorites();
 }
 function greetingText() {
   const h = new Date().getHours();
@@ -1151,7 +1067,7 @@ async function loadRestaurants() {
     const raw = await api(url);
     S.restaurants = Array.isArray(raw) ? raw : (raw.restaurants||[]);
     S.restaurants.sort((a,b) => (b.is_premium?1:0)-(a.is_premium?1:0) || (b.rating||0)-(a.rating||0));
-    applyFilters(); renderCatalog();
+    applyFilters();
   } catch {
     document.getElementById('rest-list').innerHTML = `<div class="empty"><h3>${t('err_load')}</h3><p>${t('err_load_s')}</p></div>`;
   }
@@ -1159,13 +1075,134 @@ async function loadRestaurants() {
 
 function applyFilters() {
   const chip = S.chip||'all', q = (S.q||'').toLowerCase();
-  let list = S.restaurants;
-  if (chip !== 'all') list = list.filter(r => {
-    const cs = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
-    return cs.some(c => String(c).toLowerCase().includes(chip));
+  const maxPrice = Number(S.priceMax) || 0;
+  const dishQ = (S.dishQ || '').trim().toLowerCase();
+  S.menuMatches = {};
+
+  let list = S.restaurants.filter(r => {
+    if (chip !== 'all') {
+      const cs = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
+      if (!cs.some(c => String(c).toLowerCase().includes(chip))) return false;
+    }
+
+    if (q) {
+      const searchable = [r.name, r.address, r.description, ...(Array.isArray(r.cuisine) ? r.cuisine : [r.cuisine])].filter(Boolean).join(' ').toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+
+    if (!maxPrice && !dishQ) return true;
+
+    const matches = getRestaurantMenuMatches(r, maxPrice, dishQ);
+    if (matches.length) {
+      S.menuMatches[r.id] = matches.slice(0, 4);
+      return true;
+    }
+
+    return false;
   });
-  if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q));
-  S.filtered = list; renderRestaurants();
+
+  S.filtered = list;
+  renderRestaurants();
+  updateSmartFilterNote();
+}
+
+
+function normalizeMenuItems(menu) {
+  const out = [];
+  const walk = (node, inheritedCategory='') => {
+    if (!node) return;
+    if (Array.isArray(node)) return node.forEach(x => walk(x, inheritedCategory));
+    if (typeof node !== 'object') return;
+
+    const category = node.category || node.category_name || node.type || inheritedCategory || '';
+    const children = node.items || node.dishes || node.products || node.children;
+    if (Array.isArray(children)) walk(children.map(x => ({...x, category: x.category || category})), category);
+
+    const name = node.name || node.title || node.item_name || node.dish_name || node.product_name;
+    const priceRaw = node.price ?? node.amount ?? node.cost ?? node.sum ?? node.value;
+    const price = Number(String(priceRaw ?? '').replace(/[^0-9.]/g,'')) || 0;
+    if (name || price) out.push({ name: String(name || category || 'Taom'), category: String(category || ''), price });
+  };
+  walk(menu);
+  return out.filter(x => x.name || x.price);
+}
+
+function getRestaurantMenuMatches(r, maxPrice, dishQ) {
+  const menu = normalizeMenuItems(S.menuCache[String(r.id)] || S.menuCache[r.id] || r.menu || r.menu_items || r.dishes || []);
+  const words = [dishQ].filter(Boolean);
+  const matches = menu.filter(item => {
+    const hay = `${item.name} ${item.category}`.toLowerCase();
+    const okDish = !dishQ || hay.includes(dishQ) || words.some(w => hay.includes(w));
+    const okPrice = !maxPrice || (item.price > 0 && item.price <= maxPrice);
+    return okDish && okPrice;
+  });
+
+  if (matches.length) return matches.sort((a,b) => (a.price||999999999) - (b.price||999999999));
+
+  const restHay = [r.name, r.description, r.address, ...(Array.isArray(r.cuisine) ? r.cuisine : [r.cuisine])].filter(Boolean).join(' ').toLowerCase();
+  const approxPrice = Number(r.average_bill || r.avg_price || r.price || r.min_price || 0);
+  const okDish = !dishQ || restHay.includes(dishQ);
+  const okPrice = !maxPrice || (approxPrice > 0 && approxPrice <= maxPrice);
+  if (okDish && okPrice) {
+    return [{
+      name: dishQ ? `${dishQ} bo'yicha mos restoran` : 'Narx bo‘yicha mos restoran',
+      category: 'Restoran',
+      price: approxPrice
+    }];
+  }
+  return [];
+}
+
+function renderDishMatches(rid) {
+  const matches = S.menuMatches[rid] || S.menuMatches[String(rid)] || [];
+  if (!matches.length) return '';
+  return `<div class="dish-matches"><div style="font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3)">${t('dish_matches')}</div>${matches.map(item => `<div class="dish-match"><b>${esc(item.name)}</b><span>${item.price ? fmt(item.price) + ' so\'m' : ''}</span></div>`).join('')}</div>`;
+}
+
+function updateSmartFilterNote() {
+  const note = document.getElementById('smart-filter-note');
+  if (!note) return;
+  if (!S.smartFilterActive) { note.classList.remove('show'); note.textContent = ''; return; }
+  const maxPrice = Number(S.priceMax) || 0;
+  const dishQ = (S.dishQ || '').trim();
+  note.textContent = S.filtered.length
+    ? `${t('smart_found')}: ${S.filtered.length} ta${dishQ ? ' · ' + dishQ : ''}${maxPrice ? ' · ' + fmt(maxPrice) + " so'mgacha" : ''}`
+    : t('smart_no');
+  note.classList.add('show');
+}
+
+async function preloadMenusForFilter() {
+  const targets = S.restaurants.filter(r => !S.menuCache[String(r.id)]);
+  await Promise.all(targets.map(async r => {
+    try {
+      const raw = await api(`/restaurants/${r.id}/menu`);
+      S.menuCache[String(r.id)] = Array.isArray(raw) ? raw : (raw?.menu || raw?.data || raw?.items || []);
+    } catch {
+      S.menuCache[String(r.id)] = [];
+    }
+  }));
+}
+
+async function runSmartFilter() {
+  const panel = document.getElementById('smart-filter-panel');
+  const priceInput = document.getElementById('price-filter-input');
+  const dishInput = document.getElementById('dish-filter-input');
+  S.priceMax = Number(priceInput?.value || 0) || null;
+  S.dishQ = (dishInput?.value || '').trim();
+  S.smartFilterActive = !!(S.priceMax || S.dishQ);
+  if (!S.smartFilterActive) { updateSmartFilterNote(); toast(t('smart_hint')); return; }
+  panel?.classList.add('filter-loading');
+  try { await preloadMenusForFilter(); }
+  finally { panel?.classList.remove('filter-loading'); applyFilters(); }
+}
+
+function resetSmartFilter() {
+  const priceInput = document.getElementById('price-filter-input');
+  const dishInput = document.getElementById('dish-filter-input');
+  if (priceInput) priceInput.value = '';
+  if (dishInput) dishInput.value = '';
+  S.priceMax = null; S.dishQ = ''; S.smartFilterActive = false; S.menuMatches = {};
+  applyFilters();
 }
 
 function renderRestaurants() {
@@ -1197,48 +1234,7 @@ function renderRestaurants() {
           <span>${esc(r.address)}</span>
           ${hasLoc ? `<a href="${mapsUrl}" target="_blank" class="loc-link" onclick="event.stopPropagation()">📍 ${t('map_view')}</a>` : ''}
         </div>` : ''}
-        <div class="c-foot">
-          <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
-          <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-
-function renderCatalog() {
-  const box = document.getElementById('catalog-list');
-  const count = document.getElementById('catalog-count');
-  if (!box) return;
-  const list = [...S.restaurants].sort((a,b) => {
-    const pa = a.is_premium ? 1 : 0;
-    const pb = b.is_premium ? 1 : 0;
-    return pb - pa || (Number(b.rating)||0) - (Number(a.rating)||0);
-  });
-  if (count) count.textContent = `${list.length} ta`;
-  if (!list.length) {
-    box.innerHTML = `<div class="empty"><h3>${t('not_found')}</h3><p>${t('not_found_sub')}</p></div>`;
-    return;
-  }
-  box.className = 'card-list cascade';
-  box.innerHTML = list.map(r => {
-    const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';
-    const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
-    const hasLoc = r.latitude && r.longitude;
-    const mapsUrl = hasLoc ? `https://maps.google.com/?q=${r.latitude},${r.longitude}` : '';
-    const cs = Array.isArray(r.cuisine) ? r.cuisine.slice(0,2) : [];
-    return `<div class="rest-card" onclick="openSheet(${r.id})">
-      <div class="c-image">
-        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'">
-        ${r.is_premium?`<div class="badge-premium">Premium</div>`:''}
-      </div>
-      <div class="c-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-          <div class="c-name">${esc(r.name)}</div>
-          <div class="c-rating">⭐ ${rating}</div>
-        </div>
-        ${r.address ? `<div class="c-meta"><span>📍</span><span>${esc(r.address)}</span>${hasLoc ? `<a href="${mapsUrl}" target="_blank" class="loc-link" onclick="event.stopPropagation()">${t('map_view')}</a>` : ''}</div>` : ''}
+        ${renderDishMatches(r.id)}
         <div class="c-foot">
           <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
           <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
@@ -1257,11 +1253,76 @@ function renderChips() {
 function renderTrending() {}
 
 /* ─── REELS ─── */
-async function loadReels() { S.reels = []; }
+async function loadReels() {
+  try {
+    const raw = await api('/reels');
+    let list = Array.isArray(raw) ? raw : (raw.reels||raw.data||[]);
+    S.reels = list.filter(r => r && r.url && isPublished(r));
+    console.log('[Reels] loaded:', list.length, 'published:', S.reels.length);
+  } catch(e) {
+    console.error('[Reels] load failed:', e);
+    S.reels = [];
+  }
+  
+}
 
 function renderReelsHomeStrip() {}
 
-function renderReelsFeed() {}
+function renderReelsFeed() {
+  const feed = document.getElementById('reels-feed');
+  if (!S.reels.length) {
+    feed.innerHTML = `<div class="reels-empty"><div style="font-size:48px;margin-bottom:14px">🎬</div><h3>${t('no_reels')}</h3><p>${t('no_reels_s')}</p></div>`;
+    return;
+  }
+  feed.innerHTML = S.reels.map((r,i) => {
+    const rest = S.restaurants.find(x => String(x.id) === String(r.restaurant_id));
+    const restName = rest?.name || r.restaurant_name || 'Restoran';
+    const liked = !!S.reelLikes[r.id];
+    const likes = (Number(r.likes)||0) + (liked?1:0);
+    const comments = (S.reelComments[r.id]||[]).length;
+    const saved = S.reelSaves.includes(r.id);
+    const isVideo = (r.type === 'video') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(r.url||'');
+    const poster = r.thumbnail_url || pickImage(r);
+    return `<div class="reel-slide" data-idx="${i}" data-id="${r.id}" data-rid="${r.restaurant_id||''}">
+      <div class="reel-media-wrap">
+        ${isVideo
+          ? `<video src="${esc(r.url)}" loop playsinline preload="metadata" ${poster?`poster="${esc(poster)}"`:''}></video>`
+          : `<img src="${esc(r.url)}" loading="lazy">`}
+      </div>
+      <div class="reel-overlay"></div>
+      <div class="reel-pause-overlay"><div class="reel-pause-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg></div></div>
+      <div class="reel-actions">
+        <div class="reel-action ${liked?'liked':''}" data-act="like">
+          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <span class="reel-action-count">${fmtCount(likes)}</span>
+        </div>
+        <div class="reel-action" data-act="comment">
+          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <span class="reel-action-count">${fmtCount(comments)}</span>
+        </div>
+        <div class="reel-action ${saved?'liked':''}" data-act="save">
+          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="${saved?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
+          <span class="reel-action-count">${saved?'Saved':'Save'}</span>
+        </div>
+        <div class="reel-action" data-act="share">
+          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></div>
+          <span class="reel-action-count">Share</span>
+        </div>
+      </div>
+      <div class="reel-info">
+        <div class="reel-author" ${r.restaurant_id?`onclick="openSheet(${r.restaurant_id})"`:''}>
+          <div class="reel-author-avatar">${esc((restName[0]||'R').toUpperCase())}</div>
+          <div><div class="reel-author-name">${esc(restName)}</div><div class="reel-author-sub">${rest?.is_premium?'✓ Premium':'@onetable'}</div></div>
+        </div>
+        ${r.caption?`<div class="reel-caption">${esc(r.caption)}</div>`:''}
+        ${r.restaurant_id?`<div class="reel-cta" onclick="openSheet(${r.restaurant_id})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${t('book_now')}
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  attachReelHandlers(); setupReelObserver();
+}
 
 function attachReelHandlers() {
   document.querySelectorAll('.reel-slide').forEach(slide => {
@@ -1341,13 +1402,7 @@ function setupReelObserver() {
   document.querySelectorAll('.reel-slide').forEach(s => reelObserver.observe(s));
 }
 
-window.openReelsAt = idx => {
-  switchTab('reels');
-  setTimeout(() => {
-    const slides = document.querySelectorAll('.reel-slide');
-    if (slides[idx]) slides[idx].scrollIntoView({behavior:'instant',block:'start'});
-  }, 150);
-};
+window.openReelsAt = () => switchTab('home');
 
 /* ─── COMMENTS ─── */
 function openComments(reelId) {
@@ -1473,15 +1528,14 @@ function switchTab(tab) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const page = document.getElementById(`page-${tab}`) || document.getElementById('page-home');
   page.classList.add('active');
-  document.querySelectorAll('.tab,.quick-nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   if (tab==='bookings') loadBookings();
-  if (tab==='catalog') renderCatalog();
   if (tab==='favorites') renderFavorites();
   if (tab==='profile') renderProfile();
   window.scrollTo({top:0,behavior:'smooth'});
   tg?.HapticFeedback?.impactOccurred('light');
 }
-document.querySelectorAll('.tab,.quick-nav-btn').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
+document.querySelectorAll('.tab').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
 
 /* ─── DEPOSIT LOGIC ─── */
 function checkDepositRequired(rd, booking) {
@@ -1857,6 +1911,14 @@ async function submitBookingWithDeposit() {
 let _st;
 document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(_st); _st = setTimeout(() => { S.q=e.target.value.trim(); applyFilters(); }, 250);
+});
+const smartSearchBtn = document.getElementById('smart-search-btn');
+const smartResetBtn = document.getElementById('smart-reset-btn');
+if (smartSearchBtn) smartSearchBtn.addEventListener('click', runSmartFilter);
+if (smartResetBtn) smartResetBtn.addEventListener('click', resetSmartFilter);
+['price-filter-input','dish-filter-input'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') runSmartFilter(); });
 });
 
 /* ─── GEO ─── */
