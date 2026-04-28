@@ -3,60 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#F8F6F1">
+<meta name="theme-color" content="#FBF8F1">
 <title>OneTable — Toshkent restoranlari</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* ═══════════════════════════════════════════
-     ONETABLE — Premium Pitch Design Colors
-     Cream + Black + Green + Gold accent
-  ═══════════════════════════════════════════ */
-  --bg:#F8F6F1;--bg2:#FFFFFF;--bg3:#F1ECE3;--bg4:#ECE6DA;
-  --ink:#151515;--ink2:#2F2F2F;--ink3:#6F6F6F;--ink4:#A8A29A;
-  --line:rgba(20,20,20,0.08);--line2:rgba(20,20,20,0.05);
-  /* Accent = Premium green (pitch primary) */
-  --accent:#2E7D57;--accent2:#3E8D66;--accentRgb:46,125,87;
-  /* Gold for premium markers */
-  --gold:#CDAA63;--goldRgb:205,170,99;--goldLight:rgba(205,170,99,0.16);
-  /* Status colors */
-  --success:#0F6B3A;--danger:#8F2E2E;
-  /* Cream tone for premium cards */
-  --cream:#F5EFE4;--black:#17130F;
+  --bg:#FFF8EF;--bg2:#FFFFFF;--bg3:#F7E9DA;--bg4:#EED8C1;
+  --ink:#251812;--ink2:#4B352B;--ink3:#7E6759;--ink4:#B49F8F;
+  --line:rgba(105,57,31,0.11);--line2:rgba(105,57,31,0.06);
+  --accent:#B85C38;--accent2:#D06E43;--accentRgb:184,92,56;
+  --gold:#C99A49;--goldRgb:201,154,73;--goldLight:rgba(201,154,73,0.16);
+  --success:#3E7A4D;--danger:#A33A34;
+  --cream:#FFF1DD;--black:#1C1411;
   --r:10px;--r2:16px;--r3:22px;--r4:28px;
-  /* Typography — pitch fonts */
   --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;
   --fm:'Courier New',monospace;
   --tabbar-h:72px;
   --safe-b:env(safe-area-inset-bottom,0px);
   --safe-t:env(safe-area-inset-top,0px);
-  /* Premium soft shadows */
-  --sh1:0 6px 20px rgba(20,20,20,.06);
-  --sh2:0 18px 46px -18px rgba(20,20,20,.16), 0 8px 18px -14px rgba(20,20,20,.12);
-  --sh3:0 28px 70px -24px rgba(20,20,20,.22), 0 10px 28px -20px rgba(20,20,20,.18);
-  --sh-glow:0 0 0 1px rgba(255,255,255,.6), 0 4px 20px rgba(var(--accentRgb),.1);
+  --sh1:0 6px 18px rgba(78,42,24,.07);
+  --sh2:0 18px 46px -18px rgba(78,42,24,.18), 0 8px 18px -14px rgba(78,42,24,.14);
+  --sh3:0 28px 70px -24px rgba(78,42,24,.24), 0 10px 28px -20px rgba(78,42,24,.18);
+  --sh-glow:0 0 0 1px rgba(255,255,255,.68), 0 4px 20px rgba(var(--accentRgb),.11);
   --tt:.35s cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
-  /* Glass effect for cards */
-  --glass-bg:rgba(255,255,255,.85);
-  --glass-border:rgba(255,255,255,.9);
+  --glass-bg:rgba(255,255,255,.86);
+  --glass-border:rgba(255,255,255,.92);
 }
 [data-theme="dark"]{
-  --bg:#0E0D0A;--bg2:#17140F;--bg3:#211D16;--bg4:#2C2820;
-  --ink:#F8F3EA;--ink2:#D8D2C5;--ink3:#B6AA9A;--ink4:#5C5448;
-  --line:rgba(255,255,255,0.08);--line2:rgba(255,255,255,0.04);
-  --accent:#35B56F;--accent2:#1E8A4D;--accentRgb:53,181,111;
-  --gold:#E2B85A;--goldRgb:226,184,90;--goldLight:rgba(226,184,90,0.12);
-  --success:#35B56F;--danger:#B64A4A;
-  --cream:#251F18;--black:#050505;
-  --sh1:0 4px 16px rgba(0,0,0,.3);
-  --sh2:0 18px 50px -8px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.2);
-  --sh3:0 28px 70px -12px rgba(0,0,0,.6), 0 8px 24px -8px rgba(0,0,0,.4);
+  --bg:#15110E;--bg2:#1E1814;--bg3:#2A211B;--bg4:#352A22;
+  --ink:#FFF4E6;--ink2:#EAD7C5;--ink3:#B89E8A;--ink4:#776255;
+  --line:rgba(255,238,218,0.09);--line2:rgba(255,238,218,0.05);
+  --accent:#E17A4B;--accent2:#F08D5E;--accentRgb:225,122,75;
+  --gold:#E0B45E;--goldRgb:224,180,94;--goldLight:rgba(224,180,94,0.15);
+  --success:#62A66E;--danger:#D15A50;
+  --cream:#2A211B;--black:#0C0907;
+  --sh1:0 4px 16px rgba(0,0,0,.30);
+  --sh2:0 18px 50px -12px rgba(0,0,0,.48),0 2px 8px rgba(0,0,0,.22);
+  --sh3:0 28px 70px -14px rgba(0,0,0,.65),0 8px 24px -10px rgba(0,0,0,.42);
   --sh-glow:0 0 0 1px rgba(255,255,255,.08), 0 4px 24px rgba(var(--accentRgb),.18);
-  --glass-bg:rgba(23,20,15,.85);
-  --glass-border:rgba(255,255,255,.08);
+  --glass-bg:rgba(30,24,20,.84);
+  --glass-border:rgba(255,244,230,.09);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -67,11 +56,11 @@ a{color:inherit;text-decoration:none}
 img,video{display:block;max-width:100%}
 
 /* ════════════════════════════════════════════════════════
-   SPLASH SCREEN — light-first, short and polished
+   SPLASH SCREEN — Premium dark mode + neon pulse + spring
    ════════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(circle at 20% 15%, rgba(46,125,87,.18), transparent 32%), radial-gradient(circle at 86% 18%, rgba(205,170,99,.18), transparent 34%), linear-gradient(135deg,#FFFDF8 0%,#F8F6F1 52%,#EFE7D9 100%);
+  background:radial-gradient(ellipse at center, #0a3520 0%, #050a07 60%, #000 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
   transition:opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
@@ -105,7 +94,7 @@ img,video{display:block;max-width:100%}
   font-weight:400;
   letter-spacing:.4em;
   text-transform:uppercase;
-  color:rgba(46,125,87,.9);
+  color:rgba(216,168,78,.85);
   margin-bottom:48px;
   opacity:0;
   animation:greetIn .8s cubic-bezier(.34,1.56,.64,1) .3s forwards;
@@ -176,7 +165,7 @@ img,video{display:block;max-width:100%}
   font-size:64px;
   font-weight:500;
   font-style:italic;
-  color:#F8F6F1;
+  color:#FBF8F1;
   text-shadow:0 2px 12px rgba(0,0,0,.4);
   letter-spacing:-.02em;
 }
@@ -187,7 +176,7 @@ img,video{display:block;max-width:100%}
   font-size:42px;
   font-weight:400;
   letter-spacing:-.03em;
-  color:#F8F6F1;
+  color:#FBF8F1;
   opacity:0;
   animation:brandIn .9s cubic-bezier(.34,1.56,.64,1) .9s forwards;
 }
@@ -208,7 +197,7 @@ img,video{display:block;max-width:100%}
   font-weight:400;
   letter-spacing:.18em;
   text-transform:uppercase;
-  color:rgba(23,23,23,.55);
+  color:rgba(245,239,228,.6);
   opacity:0;
   animation:taglineIn .9s ease-out 1.3s forwards;
 }
@@ -222,14 +211,14 @@ img,video{display:block;max-width:100%}
   bottom:60px;left:50%;
   transform:translateX(-50%);
   width:140px;height:2px;
-  background:rgba(46,125,87,.16);
+  background:rgba(216,168,78,.15);
   border-radius:2px;overflow:hidden;
   opacity:0;
   animation:loaderIn .6s ease-out 1.6s forwards;
 }
 .splash-loader::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg, transparent 0%, #2E7D57 50%, transparent 100%);
+  background:linear-gradient(90deg, transparent 0%, #D8A84E 50%, transparent 100%);
   animation:loaderSlide 1.8s ease-in-out infinite;
 }
 @keyframes loaderIn{0%{opacity:0}100%{opacity:1}}
@@ -237,6 +226,14 @@ img,video{display:block;max-width:100%}
   0%{transform:translateX(-100%)}
   100%{transform:translateX(100%)}
 }
+
+
+/* Sticky top navigation: My Bookings and Catalog are always visible */
+.quick-top-nav{position:sticky;top:0;z-index:70;display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:8px;padding:calc(var(--safe-t) + 10px) 16px 10px;background:linear-gradient(180deg,var(--bg) 0%,rgba(255,248,239,.96) 78%,rgba(255,248,239,0) 100%);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+[data-theme="dark"] .quick-top-nav{background:linear-gradient(180deg,var(--bg) 0%,rgba(21,17,14,.96) 78%,rgba(21,17,14,0) 100%)}
+.quick-nav-btn{min-height:44px;border-radius:18px;background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--sh1);display:flex;align-items:center;justify-content:center;gap:7px;color:var(--ink2);font-size:12px;font-weight:800;transition:transform .22s var(--spring),background .22s ease,border-color .22s ease,color .22s ease,box-shadow .22s ease}
+.quick-nav-btn span{font-size:15px;line-height:1}.quick-nav-btn b{font-size:11.5px;letter-spacing:.01em;white-space:nowrap}.quick-nav-btn.priority{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:rgba(var(--accentRgb),.34);box-shadow:0 12px 26px -12px rgba(var(--accentRgb),.62)}
+.quick-nav-btn.active:not(.priority){background:var(--ink);color:var(--bg);border-color:var(--ink)}.quick-nav-btn:active{transform:scale(.95)}
 
 /* ════════════════════════════════════════════════════════
    APP — main layout with cascade reveal animation
@@ -343,18 +340,6 @@ img,video{display:block;max-width:100%}
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:livePulse 1.6s ease-in-out infinite}
 @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 
-.trending-strip{display:flex;align-items:center;gap:9px;padding:8px 20px 10px;overflow-x:auto;scrollbar-width:none}
-.trending-strip::-webkit-scrollbar{display:none}
-.trend-pill{
-  flex-shrink:0;display:flex;align-items:center;gap:7px;
-  padding:7px 13px;
-  background:var(--glass-bg);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border:1px solid var(--glass-border);
-  border-radius:var(--r3);
-  font-size:12px;font-weight:700;color:var(--ink2);
-  box-shadow:var(--sh1);
-}
 
 /* ════════════════════════════════════════════════════════
    GLASSMORPHISM CARDS — premium with shimmer borders
@@ -399,78 +384,6 @@ img,video{display:block;max-width:100%}
 .cuisine-tag{font-size:10.5px;font-weight:700;padding:3px 9px;background:var(--bg3);border-radius:100px;color:var(--ink3)}
 .loc-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--accent);padding:4px 10px;background:rgba(var(--accentRgb),.08);border-radius:100px;text-decoration:none}
 
-/* REELS PAGE */
-.page#page-reels{padding:0;background:#000;min-height:100dvh;display:none}
-.page#page-reels.active{display:block}
-.reels-feed{height:calc(100dvh - var(--tabbar-h) - var(--safe-b));overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;background:#000}
-.reels-feed::-webkit-scrollbar{display:none}
-.reel-slide{position:relative;height:calc(100dvh - var(--tabbar-h) - var(--safe-b));scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
-.reel-media-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.reel-media-wrap video,.reel-media-wrap img{width:100%;height:100%;object-fit:cover}
-.reel-overlay{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,transparent 25%,transparent 55%,rgba(0,0,0,.85) 100%)}
-.reel-pause-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .25s ease;z-index:4}
-.reel-pause-overlay.show{opacity:1}
-.reel-pause-icon{width:78px;height:78px;border-radius:50%;background:rgba(0,0,0,.45);backdrop-filter:blur(14px);border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center}
-.reel-actions{position:absolute;right:14px;bottom:120px;display:flex;flex-direction:column;gap:18px;align-items:center;z-index:5;pointer-events:auto}
-.reel-action{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .2s ease}
-.reel-action:active{transform:scale(.88)}
-.reel-action-icon{width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,.35);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s ease}
-.reel-action.liked .reel-action-icon{background:rgba(255,60,60,.85);border-color:transparent;animation:likePop .45s cubic-bezier(.34,1.56,.64,1)}
-@keyframes likePop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
-.reel-action-count{font-size:11.5px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6)}
-.reel-info{position:absolute;left:0;right:80px;bottom:24px;padding:0 18px;color:#fff;z-index:4;pointer-events:auto}
-.reel-author{display:flex;align-items:center;gap:10px;margin-bottom:11px;cursor:pointer}
-.reel-author-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;color:#fff;border:2px solid rgba(255,255,255,.3);flex-shrink:0}
-.reel-author-name{font-family:var(--fd);font-size:15px;font-weight:500;line-height:1.2}
-.reel-author-sub{font-size:11px;color:rgba(255,255,255,.7);font-weight:600}
-.reel-caption{font-size:13.5px;line-height:1.4;margin-bottom:14px;font-weight:500;text-shadow:0 1px 6px rgba(0,0,0,.4)}
-.reel-cta{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(255,255,255,.95);color:var(--ink);border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;transition:all .2s ease;box-shadow:0 6px 20px rgba(0,0,0,.3)}
-.reels-empty{height:calc(100dvh - var(--tabbar-h) - var(--safe-b));display:flex;align-items:center;justify-content:center;flex-direction:column;color:rgba(255,255,255,.7);padding:32px}
-.reels-empty h3{font-family:var(--fd);font-size:24px;font-style:italic;margin-bottom:8px;color:#fff}
-.reels-loading{height:calc(100dvh - var(--tabbar-h) - var(--safe-b));display:flex;align-items:center;justify-content:center;color:#fff}
-
-.reels-scroll{display:flex;gap:12px;padding:4px 20px 16px;overflow-x:auto;scrollbar-width:none}
-.reels-scroll::-webkit-scrollbar{display:none}
-.reel-prev{
-  flex-shrink:0;width:148px;border-radius:var(--r3);
-  overflow:hidden;position:relative;
-  background:var(--bg3);
-  box-shadow:var(--sh3);
-  cursor:pointer;
-  transition:transform .35s var(--spring);
-}
-.reel-prev:active{transform:scale(.94)}
-.reel-prev-thumb{width:100%;aspect-ratio:9/16;object-fit:cover;display:block;background:#222}
-.reel-prev-grad{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 28%,rgba(0,0,0,.14) 52%,rgba(0,0,0,.85) 100%)}
-.reel-prev-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.22);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.45);display:flex;align-items:center;justify-content:center}
-.reel-prev-meta{position:absolute;bottom:0;left:0;right:0;padding:11px;color:#fff}
-.reel-prev-name{font-family:var(--fd);font-size:13.5px;font-weight:500;line-height:1.2;margin-bottom:3px;text-shadow:0 1px 4px rgba(0,0,0,.4)}
-.reel-prev-stats{display:flex;gap:8px;font-size:10px;color:rgba(255,255,255,.85);font-weight:700}
-.reel-prev-badge{position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:100px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);color:#fff;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;z-index:2}
-
-.tonight-scroll{display:flex;gap:11px;padding:4px 20px 16px;overflow-x:auto;scrollbar-width:none}
-.tonight-scroll::-webkit-scrollbar{display:none}
-.tonight-card{
-  flex-shrink:0;width:196px;
-  background:var(--glass-bg);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--glass-border);
-  border-radius:var(--r3);
-  overflow:hidden;
-  box-shadow:var(--sh2);
-  cursor:pointer;
-  transition:transform .35s var(--spring);
-}
-.tonight-card:active{transform:scale(.94)}
-.tonight-thumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-.tonight-body{padding:11px 13px 14px}
-.tonight-name{font-family:var(--fd);font-size:14.5px;font-weight:500;color:var(--ink);margin-bottom:4px}
-.tonight-meta{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3);font-weight:600}
-.tonight-pop{display:flex;align-items:center;gap:5px;margin-top:7px}
-.pop-bar{flex:1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
-.pop-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--gold));border-radius:2px;transition:width 1.2s ease}
-.pop-label{font-size:9.5px;color:var(--accent);font-weight:800}
-
 /* ════════════════════════════════════════════════════════
    TABBAR — premium glassmorphism with floating accent
    ════════════════════════════════════════════════════════ */
@@ -490,12 +403,6 @@ img,video{display:block;max-width:100%}
 .tab.active{color:var(--accent)}
 .tab-icon-wrap{width:36px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:10px;transition:background .3s ease,transform .35s var(--spring)}
 .tab.active .tab-icon-wrap{background:rgba(var(--accentRgb),.12);transform:scale(1.1)}
-.tab-reels{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
-.tab-reels-btn{position:absolute;top:-22px;left:50%;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 24px rgba(var(--accentRgb),.55), 0 4px 12px rgba(var(--goldRgb),.35);border:3px solid var(--bg2);transition:transform .35s var(--spring)}
-.tab-reels.active .tab-reels-btn{transform:translateX(-50%) scale(1.08)}
-.tab-reels:active .tab-reels-btn{transform:translateX(-50%) scale(.92)}
-.tab-reels-label{margin-top:36px;color:var(--ink4);transition:color .25s ease}
-.tab-reels.active .tab-reels-label{color:var(--accent)}
 
 .profile-header{padding:calc(var(--safe-t) + 34px) 20px 22px;text-align:center}
 .profile-avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(145deg,var(--accent),var(--gold));margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:34px;color:#fff;box-shadow:0 12px 36px rgba(var(--accentRgb),.4), 0 4px 16px rgba(var(--goldRgb),.25)}
@@ -593,6 +500,7 @@ img,video{display:block;max-width:100%}
 @keyframes tablesSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .table-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .table-card-item{
+  position:relative;
   background:var(--glass-bg);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border:1.5px solid var(--glass-border);
@@ -603,7 +511,10 @@ img,video{display:block;max-width:100%}
   box-shadow:var(--sh1);
 }
 .table-card-item:active{transform:scale(.93)}
-.table-card-item.active{border-color:var(--ink);background:var(--ink);color:var(--bg);box-shadow:0 8px 20px -6px rgba(0,0,0,.25)}
+.table-card-item.active{border:2px solid var(--accent);background:linear-gradient(180deg,rgba(var(--accentRgb),.14),var(--glass-bg));color:var(--ink);box-shadow:0 12px 28px -10px rgba(var(--accentRgb),.58);transform:translateY(-2px)}
+.table-card-item.active::after{content:'\2713';position:absolute;top:7px;right:7px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;box-shadow:0 6px 14px -6px rgba(var(--accentRgb),.70);z-index:3}
+.table-card-item.active .tc-num{color:var(--accent);font-weight:800}
+.table-card-item.active .tc-cap{color:var(--ink2);opacity:1}
 .table-card-item-img{width:100%;height:64px;object-fit:cover;display:block;background:var(--bg3)}
 .table-card-item-img-placeholder{width:100%;height:64px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.5}
 .table-card-item .tc-body{padding:8px 4px 9px}
@@ -611,7 +522,7 @@ img,video{display:block;max-width:100%}
 .table-card-item .tc-cap{font-size:10px;opacity:.65;margin-top:2px}
 .table-skip-btn{grid-column:1 / -1;padding:10px;border:1.5px dashed var(--line);border-radius:var(--r2);font-size:11.5px;font-weight:700;color:var(--ink3);background:transparent;cursor:pointer;transition:all .2s}
 .table-skip-btn:active{background:var(--bg3)}
-.table-skip-btn.active{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.table-skip-btn.active{border-color:var(--accent);background:rgba(var(--accentRgb),.12);color:var(--accent);box-shadow:0 8px 22px -12px rgba(var(--accentRgb),.55)}
 .no-tables-msg{padding:16px;background:var(--bg3);border-radius:var(--r2);text-align:center;font-size:12px;color:var(--ink3);font-weight:600}
 
 .date-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
@@ -762,67 +673,12 @@ img,video{display:block;max-width:100%}
 
 @keyframes heartPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-15deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
 .heart-pop{position:absolute;top:50%;left:50%;font-size:100px;color:#ff3c3c;pointer-events:none;z-index:6;animation:heartPop .8s ease-out forwards;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
-
-/* Booking-first refresh */
-body{
-  background:
-    radial-gradient(circle at 12% 0%, rgba(46,125,87,.08), transparent 28%),
-    radial-gradient(circle at 92% 4%, rgba(205,170,99,.10), transparent 30%),
-    var(--bg);
-}
-.topbar{padding-top:calc(var(--safe-t) + 18px)}
-.greet-title{font-size:30px}
-.search,.rest-card,.tonight-card,.profile-stat,.booking-card,.zone-card,.table-card-item,.date-card,.guests-control,.time-card{
-  box-shadow:var(--sh2);
-}
-.rest-card{border-color:rgba(255,255,255,.9)}
-.book-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:11.5px;padding:11px 18px}
-.tabbar{height:calc(78px + var(--safe-b));padding:9px 6px calc(9px + var(--safe-b));border-radius:24px 24px 0 0}
-.tab{font-size:8.5px}
-.tab-bookings-strong .tab-icon-wrap{
-  background:linear-gradient(135deg,var(--accent),var(--gold));
-  color:#fff;
-  box-shadow:0 10px 24px -10px rgba(var(--accentRgb),.75);
-}
-.tab-bookings-strong.active .tab-icon-wrap{transform:scale(1.12)}
-.catalog-hero{
-  margin:8px 20px 12px;
-  padding:20px;
-  border-radius:26px;
-  background:
-    linear-gradient(135deg,rgba(255,255,255,.92),rgba(241,236,227,.82)),
-    radial-gradient(circle at 90% 0%,rgba(var(--goldRgb),.2),transparent 36%);
-  border:1px solid rgba(255,255,255,.9);
-  box-shadow:var(--sh2);
-  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
-}
-[data-theme="dark"] .catalog-hero{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-color:var(--line)}
-.catalog-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
-.catalog-hero h2{font-family:var(--fd);font-size:25px;font-weight:500;line-height:1.05;letter-spacing:-.03em;margin-bottom:8px}
-.catalog-hero p{font-size:12.5px;color:var(--ink3);max-width:260px}
-.catalog-quick{flex-shrink:0;padding:9px 13px;border-radius:100px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;box-shadow:var(--sh1)}
-.catalog-filter-row{display:flex;gap:8px;overflow-x:auto;padding:8px 20px 12px;scrollbar-width:none}
-.catalog-filter-row::-webkit-scrollbar{display:none}
-.catalog-pill{flex-shrink:0;padding:9px 14px;border-radius:100px;background:var(--bg2);border:1px solid var(--line);font-size:12px;font-weight:800;color:var(--ink3);box-shadow:var(--sh1)}
-.catalog-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.catalog-media-note{padding:14px 16px;border-radius:18px;background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--ink3)}
-#page-reels{position:fixed;inset:0;z-index:180;padding:0!important}
-#page-reels:not(.active){display:none!important}
-.reels-feed{height:100dvh!important}
-.reel-slide{height:100dvh!important}
-.reel-info{bottom:34px}
-@media(max-width:360px){
-  .tab{font-size:7.8px}
-  .greet-title{font-size:27px}
-  .catalog-hero{padding:17px}
-}
-
 </style>
 </head>
 <body>
 
 <!-- ════════════════════════════════════════════════════════
-     SPLASH SCREEN — short premium intro
+     SPLASH SCREEN — 5 second premium intro
      ════════════════════════════════════════════════════════ -->
 <div id="splash">
   <div class="splash-greet">Xush kelibsiz</div>
@@ -837,6 +693,12 @@ body{
 </div>
 
 <div id="app">
+
+<div class="quick-top-nav">
+  <button class="quick-nav-btn active" data-tab="home"><span>🏠</span><b id="quick-home-label">Asosiy</b></button>
+  <button class="quick-nav-btn priority" data-tab="bookings"><span>📅</span><b id="quick-bookings-label">Bronlarim</b></button>
+  <button class="quick-nav-btn" data-tab="catalog"><span>🍽</span><b id="quick-catalog-label">Katalog</b></button>
+</div>
 
 <!-- HOME -->
 <div class="page active" id="page-home">
@@ -857,8 +719,6 @@ body{
     </div>
   </div>
   <div class="chip-row" id="chip-row"></div>
-  <div class="trending-strip reveal" id="trending-strip"></div>
-  <div class="divider"></div>
   <div class="section reveal">
     <div class="section-head">
       <div class="section-title" id="nearby-title">Yaqin <em>atrofda</em></div>
@@ -868,27 +728,6 @@ body{
       <div class="skeleton" style="height:248px;border-radius:var(--r3)"></div>
       <div class="skeleton" style="height:248px;border-radius:var(--r3)"></div>
     </div>
-  </div>
-  <div class="divider" style="margin-top:20px"></div>
-  <div class="section reveal" style="padding-bottom:0">
-    <div class="section-head">
-      <div class="section-title" id="reels-title">Atmosfera <em>media</em></div>
-      <div class="live-badge"><div class="live-dot"></div><span id="live-label">Jonli</span></div>
-    </div>
-  </div>
-  <div class="reels-scroll" id="reels-home-scroll">
-    <div class="skeleton skel-reel"></div><div class="skeleton skel-reel"></div><div class="skeleton skel-reel"></div>
-  </div>
-  <div class="divider"></div>
-  <div class="section reveal" style="padding-bottom:0">
-    <div class="section-head">
-      <div class="section-title" id="tonight-title">Bugun <em>mashhur</em></div>
-      <span class="see-all">🔥</span>
-    </div>
-  </div>
-  <div class="tonight-scroll" id="tonight-scroll">
-    <div class="skeleton" style="width:196px;height:218px;border-radius:var(--r3);flex-shrink:0"></div>
-    <div class="skeleton" style="width:196px;height:218px;border-radius:var(--r3);flex-shrink:0"></div>
   </div>
   <div style="height:24px"></div>
 </div>
@@ -905,38 +744,25 @@ body{
 <div class="page" id="page-catalog">
   <div class="topbar">
     <div>
-      <div class="eyebrow">Tanlangan</div>
-      <h1 class="greet-title"><em>Premium katalog</em></h1>
+      <div class="eyebrow" id="catalog-eyebrow">Tanlangan</div>
+      <h1 class="greet-title"><em id="catalog-title">Katalog</em></h1>
     </div>
   </div>
   <div class="catalog-hero">
     <div>
       <div class="catalog-kicker">OneTable tanlovi</div>
-      <h2>Bugun bron qilishga arziydigan joylar</h2>
-      <p>Reels chekkada, asosiy fokus — restoran topish va tez bron qilish.</p>
+      <h2 id="catalog-hero-title">Tez bron qilish uchun tanlangan joylar</h2>
+      <p id="catalog-hero-text">Restoran toping, stol tanlang va bronlaringizni kuzatib boring.</p>
     </div>
     <button class="catalog-quick" onclick="switchTab('bookings')">Bronlarim</button>
   </div>
-  <div class="catalog-filter-row" id="catalog-filter-row"></div>
   <div class="section">
     <div class="section-head">
-      <div class="section-title">Tanlangan <em>restoranlar</em></div>
+      <div class="section-title" id="catalog-list-title">Restoran <em>katalogi</em></div>
       <span id="catalog-count" style="font-size:11px;color:var(--ink4);font-weight:700"></span>
     </div>
     <div class="card-list" id="catalog-list"></div>
   </div>
-  <div class="section" id="catalog-media-wrap">
-    <div class="section-head">
-      <div class="section-title">Atmosfera <em>media</em></div>
-      <span class="see-all" onclick="openReelsAt(0)">Ko'rish</span>
-    </div>
-    <div class="reels-scroll" id="catalog-reels-scroll"></div>
-  </div>
-</div>
-
-<!-- REELS -->
-<div class="page" id="page-reels">
-  <div class="reels-feed" id="reels-feed"><div class="reels-loading"><div class="spin"></div></div></div>
 </div>
 
 <!-- FAVORITES -->
@@ -960,7 +786,6 @@ body{
     <div class="profile-stat"><div class="stat-num" id="stat-favs">0</div><div class="stat-label" id="stat-fav-label">Sevimli</div></div>
   </div>
   <div class="profile-menu">
-    <div class="menu-row" onclick="switchTab('bookings')"><div class="mr-icon">📅</div><div class="mr-label">Bronlarim</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="document.getElementById('lang-btn').click()"><div class="mr-icon">🌐</div><div class="mr-label" id="menu-lang">Tilni o'zgartirish</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="window.open('https://t.me/onetable_uz_bot','_blank')"><div class="mr-icon">💬</div><div class="mr-label" id="menu-support">Yordam</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="alert('OneTable — Toshkent restoranlari uchun bron platformasi')"><div class="mr-icon">ℹ️</div><div class="mr-label" id="menu-about">OneTable haqida</div><div class="mr-arrow">›</div></div>
@@ -1038,7 +863,7 @@ window.addEventListener('load', () => {
     splash.classList.add('hide');
     app.classList.add('show');
     setTimeout(() => splash.remove(), 800);
-  }, 1500);
+  }, 5000); // EXACTLY 5 seconds
 });
 
 const API = `${location.origin}/api`;
@@ -1049,14 +874,14 @@ if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 const T = {
   uz:{
     welcome:"Xush kelibsiz",greet_m:"Xayrli tong,",greet_d:"Xayrli kun,",greet_e:"Xayrli oqshom,",greet_n:"Xayrli kech,",
-    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"Atmosfera",reels_em:"media",
-    live:"Jonli",tonight:"Bugun",tonight_em:"mashhur",
+    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"",reels_em:"",
+    live:"",tonight:"",tonight_em:"",
     book:"Bron",book_now:"Bron qilish",not_found:"Topilmadi",not_found_sub:"Qidiruvni o'zgartiring",
-    nav_home:"Asosiy",nav_bk:"Bronlarim",nav_catalog:"Katalog",nav_reels:"Media",nav_fav:"Sevimli",nav_prof:"Profil",
+    nav_home:"Asosiy",nav_bk:"Bronlarim",nav_catalog:"Katalog",nav_reels:"",nav_fav:"Sevimli",nav_prof:"Profil",
     bk_eye:"Mening",bk_ttl:"Bronlarim",fav_eye:"Sevimli",fav_ttl:"Joylar",
     no_bk:"Bronlar yo'q",no_bk_s:"Restoran tanlang va bron qiling",
     no_fav:"Sevimlilar bo'sh",no_fav_s:"❤️ bosib qo'shing",
-    no_reels:"Hozircha reels yo'q",no_reels_s:"Restoranlar yangi videolar yuklasa bu yerda paydo bo'ladi",
+    no_reels:"",no_reels_s:"",
     stat_bk:"Bron",stat_vis:"Restoran",stat_fav:"Sevimli",open_now:"Ochiq",
     zone_l:"Zona tanlang",table_l:"Stol tanlang",table_any:"Farqi yo'q",date_l:"Sana",guests_l:"Mehmonlar",guests_s:"kishi",time_l:"Vaqt",
     no_tables:"Bu zona uchun stollar kiritilmagan",
@@ -1071,7 +896,7 @@ const T = {
     months:["Yan","Fev","Mar","Apr","May","Iyun","Iyul","Avg","Sen","Okt","Noy","Dek"],
     status:{pending:"Kutilmoqda",confirmed:"Tasdiqlangan",cancelled:"Bekor",completed:"Tugallangan",pending_deposit:"Depozit kutilmoqda"},
     chips:[["all","Barchasi"],["uzbek","O'zbek"],["european","Yevropa"],["italian","Italyan"],["asian","Osiyo"],["family","Oilaviy"]],
-    trending:[["🔥","Mashhur","128"],["⚡","Yangi","24"],["💎","Premium","16"],["🌿","Sog'lom","42"]],
+    trending:[],
     sheet_eye:"Bron qilish",main_hall:"Asosiy zal",main_zone:"Asosiy",
     err_load:"Yuklab bo'lmadi",err_load_s:"Internet yoki server xatosi",
     comments:"Izohlar",comment_placeholder:"Izoh qo'shing...",no_comments:"Hali izoh yo'q",no_comments_s:"Birinchi bo'lib izoh qoldiring",
@@ -1081,14 +906,14 @@ const T = {
   },
   ru:{
     welcome:"Добро пожаловать",greet_m:"Доброе утро,",greet_d:"Добрый день,",greet_e:"Добрый вечер,",greet_n:"Доброй ночи,",
-    search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"медиа",
+    search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"и стиль",
     live:"Live",tonight:"Сегодня",tonight_em:"популярно",
     book:"Бронь",book_now:"Забронировать",not_found:"Не найдено",not_found_sub:"Измените запрос",
-    nav_home:"Главная",nav_bk:"Мои брони",nav_catalog:"Каталог",nav_reels:"Медиа",nav_fav:"Избранное",nav_prof:"Профиль",
+    nav_home:"Главная",nav_bk:"Брони",nav_reels:"Reels",nav_fav:"Избранное",nav_prof:"Профиль",
     bk_eye:"Мои",bk_ttl:"Брони",fav_eye:"Избранные",fav_ttl:"Места",
     no_bk:"Нет броней",no_bk_s:"Выберите ресторан и забронируйте",
     no_fav:"Избранное пусто",no_fav_s:"Нажмите ❤️ чтобы добавить",
-    no_reels:"Пока нет видео",no_reels_s:"Когда рестораны загрузят новые reels — они появятся здесь",
+    no_reels:"",no_reels_s:"",
     stat_bk:"Бронь",stat_vis:"Ресторан",stat_fav:"Избранное",open_now:"Открыто",
     zone_l:"Выберите зону",table_l:"Выберите стол",table_any:"Любой стол",date_l:"Дата",guests_l:"Гости",guests_s:"чел.",time_l:"Время",
     no_tables:"В этой зоне нет добавленных столов",
@@ -1113,14 +938,14 @@ const T = {
   },
   en:{
     welcome:"Welcome back",greet_m:"Good morning,",greet_d:"Good afternoon,",greet_e:"Good evening,",greet_n:"Good night,",
-    search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"media",
+    search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"reels",
     live:"Live",tonight:"Trending",tonight_em:"tonight",
     book:"Book",book_now:"Book a Table",not_found:"Not found",not_found_sub:"Try different filters",
-    nav_home:"Home",nav_bk:"My bookings",nav_catalog:"Catalog",nav_reels:"Media",nav_fav:"Favorites",nav_prof:"Profile",
+    nav_home:"Home",nav_bk:"Bookings",nav_reels:"Reels",nav_fav:"Favorites",nav_prof:"Profile",
     bk_eye:"My",bk_ttl:"Bookings",fav_eye:"Saved",fav_ttl:"Places",
     no_bk:"No bookings yet",no_bk_s:"Choose a restaurant and book",
     no_fav:"No favorites yet",no_fav_s:"Tap ❤️ to save",
-    no_reels:"No reels yet",no_reels_s:"When restaurants upload new videos they'll appear here",
+    no_reels:"",no_reels_s:"",
     stat_bk:"Bookings",stat_vis:"Visited",stat_fav:"Favorites",open_now:"Open now",
     zone_l:"Select a zone",table_l:"Select a table",table_any:"Any table",date_l:"Date",guests_l:"Guests",guests_s:"guests",time_l:"Time",
     no_tables:"No tables configured for this zone",
@@ -1253,14 +1078,15 @@ function applyLang() {
   document.getElementById('home-user-name').textContent = uname;
   document.getElementById('search-input').placeholder = t('search');
   document.getElementById('nearby-title').innerHTML = `${t('nearby')} <em>${t('nearby_em')}</em>`;
-  document.getElementById('reels-title').innerHTML = `${t('reels')} <em>${t('reels_em')}</em>`;
-  document.getElementById('live-label').textContent = t('live');
-  document.getElementById('tonight-title').innerHTML = `${t('tonight')} <em>${t('tonight_em')}</em>`;
   ['home','bookings','catalog','favorites','profile'].forEach((k,i) => {
     const ids = ['nav-home','nav-bookings','nav-catalog','nav-favorites','nav-profile'];
     const keys = ['nav_home','nav_bk','nav_catalog','nav_fav','nav_prof'];
     document.getElementById(ids[i]).textContent = t(keys[i]);
   });
+  document.getElementById('quick-home-label').textContent = t('nav_home');
+  document.getElementById('quick-bookings-label').textContent = t('nav_bk');
+  document.getElementById('quick-catalog-label').textContent = t('nav_catalog');
+  document.getElementById('catalog-title').textContent = t('nav_catalog');
   document.getElementById('bk-eyebrow').textContent = t('bk_eye');
   document.getElementById('bk-title').textContent = t('bk_ttl');
   document.getElementById('fav-eyebrow').textContent = t('fav_eye');
@@ -1274,7 +1100,7 @@ function applyLang() {
   document.getElementById('menu-lang').textContent = t('menu_lang');
   document.getElementById('menu-support').textContent = t('menu_support');
   document.getElementById('menu-about').textContent = t('menu_about');
-  renderChips(); renderTrending(); applyFilters(); renderBookings(); renderFavorites();
+  renderChips(); applyFilters(); renderCatalog(); renderBookings(); renderFavorites();
 }
 function greetingText() {
   const h = new Date().getHours();
@@ -1331,7 +1157,7 @@ function applyFilters() {
     return cs.some(c => String(c).toLowerCase().includes(chip));
   });
   if (q) list = list.filter(r => (r.name||'').toLowerCase().includes(q));
-  S.filtered = list; renderRestaurants(); renderTonightSection();
+  S.filtered = list; renderRestaurants();
 }
 
 function renderRestaurants() {
@@ -1372,134 +1198,62 @@ function renderRestaurants() {
   }).join('');
 }
 
+
+function renderCatalog() {
+  const box = document.getElementById('catalog-list');
+  const count = document.getElementById('catalog-count');
+  if (!box) return;
+  const list = [...S.restaurants].sort((a,b) => {
+    const pa = a.is_premium ? 1 : 0;
+    const pb = b.is_premium ? 1 : 0;
+    return pb - pa || (Number(b.rating)||0) - (Number(a.rating)||0);
+  });
+  if (count) count.textContent = `${list.length} ta`;
+  if (!list.length) {
+    box.innerHTML = `<div class="empty"><h3>${t('not_found')}</h3><p>${t('not_found_sub')}</p></div>`;
+    return;
+  }
+  box.className = 'card-list cascade';
+  box.innerHTML = list.map(r => {
+    const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';
+    const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
+    const hasLoc = r.latitude && r.longitude;
+    const mapsUrl = hasLoc ? `https://maps.google.com/?q=${r.latitude},${r.longitude}` : '';
+    const cs = Array.isArray(r.cuisine) ? r.cuisine.slice(0,2) : [];
+    return `<div class="rest-card" onclick="openSheet(${r.id})">
+      <div class="c-image">
+        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800'">
+        ${r.is_premium?`<div class="badge-premium">Premium</div>`:''}
+      </div>
+      <div class="c-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div class="c-name">${esc(r.name)}</div>
+          <div class="c-rating">⭐ ${rating}</div>
+        </div>
+        ${r.address ? `<div class="c-meta"><span>📍</span><span>${esc(r.address)}</span>${hasLoc ? `<a href="${mapsUrl}" target="_blank" class="loc-link" onclick="event.stopPropagation()">${t('map_view')}</a>` : ''}</div>` : ''}
+        <div class="c-foot">
+          <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
+          <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderChips() {
   const row = document.getElementById('chip-row');
   row.innerHTML = t('chips').map(([id,lbl]) => `<button class="chip${(S.chip||'all')===id?' active':''}" data-c="${id}">${lbl}</button>`).join('');
   row.querySelectorAll('.chip').forEach(el => el.addEventListener('click', () => { S.chip=el.dataset.c; renderChips(); applyFilters(); }));
 }
 
-function renderTrending() {
-  const all = S.restaurants;
-  const premiumCount = all.filter(r => r.is_premium).length;
-  const topRated = all.filter(r => (r.rating||0) >= 4).length;
-  const total = all.length;
-  const openNow = all.filter(r => isOpen(r.working_hours) === true).length;
-  const realTrending = t('trending').map(([emoji, label], idx) => {
-    const counts = [total, openNow, premiumCount, topRated];
-    return [emoji, label, String(counts[idx] || 0)];
-  });
-  document.getElementById('trending-strip').innerHTML = realTrending.map(([e,l,c]) => `<div class="trend-pill"><span>${e}</span><span>${l}</span><span style="color:var(--ink3)">${c}</span></div>`).join('');
-}
+function renderTrending() {}
 
 /* ─── REELS ─── */
-async function loadReels() {
-  try {
-    const raw = await api('/reels');
-    let list = Array.isArray(raw) ? raw : (raw.reels||raw.data||[]);
-    S.reels = list.filter(r => r && r.url && isPublished(r));
-    console.log('[Reels] loaded:', list.length, 'published:', S.reels.length);
-  } catch(e) {
-    console.error('[Reels] load failed:', e);
-    S.reels = [];
-  }
-  renderReelsHomeStrip(); renderCatalogMedia();
-}
+async function loadReels() { S.reels = []; }
 
-function renderReelsHomeStrip() {
-  const el = document.getElementById('reels-home-scroll');
-  if (!el) return;
+function renderReelsHomeStrip() {}
 
-  if (S.reels.length) {
-    el.innerHTML = S.reels.slice(0,12).map((r,i) => {
-      const rest = S.restaurants.find(x => String(x.id) === String(r.restaurant_id));
-      const restName = rest?.name || r.restaurant_name || 'Restoran';
-      const likes = (S.reelLikes[r.id]?1:0) + (Number(r.likes)||0);
-      const isVideo = (r.type === 'video') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(r.url||'');
-      const poster = r.thumbnail_url || pickImage(r);
-      return `<div class="reel-prev" onclick="openReelsAt(${i})">
-        ${isVideo
-          ? `<video class="reel-prev-thumb" src="${esc(r.url)}" muted playsinline preload="metadata" ${poster?`poster="${esc(poster)}"`:''}></video>`
-          : `<img class="reel-prev-thumb" src="${esc(r.url)}" loading="lazy" onerror="this.style.background='#333'">`}
-        <div class="reel-prev-grad"></div>
-        ${isVideo?'<div class="reel-prev-play"><svg width="14" height="14" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg></div>':''}
-        <div class="reel-prev-meta">
-          <div class="reel-prev-name">${esc(restName)}</div>
-          <div class="reel-prev-stats"><span>♥ ${fmtCount(likes)}</span><span>👁 ${fmtCount(Number(r.views)||0)}</span></div>
-        </div>
-      </div>`;
-    }).join('');
-    return;
-  }
-
-  if (S.restaurants.length) {
-    el.innerHTML = S.restaurants.slice(0,6).map(r => {
-      const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400';
-      return `<div class="reel-prev" onclick="openSheet(${r.id})">
-        <img class="reel-prev-thumb" src="${esc(img)}" loading="lazy">
-        <div class="reel-prev-grad"></div>
-        <div class="reel-prev-meta"><div class="reel-prev-name">${esc(r.name)}</div></div>
-      </div>`;
-    }).join('');
-  } else {
-    el.innerHTML = '';
-  }
-}
-
-function renderReelsFeed() {
-  const feed = document.getElementById('reels-feed');
-  if (!S.reels.length) {
-    feed.innerHTML = `<div class="reels-empty"><div style="font-size:48px;margin-bottom:14px">🎬</div><h3>${t('no_reels')}</h3><p>${t('no_reels_s')}</p></div>`;
-    return;
-  }
-  feed.innerHTML = S.reels.map((r,i) => {
-    const rest = S.restaurants.find(x => String(x.id) === String(r.restaurant_id));
-    const restName = rest?.name || r.restaurant_name || 'Restoran';
-    const liked = !!S.reelLikes[r.id];
-    const likes = (Number(r.likes)||0) + (liked?1:0);
-    const comments = (S.reelComments[r.id]||[]).length;
-    const saved = S.reelSaves.includes(r.id);
-    const isVideo = (r.type === 'video') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(r.url||'');
-    const poster = r.thumbnail_url || pickImage(r);
-    return `<div class="reel-slide" data-idx="${i}" data-id="${r.id}" data-rid="${r.restaurant_id||''}">
-      <div class="reel-media-wrap">
-        ${isVideo
-          ? `<video src="${esc(r.url)}" loop playsinline preload="metadata" ${poster?`poster="${esc(poster)}"`:''}></video>`
-          : `<img src="${esc(r.url)}" loading="lazy">`}
-      </div>
-      <div class="reel-overlay"></div>
-      <div class="reel-pause-overlay"><div class="reel-pause-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg></div></div>
-      <div class="reel-actions">
-        <div class="reel-action ${liked?'liked':''}" data-act="like">
-          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="${liked?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-          <span class="reel-action-count">${fmtCount(likes)}</span>
-        </div>
-        <div class="reel-action" data-act="comment">
-          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-          <span class="reel-action-count">${fmtCount(comments)}</span>
-        </div>
-        <div class="reel-action ${saved?'liked':''}" data-act="save">
-          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="${saved?'currentColor':'none'}" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
-          <span class="reel-action-count">${saved?'Saved':'Save'}</span>
-        </div>
-        <div class="reel-action" data-act="share">
-          <div class="reel-action-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></div>
-          <span class="reel-action-count">Share</span>
-        </div>
-      </div>
-      <div class="reel-info">
-        <div class="reel-author" ${r.restaurant_id?`onclick="openSheet(${r.restaurant_id})"`:''}>
-          <div class="reel-author-avatar">${esc((restName[0]||'R').toUpperCase())}</div>
-          <div><div class="reel-author-name">${esc(restName)}</div><div class="reel-author-sub">${rest?.is_premium?'✓ Premium':'@onetable'}</div></div>
-        </div>
-        ${r.caption?`<div class="reel-caption">${esc(r.caption)}</div>`:''}
-        ${r.restaurant_id?`<div class="reel-cta" onclick="openSheet(${r.restaurant_id})">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${t('book_now')}
-        </div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-  attachReelHandlers(); setupReelObserver();
-}
+function renderReelsFeed() {}
 
 function attachReelHandlers() {
   document.querySelectorAll('.reel-slide').forEach(slide => {
@@ -1624,24 +1378,7 @@ function sendComment() {
 }
 
 /* ─── TONIGHT ─── */
-function renderTonightSection() {
-  const el = document.getElementById('tonight-scroll');
-  const items = [...S.filtered].sort((a,b)=>(b.rating||0)-(a.rating||0)).slice(0,5);
-  if (!items.length) { el.innerHTML=''; return; }
-  el.innerHTML = items.map(r => {
-    const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400';
-    const pop = Math.min(100,Math.round((r.rating||3)/5*100));
-    const o = isOpen(r.working_hours);
-    return `<div class="tonight-card" onclick="openSheet(${r.id})">
-      <img class="tonight-thumb" src="${esc(img)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400'">
-      <div class="tonight-body">
-        <div class="tonight-name">${esc(r.name)}</div>
-        <div class="tonight-meta">⭐ ${r.rating?Number(r.rating).toFixed(1):'—'}${o===true?`<span style="color:var(--success)">● ${t('open_now')}</span>`:''}</div>
-        <div class="tonight-pop"><div class="pop-bar"><div class="pop-fill" style="width:${pop}%"></div></div><div class="pop-label">${pop}%</div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
+function renderTonightSection() {}
 
 /* ─── BOOKINGS ─── */
 async function loadBookings() {
@@ -1722,114 +1459,21 @@ function updateStats() {
   document.getElementById('stat-visited').textContent = new Set(S.bookings.filter(b=>b.status==='completed').map(b=>b.restaurant_id)).size;
 }
 
-
-/* ─── CATALOG ─── */
-S.catalog = S.catalog || 'premium';
-
-function catalogBuckets(){
-  return [
-    ['premium','Premium'],
-    ['top','Top reyting'],
-    ['new','Yangi'],
-    ['family','Oilaviy'],
-    ['vip','VIP zona'],
-    ['deposit','Ishonchli bron']
-  ];
-}
-
-function catalogList(){
-  let list = [...S.restaurants];
-  const mode = S.catalog || 'premium';
-  if (mode === 'premium') list = list.filter(r => r.is_premium || Number(r.rating||0) >= 4.6);
-  if (mode === 'top') list = list.filter(r => Number(r.rating||0) >= 4.3).sort((a,b)=>Number(b.rating||0)-Number(a.rating||0));
-  if (mode === 'new') list = list.slice().reverse();
-  if (mode === 'family') list = list.filter(r => String(r.cuisine||'').toLowerCase().includes('family') || String(r.description||'').toLowerCase().includes('oilaviy'));
-  if (mode === 'vip') list = list.filter(r => String(r.description||'').toLowerCase().includes('vip') || String(r.name||'').toLowerCase().includes('vip'));
-  if (mode === 'deposit') list = list.filter(r => r.deposit_enabled || r.deposit_amount || r.deposit_amount_default);
-  if (!list.length) list = [...S.restaurants].sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0) || Number(b.rating||0)-Number(a.rating||0)).slice(0,12);
-  return list.slice(0,20);
-}
-
-function renderCatalog(){
-  const row = document.getElementById('catalog-filter-row');
-  const listEl = document.getElementById('catalog-list');
-  const count = document.getElementById('catalog-count');
-  if (!row || !listEl) return;
-  row.innerHTML = catalogBuckets().map(([id,label]) => `<button class="catalog-pill ${S.catalog===id?'active':''}" data-catalog="${id}">${label}</button>`).join('');
-  row.querySelectorAll('.catalog-pill').forEach(btn => btn.addEventListener('click', () => {
-    S.catalog = btn.dataset.catalog;
-    renderCatalog();
-    tg?.HapticFeedback?.selectionChanged?.();
-  }));
-
-  const list = catalogList();
-  if (count) count.textContent = `${list.length} ta`;
-  if (!list.length) {
-    listEl.innerHTML = `<div class="empty"><h3>${t('not_found')}</h3><p>${t('not_found_sub')}</p></div>`;
-    return;
-  }
-  listEl.className = 'card-list cascade';
-  listEl.innerHTML = list.map(r => {
-    const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900';
-    const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
-    const hasLoc = r.latitude && r.longitude;
-    const mapsUrl = hasLoc ? `https://maps.google.com/?q=${r.latitude},${r.longitude}` : '';
-    const cs = Array.isArray(r.cuisine) ? r.cuisine.slice(0,2) : [];
-    return `<div class="rest-card" onclick="openSheet(${r.id})">
-      <div class="c-image">
-        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900'">
-        <div class="badge-premium">${r.is_premium?'Premium':'Tanlangan'}</div>
-      </div>
-      <div class="c-body">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
-          <div class="c-name">${esc(r.name)}</div>
-          <div class="c-rating">⭐ ${rating}</div>
-        </div>
-        ${r.address ? `<div class="c-meta">📍 <span>${esc(r.address)}</span>${hasLoc ? `<a href="${mapsUrl}" target="_blank" class="loc-link" onclick="event.stopPropagation()">${t('map_view')}</a>` : ''}</div>` : ''}
-        <div class="c-foot">
-          <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
-          <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-  renderCatalogMedia();
-}
-
-function renderCatalogMedia(){
-  const el = document.getElementById('catalog-reels-scroll');
-  if (!el) return;
-  if (!S.reels.length) {
-    el.innerHTML = `<div class="catalog-media-note">Atmosfera videolari hozircha chekkada turadi. Asosiy fokus bron qilish va bronlarim bo'limida.</div>`;
-    return;
-  }
-  el.innerHTML = S.reels.slice(0,6).map((r,i) => {
-    const isVideo = (r.type === 'video') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(r.url||'');
-    const poster = r.thumbnail_url || pickImage(r);
-    return `<div class="reel-prev" onclick="openReelsAt(${i})">
-      ${isVideo ? `<video class="reel-prev-thumb" src="${esc(r.url)}" muted playsinline preload="metadata" ${poster?`poster="${esc(poster)}"`:''}></video>` : `<img class="reel-prev-thumb" src="${esc(r.url)}" loading="lazy">`}
-      <div class="reel-prev-grad"></div>
-      <div class="reel-prev-badge">Media</div>
-      <div class="reel-prev-meta"><div class="reel-prev-name">${esc(r.restaurant_name||'Restoran')}</div><div class="reel-prev-stats">▶ atmosfera</div></div>
-    </div>`;
-  }).join('');
-}
-
 /* ─── TABS ─── */
 function switchTab(tab) {
   S.tab = tab;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg = document.getElementById(`page-${tab}`); if (pg) pg.classList.add('active');
-  document.querySelectorAll('.tab,.tab-reels').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
+  const page = document.getElementById(`page-${tab}`) || document.getElementById('page-home');
+  page.classList.add('active');
+  document.querySelectorAll('.tab,.quick-nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   if (tab==='bookings') loadBookings();
+  if (tab==='catalog') renderCatalog();
   if (tab==='favorites') renderFavorites();
   if (tab==='profile') renderProfile();
-  if (tab==='catalog') renderCatalog();
-  if (tab==='reels') renderReelsFeed();
-  else document.querySelectorAll('#reels-feed video').forEach(v=>v.pause());
+  window.scrollTo({top:0,behavior:'smooth'});
   tg?.HapticFeedback?.impactOccurred('light');
 }
-document.querySelectorAll('.tab,.tab-reels').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
+document.querySelectorAll('.tab,.quick-nav-btn').forEach(el=>el.addEventListener('click',()=>switchTab(el.dataset.tab)));
 
 /* ─── DEPOSIT LOGIC ─── */
 function checkDepositRequired(rd, booking) {
@@ -2244,14 +1888,11 @@ async function init() {
     const lc = tg.initDataUnsafe.user.language_code;
     S.lang = lc.startsWith('ru')?'ru':lc.startsWith('en')?'en':'uz';
   }
-  applyLang(); renderChips(); renderTrending();
+  applyLang(); renderChips();
   await auth();
   document.getElementById('home-user-name').textContent = S.user?.first_name || (S.lang==='uz'?'mehmon':S.lang==='ru'?'гость':'guest');
   requestGeo();
   await loadRestaurants();
-  await loadReels();
-  renderReelsHomeStrip();
-  renderTonightSection();
   initReveal();
   handleDeepLink();
 }
