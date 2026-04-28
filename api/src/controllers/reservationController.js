@@ -2,11 +2,126 @@ const db = require('../config/db')
 const bookingService = require('../services/bookingService')
 const asyncHandler = require('../utils/asyncHandler')
 const AppError = require('../utils/AppError')
+const { sendTelegramMessage } = require('../utils/telegram')
+
+async function getReservationDetails(reservationId) {
+  const result = await db.query(`
+    SELECT 
+      res.id,
+      res.date,
+      res.time,
+      res.guests,
+      res.status,
+      res.restaurant_id,
+      res.zone_id,
+      res.table_id,
+      u.telegram_id,
+      r.name AS restaurant_name,
+      r.address AS restaurant_address,
+      z.name AS zone_name,
+      t.table_number
+    FROM reservations res
+    JOIN users u ON u.id = res.user_id
+    JOIN restaurants r ON r.id = res.restaurant_id
+    LEFT JOIN zones z ON z.id = res.zone_id
+    LEFT JOIN tables t ON t.id = res.table_id
+    WHERE res.id = $1
+    LIMIT 1
+  `, [reservationId])
+
+  return result.rows[0] || null
+}
+
+function formatReservationTime(time) {
+  if (!time) return '—'
+  return String(time).slice(0, 5)
+}
+
+function buildCreatedMessage(booking) {
+  return `
+✅ <b>Bron qabul qilindi!</b>
+
+🍽 <b>Restoran:</b> ${booking.restaurant_name}
+📅 <b>Sana:</b> ${booking.date}
+⏰ <b>Vaqt:</b> ${formatReservationTime(booking.time)}
+👥 <b>Mehmonlar:</b> ${booking.guests} kishi
+${booking.zone_name ? `📍 <b>Zona:</b> ${booking.zone_name}\n` : ''}${booking.table_number ? `🪑 <b>Stol:</b> ${booking.table_number}\n` : ''}
+📌 <b>Holat:</b> Kutilmoqda
+
+Restoran tasdiqlagandan keyin sizga yana xabar yuboramiz.
+`
+}
+
+function buildCancelledMessage(booking) {
+  return `
+❌ <b>Bron bekor qilindi</b>
+
+🍽 <b>Restoran:</b> ${booking.restaurant_name}
+📅 <b>Sana:</b> ${booking.date}
+⏰ <b>Vaqt:</b> ${formatReservationTime(booking.time)}
+👥 <b>Mehmonlar:</b> ${booking.guests} kishi
+
+Boshqa vaqt tanlab qayta bron qilishingiz mumkin.
+`
+}
+
+async function sendReservationCreatedNotification(reservation) {
+  try {
+    const reservationId = reservation?.id || reservation?.reservation?.id || reservation?.data?.id
+
+    if (!reservationId) {
+      console.warn('[Telegram] reservation id topilmadi')
+      return
+    }
+
+    const booking = await getReservationDetails(reservationId)
+
+    if (!booking) {
+      console.warn('[Telegram] reservation details topilmadi')
+      return
+    }
+
+    if (!booking.telegram_id) {
+      console.warn('[Telegram] user telegram_id yo‘q')
+      return
+    }
+
+    await sendTelegramMessage(booking.telegram_id, buildCreatedMessage(booking))
+  } catch (err) {
+    console.error('[Telegram] bron yaratildi xabarida xato:', err.message)
+  }
+}
+
+async function sendReservationCancelledNotification(reservationId) {
+  try {
+    const booking = await getReservationDetails(reservationId)
+
+    if (!booking) {
+      console.warn('[Telegram] cancelled reservation details topilmadi')
+      return
+    }
+
+    if (!booking.telegram_id) {
+      console.warn('[Telegram] user telegram_id yo‘q')
+      return
+    }
+
+    await sendTelegramMessage(booking.telegram_id, buildCancelledMessage(booking))
+  } catch (err) {
+    console.error('[Telegram] bron bekor qilindi xabarida xato:', err.message)
+  }
+}
 
 exports.create = asyncHandler(async (req, res) => {
   const io = req.app.get('io')
+
   const reservation = await bookingService.createReservation(req.user.id, req.body, io)
+
   res.status(201).json(reservation)
+
+  sendReservationCreatedNotification(reservation).catch(err => {
+    console.error('[Telegram] create notification error:', err.message)
+  })
 })
 
 exports.myList = asyncHandler(async (req, res) => {
@@ -50,6 +165,10 @@ exports.cancel = asyncHandler(async (req, res) => {
   if (io) io.to(`restaurant_${r.rows[0].restaurant_id}`).emit('reservation_updated', r.rows[0])
 
   res.json({ ok: true, reservation: r.rows[0] })
+
+  sendReservationCancelledNotification(r.rows[0].id).catch(err => {
+    console.error('[Telegram] cancel notification error:', err.message)
+  })
 })
 
 // Bot review cron endpoints
