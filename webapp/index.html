@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#FBF8F1">
+<meta name="theme-color" content="#F8F6F1">
 <title>OneTable — Toshkent restoranlari</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,13 +14,13 @@
      ONETABLE — Premium Pitch Design Colors
      Cream + Black + Green + Gold accent
   ═══════════════════════════════════════════ */
-  --bg:#FBF8F1;--bg2:#FFFFFF;--bg3:#F7F3EC;--bg4:#F0EBE1;
+  --bg:#F8F6F1;--bg2:#FFFFFF;--bg3:#F1ECE3;--bg4:#ECE6DA;
   --ink:#151515;--ink2:#2F2F2F;--ink3:#6F6F6F;--ink4:#A8A29A;
   --line:rgba(20,20,20,0.08);--line2:rgba(20,20,20,0.05);
   /* Accent = Premium green (pitch primary) */
-  --accent:#0F6B3A;--accent2:#1E8A4D;--accentRgb:15,107,58;
+  --accent:#2E7D57;--accent2:#3E8D66;--accentRgb:46,125,87;
   /* Gold for premium markers */
-  --gold:#D8A84E;--goldRgb:216,168,78;--goldLight:rgba(216,168,78,0.12);
+  --gold:#CDAA63;--goldRgb:205,170,99;--goldLight:rgba(205,170,99,0.16);
   /* Status colors */
   --success:#0F6B3A;--danger:#8F2E2E;
   /* Cream tone for premium cards */
@@ -33,9 +33,9 @@
   --safe-b:env(safe-area-inset-bottom,0px);
   --safe-t:env(safe-area-inset-top,0px);
   /* Premium soft shadows */
-  --sh1:0 4px 16px rgba(0,0,0,.07);
-  --sh2:0 18px 45px -8px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.04);
-  --sh3:0 28px 60px -12px rgba(0,0,0,.15), 0 8px 24px -8px rgba(0,0,0,.08);
+  --sh1:0 6px 20px rgba(20,20,20,.06);
+  --sh2:0 18px 46px -18px rgba(20,20,20,.16), 0 8px 18px -14px rgba(20,20,20,.12);
+  --sh3:0 28px 70px -24px rgba(20,20,20,.22), 0 10px 28px -20px rgba(20,20,20,.18);
   --sh-glow:0 0 0 1px rgba(255,255,255,.6), 0 4px 20px rgba(var(--accentRgb),.1);
   --tt:.35s cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
@@ -67,11 +67,11 @@ a{color:inherit;text-decoration:none}
 img,video{display:block;max-width:100%}
 
 /* ════════════════════════════════════════════════════════
-   SPLASH SCREEN — Premium dark mode + neon pulse + spring
+   SPLASH SCREEN — light-first, short and polished
    ════════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(ellipse at center, #0a3520 0%, #050a07 60%, #000 100%);
+  background:radial-gradient(circle at 20% 15%, rgba(46,125,87,.18), transparent 32%), radial-gradient(circle at 86% 18%, rgba(205,170,99,.18), transparent 34%), linear-gradient(135deg,#FFFDF8 0%,#F8F6F1 52%,#EFE7D9 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
   transition:opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
@@ -105,7 +105,7 @@ img,video{display:block;max-width:100%}
   font-weight:400;
   letter-spacing:.4em;
   text-transform:uppercase;
-  color:rgba(216,168,78,.85);
+  color:rgba(46,125,87,.9);
   margin-bottom:48px;
   opacity:0;
   animation:greetIn .8s cubic-bezier(.34,1.56,.64,1) .3s forwards;
@@ -176,7 +176,7 @@ img,video{display:block;max-width:100%}
   font-size:64px;
   font-weight:500;
   font-style:italic;
-  color:#FBF8F1;
+  color:#F8F6F1;
   text-shadow:0 2px 12px rgba(0,0,0,.4);
   letter-spacing:-.02em;
 }
@@ -187,7 +187,7 @@ img,video{display:block;max-width:100%}
   font-size:42px;
   font-weight:400;
   letter-spacing:-.03em;
-  color:#FBF8F1;
+  color:#F8F6F1;
   opacity:0;
   animation:brandIn .9s cubic-bezier(.34,1.56,.64,1) .9s forwards;
 }
@@ -208,7 +208,7 @@ img,video{display:block;max-width:100%}
   font-weight:400;
   letter-spacing:.18em;
   text-transform:uppercase;
-  color:rgba(245,239,228,.6);
+  color:rgba(23,23,23,.55);
   opacity:0;
   animation:taglineIn .9s ease-out 1.3s forwards;
 }
@@ -222,14 +222,14 @@ img,video{display:block;max-width:100%}
   bottom:60px;left:50%;
   transform:translateX(-50%);
   width:140px;height:2px;
-  background:rgba(216,168,78,.15);
+  background:rgba(46,125,87,.16);
   border-radius:2px;overflow:hidden;
   opacity:0;
   animation:loaderIn .6s ease-out 1.6s forwards;
 }
 .splash-loader::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg, transparent 0%, #D8A84E 50%, transparent 100%);
+  background:linear-gradient(90deg, transparent 0%, #2E7D57 50%, transparent 100%);
   animation:loaderSlide 1.8s ease-in-out infinite;
 }
 @keyframes loaderIn{0%{opacity:0}100%{opacity:1}}
@@ -762,12 +762,67 @@ img,video{display:block;max-width:100%}
 
 @keyframes heartPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-15deg)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
 .heart-pop{position:absolute;top:50%;left:50%;font-size:100px;color:#ff3c3c;pointer-events:none;z-index:6;animation:heartPop .8s ease-out forwards;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+
+/* Booking-first refresh */
+body{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(46,125,87,.08), transparent 28%),
+    radial-gradient(circle at 92% 4%, rgba(205,170,99,.10), transparent 30%),
+    var(--bg);
+}
+.topbar{padding-top:calc(var(--safe-t) + 18px)}
+.greet-title{font-size:30px}
+.search,.rest-card,.tonight-card,.profile-stat,.booking-card,.zone-card,.table-card-item,.date-card,.guests-control,.time-card{
+  box-shadow:var(--sh2);
+}
+.rest-card{border-color:rgba(255,255,255,.9)}
+.book-btn{background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:11.5px;padding:11px 18px}
+.tabbar{height:calc(78px + var(--safe-b));padding:9px 6px calc(9px + var(--safe-b));border-radius:24px 24px 0 0}
+.tab{font-size:8.5px}
+.tab-bookings-strong .tab-icon-wrap{
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  color:#fff;
+  box-shadow:0 10px 24px -10px rgba(var(--accentRgb),.75);
+}
+.tab-bookings-strong.active .tab-icon-wrap{transform:scale(1.12)}
+.catalog-hero{
+  margin:8px 20px 12px;
+  padding:20px;
+  border-radius:26px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.92),rgba(241,236,227,.82)),
+    radial-gradient(circle at 90% 0%,rgba(var(--goldRgb),.2),transparent 36%);
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:var(--sh2);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+}
+[data-theme="dark"] .catalog-hero{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-color:var(--line)}
+.catalog-kicker{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.catalog-hero h2{font-family:var(--fd);font-size:25px;font-weight:500;line-height:1.05;letter-spacing:-.03em;margin-bottom:8px}
+.catalog-hero p{font-size:12.5px;color:var(--ink3);max-width:260px}
+.catalog-quick{flex-shrink:0;padding:9px 13px;border-radius:100px;background:var(--ink);color:var(--bg);font-size:11px;font-weight:800;box-shadow:var(--sh1)}
+.catalog-filter-row{display:flex;gap:8px;overflow-x:auto;padding:8px 20px 12px;scrollbar-width:none}
+.catalog-filter-row::-webkit-scrollbar{display:none}
+.catalog-pill{flex-shrink:0;padding:9px 14px;border-radius:100px;background:var(--bg2);border:1px solid var(--line);font-size:12px;font-weight:800;color:var(--ink3);box-shadow:var(--sh1)}
+.catalog-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.catalog-media-note{padding:14px 16px;border-radius:18px;background:var(--bg3);border:1px solid var(--line);font-size:12.5px;color:var(--ink3)}
+#page-reels{position:fixed;inset:0;z-index:180;padding:0!important}
+#page-reels:not(.active){display:none!important}
+.reels-feed{height:100dvh!important}
+.reel-slide{height:100dvh!important}
+.reel-info{bottom:34px}
+@media(max-width:360px){
+  .tab{font-size:7.8px}
+  .greet-title{font-size:27px}
+  .catalog-hero{padding:17px}
+}
+
 </style>
 </head>
 <body>
 
 <!-- ════════════════════════════════════════════════════════
-     SPLASH SCREEN — 5 second premium intro
+     SPLASH SCREEN — short premium intro
      ════════════════════════════════════════════════════════ -->
 <div id="splash">
   <div class="splash-greet">Xush kelibsiz</div>
@@ -817,7 +872,7 @@ img,video{display:block;max-width:100%}
   <div class="divider" style="margin-top:20px"></div>
   <div class="section reveal" style="padding-bottom:0">
     <div class="section-head">
-      <div class="section-title" id="reels-title">Atmosfera <em>reels</em></div>
+      <div class="section-title" id="reels-title">Atmosfera <em>media</em></div>
       <div class="live-badge"><div class="live-dot"></div><span id="live-label">Jonli</span></div>
     </div>
   </div>
@@ -846,6 +901,39 @@ img,video{display:block;max-width:100%}
   <div class="section"><div id="bookings-list"></div></div>
 </div>
 
+<!-- CATALOG -->
+<div class="page" id="page-catalog">
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Tanlangan</div>
+      <h1 class="greet-title"><em>Premium katalog</em></h1>
+    </div>
+  </div>
+  <div class="catalog-hero">
+    <div>
+      <div class="catalog-kicker">OneTable tanlovi</div>
+      <h2>Bugun bron qilishga arziydigan joylar</h2>
+      <p>Reels chekkada, asosiy fokus — restoran topish va tez bron qilish.</p>
+    </div>
+    <button class="catalog-quick" onclick="switchTab('bookings')">Bronlarim</button>
+  </div>
+  <div class="catalog-filter-row" id="catalog-filter-row"></div>
+  <div class="section">
+    <div class="section-head">
+      <div class="section-title">Tanlangan <em>restoranlar</em></div>
+      <span id="catalog-count" style="font-size:11px;color:var(--ink4);font-weight:700"></span>
+    </div>
+    <div class="card-list" id="catalog-list"></div>
+  </div>
+  <div class="section" id="catalog-media-wrap">
+    <div class="section-head">
+      <div class="section-title">Atmosfera <em>media</em></div>
+      <span class="see-all" onclick="openReelsAt(0)">Ko'rish</span>
+    </div>
+    <div class="reels-scroll" id="catalog-reels-scroll"></div>
+  </div>
+</div>
+
 <!-- REELS -->
 <div class="page" id="page-reels">
   <div class="reels-feed" id="reels-feed"><div class="reels-loading"><div class="spin"></div></div></div>
@@ -872,6 +960,7 @@ img,video{display:block;max-width:100%}
     <div class="profile-stat"><div class="stat-num" id="stat-favs">0</div><div class="stat-label" id="stat-fav-label">Sevimli</div></div>
   </div>
   <div class="profile-menu">
+    <div class="menu-row" onclick="switchTab('bookings')"><div class="mr-icon">📅</div><div class="mr-label">Bronlarim</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="document.getElementById('lang-btn').click()"><div class="mr-icon">🌐</div><div class="mr-label" id="menu-lang">Tilni o'zgartirish</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="window.open('https://t.me/onetable_uz_bot','_blank')"><div class="mr-icon">💬</div><div class="mr-label" id="menu-support">Yordam</div><div class="mr-arrow">›</div></div>
     <div class="menu-row" onclick="alert('OneTable — Toshkent restoranlari uchun bron platformasi')"><div class="mr-icon">ℹ️</div><div class="mr-label" id="menu-about">OneTable haqida</div><div class="mr-arrow">›</div></div>
@@ -884,13 +973,13 @@ img,video{display:block;max-width:100%}
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
     <span id="nav-home">Asosiy</span>
   </button>
-  <button class="tab" data-tab="bookings">
+  <button class="tab tab-bookings-strong" data-tab="bookings">
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
-    <span id="nav-bookings">Bronlar</span>
+    <span id="nav-bookings">Bronlarim</span>
   </button>
-  <button class="tab-reels" data-tab="reels">
-    <div class="tab-reels-btn"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,4 20,12 6,20"/></svg></div>
-    <span class="tab-reels-label" id="nav-reels">Reels</span>
+  <button class="tab" data-tab="catalog">
+    <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="8" cy="5" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="19" r="2"/></svg></div>
+    <span id="nav-catalog">Katalog</span>
   </button>
   <button class="tab" data-tab="favorites">
     <div class="tab-icon-wrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
@@ -949,7 +1038,7 @@ window.addEventListener('load', () => {
     splash.classList.add('hide');
     app.classList.add('show');
     setTimeout(() => splash.remove(), 800);
-  }, 5000); // EXACTLY 5 seconds
+  }, 1500);
 });
 
 const API = `${location.origin}/api`;
@@ -960,10 +1049,10 @@ if (tg) { tg.ready(); tg.expand(); tg.disableVerticalSwipes?.(); }
 const T = {
   uz:{
     welcome:"Xush kelibsiz",greet_m:"Xayrli tong,",greet_d:"Xayrli kun,",greet_e:"Xayrli oqshom,",greet_n:"Xayrli kech,",
-    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"Atmosfera",reels_em:"reels",
+    search:"Restoran qidirish...",nearby:"Yaqin",nearby_em:"atrofda",reels:"Atmosfera",reels_em:"media",
     live:"Jonli",tonight:"Bugun",tonight_em:"mashhur",
     book:"Bron",book_now:"Bron qilish",not_found:"Topilmadi",not_found_sub:"Qidiruvni o'zgartiring",
-    nav_home:"Asosiy",nav_bk:"Bronlar",nav_reels:"Reels",nav_fav:"Sevimli",nav_prof:"Profil",
+    nav_home:"Asosiy",nav_bk:"Bronlarim",nav_catalog:"Katalog",nav_reels:"Media",nav_fav:"Sevimli",nav_prof:"Profil",
     bk_eye:"Mening",bk_ttl:"Bronlarim",fav_eye:"Sevimli",fav_ttl:"Joylar",
     no_bk:"Bronlar yo'q",no_bk_s:"Restoran tanlang va bron qiling",
     no_fav:"Sevimlilar bo'sh",no_fav_s:"❤️ bosib qo'shing",
@@ -992,10 +1081,10 @@ const T = {
   },
   ru:{
     welcome:"Добро пожаловать",greet_m:"Доброе утро,",greet_d:"Добрый день,",greet_e:"Добрый вечер,",greet_n:"Доброй ночи,",
-    search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"и стиль",
+    search:"Поиск ресторана...",nearby:"Рядом",nearby_em:"с вами",reels:"Атмосфера",reels_em:"медиа",
     live:"Live",tonight:"Сегодня",tonight_em:"популярно",
     book:"Бронь",book_now:"Забронировать",not_found:"Не найдено",not_found_sub:"Измените запрос",
-    nav_home:"Главная",nav_bk:"Брони",nav_reels:"Reels",nav_fav:"Избранное",nav_prof:"Профиль",
+    nav_home:"Главная",nav_bk:"Мои брони",nav_catalog:"Каталог",nav_reels:"Медиа",nav_fav:"Избранное",nav_prof:"Профиль",
     bk_eye:"Мои",bk_ttl:"Брони",fav_eye:"Избранные",fav_ttl:"Места",
     no_bk:"Нет броней",no_bk_s:"Выберите ресторан и забронируйте",
     no_fav:"Избранное пусто",no_fav_s:"Нажмите ❤️ чтобы добавить",
@@ -1024,10 +1113,10 @@ const T = {
   },
   en:{
     welcome:"Welcome back",greet_m:"Good morning,",greet_d:"Good afternoon,",greet_e:"Good evening,",greet_n:"Good night,",
-    search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"reels",
+    search:"Search restaurants...",nearby:"Nearby",nearby_em:"you",reels:"Atmosphere",reels_em:"media",
     live:"Live",tonight:"Trending",tonight_em:"tonight",
     book:"Book",book_now:"Book a Table",not_found:"Not found",not_found_sub:"Try different filters",
-    nav_home:"Home",nav_bk:"Bookings",nav_reels:"Reels",nav_fav:"Favorites",nav_prof:"Profile",
+    nav_home:"Home",nav_bk:"My bookings",nav_catalog:"Catalog",nav_reels:"Media",nav_fav:"Favorites",nav_prof:"Profile",
     bk_eye:"My",bk_ttl:"Bookings",fav_eye:"Saved",fav_ttl:"Places",
     no_bk:"No bookings yet",no_bk_s:"Choose a restaurant and book",
     no_fav:"No favorites yet",no_fav_s:"Tap ❤️ to save",
@@ -1167,9 +1256,9 @@ function applyLang() {
   document.getElementById('reels-title').innerHTML = `${t('reels')} <em>${t('reels_em')}</em>`;
   document.getElementById('live-label').textContent = t('live');
   document.getElementById('tonight-title').innerHTML = `${t('tonight')} <em>${t('tonight_em')}</em>`;
-  ['home','bookings','reels','favorites','profile'].forEach((k,i) => {
-    const ids = ['nav-home','nav-bookings','nav-reels','nav-favorites','nav-profile'];
-    const keys = ['nav_home','nav_bk','nav_reels','nav_fav','nav_prof'];
+  ['home','bookings','catalog','favorites','profile'].forEach((k,i) => {
+    const ids = ['nav-home','nav-bookings','nav-catalog','nav-favorites','nav-profile'];
+    const keys = ['nav_home','nav_bk','nav_catalog','nav_fav','nav_prof'];
     document.getElementById(ids[i]).textContent = t(keys[i]);
   });
   document.getElementById('bk-eyebrow').textContent = t('bk_eye');
@@ -1228,7 +1317,7 @@ async function loadRestaurants() {
     const raw = await api(url);
     S.restaurants = Array.isArray(raw) ? raw : (raw.restaurants||[]);
     S.restaurants.sort((a,b) => (b.is_premium?1:0)-(a.is_premium?1:0) || (b.rating||0)-(a.rating||0));
-    applyFilters();
+    applyFilters(); renderCatalog();
   } catch {
     document.getElementById('rest-list').innerHTML = `<div class="empty"><h3>${t('err_load')}</h3><p>${t('err_load_s')}</p></div>`;
   }
@@ -1313,7 +1402,7 @@ async function loadReels() {
     console.error('[Reels] load failed:', e);
     S.reels = [];
   }
-  renderReelsHomeStrip();
+  renderReelsHomeStrip(); renderCatalogMedia();
 }
 
 function renderReelsHomeStrip() {
@@ -1633,15 +1722,109 @@ function updateStats() {
   document.getElementById('stat-visited').textContent = new Set(S.bookings.filter(b=>b.status==='completed').map(b=>b.restaurant_id)).size;
 }
 
+
+/* ─── CATALOG ─── */
+S.catalog = S.catalog || 'premium';
+
+function catalogBuckets(){
+  return [
+    ['premium','Premium'],
+    ['top','Top reyting'],
+    ['new','Yangi'],
+    ['family','Oilaviy'],
+    ['vip','VIP zona'],
+    ['deposit','Ishonchli bron']
+  ];
+}
+
+function catalogList(){
+  let list = [...S.restaurants];
+  const mode = S.catalog || 'premium';
+  if (mode === 'premium') list = list.filter(r => r.is_premium || Number(r.rating||0) >= 4.6);
+  if (mode === 'top') list = list.filter(r => Number(r.rating||0) >= 4.3).sort((a,b)=>Number(b.rating||0)-Number(a.rating||0));
+  if (mode === 'new') list = list.slice().reverse();
+  if (mode === 'family') list = list.filter(r => String(r.cuisine||'').toLowerCase().includes('family') || String(r.description||'').toLowerCase().includes('oilaviy'));
+  if (mode === 'vip') list = list.filter(r => String(r.description||'').toLowerCase().includes('vip') || String(r.name||'').toLowerCase().includes('vip'));
+  if (mode === 'deposit') list = list.filter(r => r.deposit_enabled || r.deposit_amount || r.deposit_amount_default);
+  if (!list.length) list = [...S.restaurants].sort((a,b)=>(b.is_premium?1:0)-(a.is_premium?1:0) || Number(b.rating||0)-Number(a.rating||0)).slice(0,12);
+  return list.slice(0,20);
+}
+
+function renderCatalog(){
+  const row = document.getElementById('catalog-filter-row');
+  const listEl = document.getElementById('catalog-list');
+  const count = document.getElementById('catalog-count');
+  if (!row || !listEl) return;
+  row.innerHTML = catalogBuckets().map(([id,label]) => `<button class="catalog-pill ${S.catalog===id?'active':''}" data-catalog="${id}">${label}</button>`).join('');
+  row.querySelectorAll('.catalog-pill').forEach(btn => btn.addEventListener('click', () => {
+    S.catalog = btn.dataset.catalog;
+    renderCatalog();
+    tg?.HapticFeedback?.selectionChanged?.();
+  }));
+
+  const list = catalogList();
+  if (count) count.textContent = `${list.length} ta`;
+  if (!list.length) {
+    listEl.innerHTML = `<div class="empty"><h3>${t('not_found')}</h3><p>${t('not_found_sub')}</p></div>`;
+    return;
+  }
+  listEl.className = 'card-list cascade';
+  listEl.innerHTML = list.map(r => {
+    const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900';
+    const rating = r.rating ? Number(r.rating).toFixed(1) : '—';
+    const hasLoc = r.latitude && r.longitude;
+    const mapsUrl = hasLoc ? `https://maps.google.com/?q=${r.latitude},${r.longitude}` : '';
+    const cs = Array.isArray(r.cuisine) ? r.cuisine.slice(0,2) : [];
+    return `<div class="rest-card" onclick="openSheet(${r.id})">
+      <div class="c-image">
+        <img src="${esc(img)}" alt="${esc(r.name)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900'">
+        <div class="badge-premium">${r.is_premium?'Premium':'Tanlangan'}</div>
+      </div>
+      <div class="c-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+          <div class="c-name">${esc(r.name)}</div>
+          <div class="c-rating">⭐ ${rating}</div>
+        </div>
+        ${r.address ? `<div class="c-meta">📍 <span>${esc(r.address)}</span>${hasLoc ? `<a href="${mapsUrl}" target="_blank" class="loc-link" onclick="event.stopPropagation()">${t('map_view')}</a>` : ''}</div>` : ''}
+        <div class="c-foot">
+          <div style="display:flex;gap:5px;flex-wrap:wrap">${cs.map(c=>`<span class="cuisine-tag">${esc(c)}</span>`).join('')}</div>
+          <button class="book-btn" onclick="event.stopPropagation();openSheet(${r.id})">${t('book')}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  renderCatalogMedia();
+}
+
+function renderCatalogMedia(){
+  const el = document.getElementById('catalog-reels-scroll');
+  if (!el) return;
+  if (!S.reels.length) {
+    el.innerHTML = `<div class="catalog-media-note">Atmosfera videolari hozircha chekkada turadi. Asosiy fokus bron qilish va bronlarim bo'limida.</div>`;
+    return;
+  }
+  el.innerHTML = S.reels.slice(0,6).map((r,i) => {
+    const isVideo = (r.type === 'video') || /\.(mp4|webm|mov|m4v)(\?|$)/i.test(r.url||'');
+    const poster = r.thumbnail_url || pickImage(r);
+    return `<div class="reel-prev" onclick="openReelsAt(${i})">
+      ${isVideo ? `<video class="reel-prev-thumb" src="${esc(r.url)}" muted playsinline preload="metadata" ${poster?`poster="${esc(poster)}"`:''}></video>` : `<img class="reel-prev-thumb" src="${esc(r.url)}" loading="lazy">`}
+      <div class="reel-prev-grad"></div>
+      <div class="reel-prev-badge">Media</div>
+      <div class="reel-prev-meta"><div class="reel-prev-name">${esc(r.restaurant_name||'Restoran')}</div><div class="reel-prev-stats">▶ atmosfera</div></div>
+    </div>`;
+  }).join('');
+}
+
 /* ─── TABS ─── */
 function switchTab(tab) {
   S.tab = tab;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(`page-${tab}`).classList.add('active');
+  const pg = document.getElementById(`page-${tab}`); if (pg) pg.classList.add('active');
   document.querySelectorAll('.tab,.tab-reels').forEach(el=>el.classList.toggle('active',el.dataset.tab===tab));
   if (tab==='bookings') loadBookings();
   if (tab==='favorites') renderFavorites();
   if (tab==='profile') renderProfile();
+  if (tab==='catalog') renderCatalog();
   if (tab==='reels') renderReelsFeed();
   else document.querySelectorAll('#reels-feed video').forEach(v=>v.pause());
   tg?.HapticFeedback?.impactOccurred('light');
