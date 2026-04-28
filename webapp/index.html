@@ -3,46 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#FAF7F0">
+<meta name="theme-color" content="#FBF8F1">
 <title>OneTable — Toshkent restoranlari</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,300&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FAF7F0;--bg2:#FFF;--bg3:#F3EDE0;--bg4:#EDE6D5;
-  --ink:#1A1714;--ink2:#3D3830;--ink3:#857A6E;--ink4:#C0B5A8;
-  --line:#E8DFD0;--line2:#F0E9DC;
-  --accent:#7B2D26;--accent2:#9B3D34;--accentRgb:123,45,38;
-  --gold:#A8722A;--goldRgb:168,114,42;--goldLight:#F5E9D0;
-  --success:#3A6835;--danger:#8B2828;
+  /* ═══════════════════════════════════════════
+     ONETABLE — Premium Pitch Design Colors
+     Cream + Black + Green + Gold accent
+  ═══════════════════════════════════════════ */
+  --bg:#FBF8F1;--bg2:#FFFFFF;--bg3:#F7F3EC;--bg4:#F0EBE1;
+  --ink:#151515;--ink2:#2F2F2F;--ink3:#6F6F6F;--ink4:#A8A29A;
+  --line:rgba(20,20,20,0.08);--line2:rgba(20,20,20,0.05);
+  /* Accent = Premium green (pitch primary) */
+  --accent:#0F6B3A;--accent2:#1E8A4D;--accentRgb:15,107,58;
+  /* Gold for premium markers */
+  --gold:#D8A84E;--goldRgb:216,168,78;--goldLight:rgba(216,168,78,0.12);
+  /* Status colors */
+  --success:#0F6B3A;--danger:#8F2E2E;
+  /* Cream tone for premium cards */
+  --cream:#F5EFE4;--black:#17130F;
   --r:10px;--r2:16px;--r3:22px;--r4:28px;
-  --fd:'Fraunces',Georgia,serif;--fb:'Manrope',system-ui,sans-serif;
+  /* Typography — pitch fonts */
+  --fd:'Cormorant Garamond',Georgia,serif;--fb:'DM Sans',system-ui,sans-serif;
   --fm:'Courier New',monospace;
   --tabbar-h:72px;
   --safe-b:env(safe-area-inset-bottom,0px);
   --safe-t:env(safe-area-inset-top,0px);
-  --sh1:0 2px 12px rgba(0,0,0,.05);
-  --sh2:0 8px 28px -8px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.04);
-  --sh3:0 24px 60px -12px rgba(0,0,0,.18), 0 8px 24px -8px rgba(0,0,0,.1);
-  --sh-glow:0 0 0 1px rgba(255,255,255,.6), 0 4px 20px rgba(var(--accentRgb),.08);
+  /* Premium soft shadows */
+  --sh1:0 4px 16px rgba(0,0,0,.07);
+  --sh2:0 18px 45px -8px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.04);
+  --sh3:0 28px 60px -12px rgba(0,0,0,.15), 0 8px 24px -8px rgba(0,0,0,.08);
+  --sh-glow:0 0 0 1px rgba(255,255,255,.6), 0 4px 20px rgba(var(--accentRgb),.1);
   --tt:.35s cubic-bezier(.4,0,.2,1);
   --spring:cubic-bezier(.34,1.56,.64,1);
-  --glass-bg:rgba(255,255,255,.65);
-  --glass-border:rgba(255,255,255,.85);
+  /* Glass effect for cards */
+  --glass-bg:rgba(255,255,255,.85);
+  --glass-border:rgba(255,255,255,.9);
 }
 [data-theme="dark"]{
-  --bg:#0A0807;--bg2:#16110D;--bg3:#1F1813;--bg4:#2A2018;
-  --ink:#F2EDE3;--ink2:#CFC7BB;--ink3:#8A8078;--ink4:#4A4540;
-  --line:#2A231A;--line2:#1E1A14;
-  --accent:#D4866E;--accent2:#E09A82;--accentRgb:212,134,110;
-  --gold:#D4A045;--goldRgb:212,160,69;--goldLight:#2A2010;
-  --success:#6FA860;--danger:#D47070;
-  --sh1:0 2px 12px rgba(0,0,0,.4);
-  --sh2:0 8px 28px -8px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.3);
-  --sh3:0 24px 60px -12px rgba(0,0,0,.7), 0 8px 24px -8px rgba(0,0,0,.4);
+  --bg:#0E0D0A;--bg2:#17140F;--bg3:#211D16;--bg4:#2C2820;
+  --ink:#F8F3EA;--ink2:#D8D2C5;--ink3:#B6AA9A;--ink4:#5C5448;
+  --line:rgba(255,255,255,0.08);--line2:rgba(255,255,255,0.04);
+  --accent:#35B56F;--accent2:#1E8A4D;--accentRgb:53,181,111;
+  --gold:#E2B85A;--goldRgb:226,184,90;--goldLight:rgba(226,184,90,0.12);
+  --success:#35B56F;--danger:#B64A4A;
+  --cream:#251F18;--black:#050505;
+  --sh1:0 4px 16px rgba(0,0,0,.3);
+  --sh2:0 18px 50px -8px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.2);
+  --sh3:0 28px 70px -12px rgba(0,0,0,.6), 0 8px 24px -8px rgba(0,0,0,.4);
   --sh-glow:0 0 0 1px rgba(255,255,255,.08), 0 4px 24px rgba(var(--accentRgb),.18);
-  --glass-bg:rgba(22,17,13,.72);
+  --glass-bg:rgba(23,20,15,.85);
   --glass-border:rgba(255,255,255,.08);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -58,26 +71,26 @@ img,video{display:block;max-width:100%}
    ════════════════════════════════════════════════════════ */
 #splash{
   position:fixed;inset:0;z-index:9999;
-  background:radial-gradient(ellipse at center, #1a0f0c 0%, #0A0807 60%, #000 100%);
+  background:radial-gradient(ellipse at center, #0a3520 0%, #050a07 60%, #000 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;
   transition:opacity .8s cubic-bezier(.4,0,.2,1), transform .8s cubic-bezier(.4,0,.2,1);
 }
 #splash.hide{opacity:0;transform:scale(1.05);pointer-events:none}
 
-/* Floating ambient orbs in background */
+/* Floating ambient orbs in background — green + gold (pitch colors) */
 #splash::before, #splash::after{
   content:'';position:absolute;border-radius:50%;
-  filter:blur(80px);opacity:.4;
+  filter:blur(80px);opacity:.5;
   animation:floatOrb 8s ease-in-out infinite;
 }
 #splash::before{
-  width:400px;height:400px;background:#D4866E;
+  width:400px;height:400px;background:#0F6B3A;
   top:-100px;left:-100px;
   animation-delay:0s;
 }
 #splash::after{
-  width:350px;height:350px;background:#A8722A;
+  width:350px;height:350px;background:#D8A84E;
   bottom:-80px;right:-80px;
   animation-delay:-4s;
 }
@@ -89,10 +102,10 @@ img,video{display:block;max-width:100%}
 .splash-greet{
   font-family:var(--fd);
   font-size:14px;
-  font-weight:300;
+  font-weight:400;
   letter-spacing:.4em;
   text-transform:uppercase;
-  color:rgba(212,134,110,.85);
+  color:rgba(216,168,78,.85);
   margin-bottom:48px;
   opacity:0;
   animation:greetIn .8s cubic-bezier(.34,1.56,.64,1) .3s forwards;
@@ -115,18 +128,18 @@ img,video{display:block;max-width:100%}
   100%{opacity:1;transform:scale(1) rotate(0)}
 }
 
-/* Neon pulsing layered shadows behind logo */
+/* Premium pulsing layered glows — green + gold */
 .splash-logo-wrap::before, .splash-logo-wrap::after{
   content:'';position:absolute;inset:0;border-radius:50%;
   pointer-events:none;
 }
 .splash-logo-wrap::before{
-  background:radial-gradient(circle, rgba(212,134,110,.6) 0%, transparent 60%);
+  background:radial-gradient(circle, rgba(15,107,58,.7) 0%, transparent 60%);
   animation:neonPulse1 2.5s ease-in-out infinite;
   filter:blur(20px);
 }
 .splash-logo-wrap::after{
-  background:radial-gradient(circle, rgba(168,114,42,.5) 0%, transparent 65%);
+  background:radial-gradient(circle, rgba(216,168,78,.5) 0%, transparent 65%);
   animation:neonPulse2 3s ease-in-out infinite;
   filter:blur(30px);
   transform:scale(1.4);
@@ -143,27 +156,27 @@ img,video{display:block;max-width:100%}
 .splash-logo{
   position:relative;z-index:2;
   width:120px;height:120px;
-  border-radius:50%;
-  background:linear-gradient(135deg, #D4866E 0%, #A8722A 100%);
+  border-radius:24px;
+  background:linear-gradient(135deg, #0F6B3A 0%, #1E8A4D 100%);
   display:flex;align-items:center;justify-content:center;
   box-shadow:
-    0 0 60px rgba(212,134,110,.6),
-    0 0 100px rgba(168,114,42,.4),
-    inset 0 2px 0 rgba(255,255,255,.3),
+    0 0 60px rgba(15,107,58,.6),
+    0 0 100px rgba(216,168,78,.3),
+    inset 0 2px 0 rgba(255,255,255,.2),
     inset 0 -2px 8px rgba(0,0,0,.3);
   animation:logoBreathe 3s ease-in-out infinite;
 }
 @keyframes logoBreathe{
-  0%,100%{box-shadow:0 0 60px rgba(212,134,110,.6),0 0 100px rgba(168,114,42,.4),inset 0 2px 0 rgba(255,255,255,.3),inset 0 -2px 8px rgba(0,0,0,.3)}
-  50%{box-shadow:0 0 90px rgba(212,134,110,.9),0 0 140px rgba(168,114,42,.6),inset 0 2px 0 rgba(255,255,255,.4),inset 0 -2px 8px rgba(0,0,0,.3)}
+  0%,100%{box-shadow:0 0 60px rgba(15,107,58,.6),0 0 100px rgba(216,168,78,.3),inset 0 2px 0 rgba(255,255,255,.2),inset 0 -2px 8px rgba(0,0,0,.3)}
+  50%{box-shadow:0 0 90px rgba(15,107,58,.9),0 0 140px rgba(216,168,78,.5),inset 0 2px 0 rgba(255,255,255,.3),inset 0 -2px 8px rgba(0,0,0,.3)}
 }
 
 .splash-logo-text{
   font-family:var(--fd);
   font-size:64px;
-  font-weight:300;
+  font-weight:500;
   font-style:italic;
-  color:#fff;
+  color:#FBF8F1;
   text-shadow:0 2px 12px rgba(0,0,0,.4);
   letter-spacing:-.02em;
 }
@@ -171,16 +184,16 @@ img,video{display:block;max-width:100%}
 .splash-brand{
   margin-top:36px;
   font-family:var(--fd);
-  font-size:38px;
-  font-weight:300;
+  font-size:42px;
+  font-weight:400;
   letter-spacing:-.03em;
-  color:#fff;
+  color:#FBF8F1;
   opacity:0;
   animation:brandIn .9s cubic-bezier(.34,1.56,.64,1) .9s forwards;
 }
 .splash-brand em{
-  font-style:italic;font-weight:200;
-  background:linear-gradient(135deg, #D4866E 0%, #E09A82 100%);
+  font-style:italic;font-weight:500;
+  background:linear-gradient(135deg, #D8A84E 0%, #E2B85A 100%);
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -191,11 +204,11 @@ img,video{display:block;max-width:100%}
 
 .splash-tagline{
   margin-top:14px;
-  font-size:13px;
+  font-size:12px;
   font-weight:400;
-  letter-spacing:.15em;
+  letter-spacing:.18em;
   text-transform:uppercase;
-  color:rgba(255,255,255,.5);
+  color:rgba(245,239,228,.6);
   opacity:0;
   animation:taglineIn .9s ease-out 1.3s forwards;
 }
@@ -209,14 +222,14 @@ img,video{display:block;max-width:100%}
   bottom:60px;left:50%;
   transform:translateX(-50%);
   width:140px;height:2px;
-  background:rgba(255,255,255,.1);
+  background:rgba(216,168,78,.15);
   border-radius:2px;overflow:hidden;
   opacity:0;
   animation:loaderIn .6s ease-out 1.6s forwards;
 }
 .splash-loader::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg, transparent 0%, #D4866E 50%, transparent 100%);
+  background:linear-gradient(90deg, transparent 0%, #D8A84E 50%, transparent 100%);
   animation:loaderSlide 1.8s ease-in-out infinite;
 }
 @keyframes loaderIn{0%{opacity:0}100%{opacity:1}}
@@ -381,8 +394,8 @@ img,video{display:block;max-width:100%}
 .c-meta{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3);margin-top:3px}
 .c-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--line2)}
 .c-rating{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--ink);padding:4px 9px;background:var(--bg3);border-radius:100px}
-.book-btn{padding:9px 17px;background:var(--ink);color:var(--bg);border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;transition:all .25s var(--spring);box-shadow:0 4px 12px -2px rgba(0,0,0,.25)}
-.book-btn:active{transform:scale(.88);opacity:.85}
+.book-btn{padding:10px 18px;background:var(--accent);color:#fff;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;transition:all .25s var(--spring);box-shadow:0 6px 16px -4px rgba(var(--accentRgb),.45)}
+.book-btn:active{transform:scale(.92);opacity:.92}
 .cuisine-tag{font-size:10.5px;font-weight:700;padding:3px 9px;background:var(--bg3);border-radius:100px;color:var(--ink3)}
 .loc-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--accent);padding:4px 10px;background:rgba(var(--accentRgb),.08);border-radius:100px;text-decoration:none}
 
@@ -764,7 +777,7 @@ img,video{display:block;max-width:100%}
     </div>
   </div>
   <div class="splash-brand">One<em>Table</em></div>
-  <div class="splash-tagline">Premium Restaurants · Toshkent</div>
+  <div class="splash-tagline">Mijoz uchun oson · Restoran uchun aqlli</div>
   <div class="splash-loader"></div>
 </div>
 
