@@ -73,11 +73,7 @@ img{display:block;max-width:100%}
     radial-gradient(circle at 20% 78%,rgba(201,154,73,.22),transparent 36%);
   overflow:hidden;border-right:1px solid var(--line);
 }
-.auth-hero::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse at 30% 70%,rgba(184,92,56,.13),transparent 58%),
-    linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0));
-}
+.auth-hero::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 30% 70%,rgba(184,92,56,.13),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0));}
 .brand{display:flex;align-items:center;gap:12px;position:relative;z-index:2}
 .brand-mark{width:44px;height:44px;border-radius:12px;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:22px;font-style:italic}
 .brand-name{font-family:var(--fd);font-size:22px;color:var(--ink)}
@@ -145,10 +141,20 @@ textarea.field-input{resize:vertical;min-height:80px}
 .sidebar-head .brand-mark{width:36px;height:36px;font-size:17px;border-radius:10px}
 .sidebar-head .brand-name{font-size:17px}
 .sidebar-rest{padding:16px 20px;border-bottom:1px solid var(--line)}
-.sidebar-rest .name{font-family:var(--fd);font-size:16px;margin-top:5px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-rest .name{font-family:var(--fd);font-size:16px;margin-top:5px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sidebar-rest .live{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--green)}
 .sidebar-rest .live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── PLAN BADGE (sidebar) ── */
+.plan-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.05em;margin-top:6px}
+.plan-badge.trial{background:var(--blue-s);color:var(--blue)}
+.plan-badge.basic{background:var(--bg5);color:var(--ink3)}
+.plan-badge.business{background:var(--gold-s);color:var(--gold)}
+.plan-badge.elite{background:var(--accent-s);color:var(--accent)}
+.plan-badge.expired{background:var(--rose-s);color:var(--rose)}
+.plan-badge.grace{background:var(--gold-s);color:var(--gold)}
+
 .sidebar-nav{flex:1;padding:14px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:1px}
 .nav-sec{font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink4);padding:13px 12px 5px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink3);transition:all .18s var(--ease);position:relative;cursor:pointer;user-select:none}
@@ -157,6 +163,8 @@ textarea.field-input{resize:vertical;min-height:80px}
 .nav-item.active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:0 2px 2px 0}
 .nav-item .badge{margin-left:auto;padding:2px 7px;background:var(--accent);color:var(--ink);font-size:10px;font-weight:700;border-radius:100px}
 .nav-item .badge.gold{background:var(--gold)}
+.nav-item.locked-nav{opacity:.55}
+.nav-item.locked-nav::after{content:'🔒';font-size:11px;margin-left:auto}
 .sidebar-foot{padding:14px;border-top:1px solid var(--line)}
 .sidebar-user{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer}
 .sidebar-user:hover{background:var(--bg4)}
@@ -225,6 +233,10 @@ textarea.field-input{resize:vertical;min-height:80px}
 .pill.pending_deposit{background:var(--gold-s);color:var(--gold)}
 .pill.draft{background:var(--bg5);color:var(--ink4)}
 .pill.published{background:var(--green-s);color:var(--green)}
+.pill.trial{background:var(--blue-s);color:var(--blue)}
+.pill.active{background:var(--green-s);color:var(--green)}
+.pill.expired{background:var(--rose-s);color:var(--rose)}
+.pill.grace_period{background:var(--gold-s);color:var(--gold)}
 
 /* ─── QUICK ACTIONS ─────────────────────────────────────── */
 .qa-grid{display:flex;flex-direction:column;gap:8px}
@@ -234,6 +246,7 @@ textarea.field-input{resize:vertical;min-height:80px}
 .qa-icon.green{background:var(--green-s);color:var(--green)}
 .qa-icon.gold{background:var(--gold-s);color:var(--gold)}
 .qa-icon.teal{background:var(--teal-s);color:var(--teal)}
+.qa-icon.blue{background:var(--blue-s);color:var(--blue)}
 .qa-text{flex:1}
 .qa-title{font-size:13px;font-weight:700;color:var(--ink)}
 .qa-desc{font-size:11px;color:var(--ink3);margin-top:2px}
@@ -269,6 +282,31 @@ textarea.field-input{resize:vertical;min-height:80px}
 .item-card .ic-price{font-family:var(--fd);font-size:20px;color:var(--accent)}
 .item-card .ic-price small{font-family:var(--fb);font-size:11px;color:var(--ink3);margin-left:3px}
 .item-card img.ic-img{width:100%;height:140px;object-fit:cover;border-radius:var(--r);margin-bottom:12px;background:var(--bg)}
+
+/* ─── PLAN CARDS ─────────────────────────────────────────── */
+.plan-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:24px}
+.plan-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:var(--r2);padding:22px;position:relative;cursor:pointer;transition:all .25s var(--ease)}
+.plan-card:hover{border-color:var(--line3);transform:translateY(-2px)}
+.plan-card.current{border-color:var(--green);background:var(--green-s)}
+.plan-card.recommended{border-color:var(--accent)}
+.plan-card .pc-tag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);padding:3px 12px;border-radius:100px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.plan-card .pc-tag.green{background:var(--green);color:#fff}
+.plan-card .pc-tag.accent{background:var(--accent);color:#fff}
+.plan-card .pc-name{font-family:var(--fd);font-size:20px;margin-bottom:4px}
+.plan-card .pc-price{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.plan-card .pc-price small{font-size:11px;font-weight:400;color:var(--ink3)}
+.plan-card .pc-desc{font-size:11px;color:var(--ink3);margin-bottom:16px;line-height:1.4}
+.plan-card .pc-features{display:flex;flex-direction:column;gap:5px;margin-bottom:18px}
+.plan-card .pc-feature{font-size:11px;color:var(--ink2);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.plan-card .pc-feature.yes::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0}
+.plan-card .pc-feature.no::before{content:'—';color:var(--ink4);font-weight:800;flex-shrink:0}
+.plan-card .pc-feature.no{color:var(--ink4)}
+
+/* ─── LOCKED PAGE OVERLAY ────────────────────────────────── */
+.locked-page{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 32px;text-align:center;background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);margin:32px 0}
+.locked-page .lock-icon{width:80px;height:80px;border-radius:50%;background:var(--bg5);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px}
+.locked-page h2{font-family:var(--fd);font-size:28px;font-style:italic;margin-bottom:8px}
+.locked-page p{font-size:14px;color:var(--ink3);max-width:360px;margin:0 auto 24px}
 
 /* ─── MODAL ──────────────────────────────────────────────── */
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
@@ -351,6 +389,7 @@ textarea.field-input{resize:vertical;min-height:80px}
 .info-box.warning{border-color:rgba(212,160,91,.3);background:var(--gold-s);color:var(--gold)}
 .info-box.info{border-color:rgba(92,143,184,.3);background:var(--blue-s);color:var(--blue)}
 .info-box.success{border-color:rgba(107,155,111,.3);background:var(--green-s);color:var(--green)}
+.info-box.danger{border-color:rgba(200,99,95,.3);background:var(--rose-s);color:var(--rose)}
 .info-box strong{font-weight:800}
 
 /* ─── SETTINGS TABS ──────────────────────────────────────── */
@@ -358,8 +397,24 @@ textarea.field-input{resize:vertical;min-height:80px}
 .settings-tab{padding:8px 18px;border-radius:100px;font-size:12px;font-weight:700;color:var(--ink3);cursor:pointer;transition:all .2s var(--ease)}
 .settings-tab.active{background:var(--accent);color:var(--ink)}
 
-/* ─── RISK / NO-SHOW ─────────────────────────────────────── */
+/* ─── NOSHOW / RISK ──────────────────────────────────────── */
 .noshow-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:100px;font-size:9.5px;font-weight:800;background:var(--plum-s);color:var(--plum)}
+
+/* ─── PROGRESS BAR ───────────────────────────────────────── */
+.progress-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0}
+.progress-bar-fill{height:100%;border-radius:3px;transition:width .6s var(--ease)}
+.progress-bar-fill.green{background:var(--green)}
+.progress-bar-fill.gold{background:var(--gold)}
+.progress-bar-fill.rose{background:var(--rose)}
+
+/* ─── SUBSCRIPTION TIMER ─────────────────────────────────── */
+.sub-timer{background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2);padding:22px 26px;margin-bottom:20px;display:flex;align-items:center;gap:20px}
+.sub-timer.warn{border-color:rgba(212,160,91,.4);background:var(--gold-s)}
+.sub-timer.danger{border-color:rgba(200,99,95,.4);background:var(--rose-s)}
+.sub-timer .st-icon{font-size:32px;flex-shrink:0}
+.sub-timer .st-body{flex:1}
+.sub-timer .st-title{font-family:var(--fd);font-size:18px;margin-bottom:4px}
+.sub-timer .st-sub{font-size:12px;color:var(--ink3)}
 
 /* ─── STAGGER ANIMATION ──────────────────────────────────── */
 .stagger > *{animation:fadeUp .5s var(--ease) both}
@@ -370,8 +425,8 @@ textarea.field-input{resize:vertical;min-height:80px}
 .stagger > *:nth-child(5){animation-delay:.25s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-@media(max-width:1100px){.hero-stats{grid-template-columns:repeat(2,1fr)}.dashboard-grid,.analytics-grid{grid-template-columns:1fr}.deposit-meta{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:820px){.auth{grid-template-columns:1fr}.auth-hero{display:none}.auth-form{padding:32px 24px}.app.active{grid-template-columns:1fr}.sidebar{position:fixed;left:-260px;transition:left .3s var(--ease)}.sidebar.open{left:0}.page-wrap{padding:20px 16px}.page-head h1{font-size:30px}.hero-stats{grid-template-columns:1fr 1fr}}
+@media(max-width:1100px){.hero-stats{grid-template-columns:repeat(2,1fr)}.dashboard-grid,.analytics-grid{grid-template-columns:1fr}.deposit-meta{grid-template-columns:repeat(2,1fr)}.plan-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.auth{grid-template-columns:1fr}.auth-hero{display:none}.auth-form{padding:32px 24px}.app.active{grid-template-columns:1fr}.sidebar{position:fixed;left:-260px;transition:left .3s var(--ease)}.sidebar.open{left:0}.page-wrap{padding:20px 16px}.page-head h1{font-size:30px}.hero-stats{grid-template-columns:1fr 1fr}.plan-cards{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -422,6 +477,8 @@ textarea.field-input{resize:vertical;min-height:80px}
     <div class="eyebrow">Sizning restoraningiz</div>
     <div class="name" id="side-rest-name">—</div>
     <div class="live">Live</div>
+    <!-- Plan badge -->
+    <div id="side-plan-badge" style="margin-top:6px"></div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-sec">Operatsiyalar</div>
@@ -435,8 +492,9 @@ textarea.field-input{resize:vertical;min-height:80px}
     <a class="nav-item" data-page="menu">🍽 Menyu</a>
     <a class="nav-item" data-page="zones">🏗 Zonalar</a>
     <a class="nav-item" data-page="tables">🪑 Stollar</a>
-    <a class="nav-item" data-page="premium">⭐ Premium katalog</a>
+    <a class="nav-item" data-page="premium" id="nav-premium">⭐ Premium katalog</a>
     <div class="nav-sec">Sozlamalar</div>
+    <a class="nav-item" data-page="subscription">💎 Tarif & To'lov</a>
     <a class="nav-item" data-page="restaurant">🏠 Profil</a>
     <a class="nav-item" data-page="deposit-settings">🔐 Depozit sozlamalari</a>
     <a class="nav-item" data-page="location">📍 Lokatsiya</a>
@@ -487,6 +545,7 @@ const S = {
   restaurant: null, reservations: [], todayRes: [],
   menu: [], zones: [], tables: [], reels: [], deposits: [],
   analytics: null, premium: null,
+  subscription: null,          /* ← NEW: tarif ma'lumotlari */
   page: 'overview', theme: localStorage.getItem('ot_theme') || 'light',
   filters: { status: 'all', depositStatus: 'pending' },
   restTab: 'general', socket: null, charts: {}, map: null, marker: null
@@ -502,6 +561,133 @@ const fmtTime = t => t ? String(t).slice(0,5) : '—';
 const fmtDatetime = iso => { if(!iso) return '—'; const d=new Date(iso); return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; };
 const statusLabel = s => ({pending:'Kutilmoqda',confirmed:'Tasdiqlangan',cancelled:'Bekor qilindi',completed:'Tugallangan',noshow:'Kelmagan',pending_deposit:'Depozit kutilmoqda',blocked:'Bloklangan'}[s] || s);
 const depositStatusLabel = s => ({not_required:"Talab yo'q",required:'Talab qilinadi',awaiting_payment:"To'lov kutilmoqda",payment_submitted:"To'lov yuborildi",under_review:"Ko'rib chiqilmoqda",confirmed:'Tasdiqlangan',failed:'Rad etildi',refunded:'Qaytarildi',expired:"Muddati o'tdi"}[s] || s);
+
+/* ═══════════════════════════════════════════════════════════
+   SUBSCRIPTION HELPERS
+═══════════════════════════════════════════════════════════ */
+const PLAN_NAMES  = { trial:'Trial (Bepul)', basic:'Basic', business:'Business', elite:'Elite', chain:'Chain' };
+const PLAN_PRICES = { trial:0, basic:499000, business:999000, elite:1999000 };
+const PLAN_ORDER  = ['trial','basic','business','elite','chain'];
+const PLAN_FEATURES = {
+  trial:    { deposits:true, analytics_basic:true, analytics_advanced:true, marketing:true, top_placement:true, ai_analytics:true, priority_support:true },
+  basic:    { deposits:true, analytics_basic:true, analytics_advanced:false, marketing:false, top_placement:false, ai_analytics:false, priority_support:false },
+  business: { deposits:true, analytics_basic:true, analytics_advanced:true, marketing:true, top_placement:true, ai_analytics:false, priority_support:false },
+  elite:    { deposits:true, analytics_basic:true, analytics_advanced:true, marketing:true, top_placement:true, ai_analytics:true, priority_support:true },
+  chain:    { deposits:true, analytics_basic:true, analytics_advanced:true, marketing:true, top_placement:true, ai_analytics:true, priority_support:true }
+};
+
+function getCurrentPlan() {
+  return S.subscription?.plan || 'trial';
+}
+function getSubStatus() {
+  return S.subscription?.status || 'trial';
+}
+function hasFeature(feature) {
+  const st = getSubStatus();
+  // expired/read_only → no features except viewing
+  if (st === 'expired') return false;
+  const plan = getCurrentPlan();
+  return PLAN_FEATURES[plan]?.[feature] ?? false;
+}
+function getDaysLeft() {
+  if (!S.subscription?.expires_at) return null;
+  const diff = new Date(S.subscription.expires_at) - new Date();
+  return Math.max(0, Math.ceil(diff / 86400000));
+}
+function getPlanLabel() {
+  const plan = getCurrentPlan();
+  const st = getSubStatus();
+  if (st === 'expired') return { text:'Muddati tugagan', cls:'expired' };
+  if (st === 'grace_period') return { text:'Grace period', cls:'grace' };
+  if (st === 'trial' || plan === 'trial') return { text:'Trial · 1 oy', cls:'trial' };
+  if (plan === 'basic') return { text:'Basic', cls:'basic' };
+  if (plan === 'business') return { text:'Business', cls:'business' };
+  if (plan === 'elite') return { text:'Elite ⭐', cls:'elite' };
+  return { text: PLAN_NAMES[plan] || plan, cls:'basic' };
+}
+
+/* ─── Upgrade modal (feature-locked) ─── */
+window.openUpgradeModal = (reason = '', requiredPlan = 'basic') => {
+  const plan = PLAN_NAMES[requiredPlan] || requiredPlan;
+  openModal({
+    title: '🔒 Tarif <em>yangilash</em>',
+    body: `<div style="text-align:center;padding:16px 0">
+      <div style="font-size:48px;margin-bottom:16px">🚀</div>
+      <div style="font-family:var(--fd);font-size:22px;margin-bottom:8px">${esc(reason)}</div>
+      <p style="color:var(--ink3);margin-bottom:28px">Bu xususiyat <strong>${esc(plan)}</strong> tarifdan boshlab mavjud</p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="btn btn-primary btn-lg" onclick="closeModal();navigate('subscription')">💎 Tarifni yangilash</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Keyinroq</button>
+      </div>
+    </div>`,
+    footer: ''
+  });
+};
+
+/* ─── Render locked page ─── */
+function renderLockedPage(featureName, requiredPlan='basic') {
+  const planName = PLAN_NAMES[requiredPlan] || requiredPlan;
+  return `<div class="locked-page">
+    <div class="lock-icon">🔒</div>
+    <h2>${esc(featureName)}</h2>
+    <p>Bu bo'lim <strong>${esc(planName)}</strong> tarifidan boshlab mavjud. Tarifingizni yangilang.</p>
+    <button class="btn btn-primary btn-lg" onclick="navigate('subscription')">💎 Tarifni yangilash</button>
+  </div>`;
+}
+
+/* ─── Auto modal: trial expired or grace ─── */
+function checkSubscriptionModal() {
+  const st = getSubStatus();
+  const days = getDaysLeft();
+  // Show warning if ≤7 days left and not expired
+  if ((st === 'trial' || st === 'active') && days !== null && days <= 7 && days > 0) {
+    setTimeout(() => {
+      openModal({
+        title: '⚠️ Tarif <em>tugayapti</em>',
+        body: `<div style="text-align:center;padding:16px 0">
+          <div style="font-size:48px;margin-bottom:16px">${days <= 3 ? '🚨' : '⏳'}</div>
+          <div style="font-family:var(--fd);font-size:24px;margin-bottom:8px">${days} kun qoldi</div>
+          <p style="color:var(--ink3);margin-bottom:28px">Trial davringiz tugayapti. Uzluksiz ishlash uchun tarifni tanlang.</p>
+          <button class="btn btn-primary btn-lg btn-block" onclick="closeModal();navigate('subscription')">💎 Tarifni tanlash</button>
+        </div>`,
+        footer: `<button class="btn btn-ghost" onclick="closeModal()">Keyinroq</button>`
+      });
+    }, 2000);
+    return;
+  }
+  // Grace period: show mandatory modal
+  if (st === 'grace_period') {
+    setTimeout(() => {
+      openModal({
+        title: '⏰ Oxirgi <em>ogohlantirish</em>',
+        body: `<div style="text-align:center;padding:16px 0">
+          <div style="font-size:48px;margin-bottom:16px">🚨</div>
+          <div style="font-family:var(--fd);font-size:22px;margin-bottom:8px">Trial muddatingiz tugadi</div>
+          <p style="color:var(--ink3);margin-bottom:6px">Hisobingiz <strong style="color:var(--rose)">${days !== null ? days+' kun' : ''}</strong> ichida bloklanadi.</p>
+          <p style="color:var(--ink3);margin-bottom:28px">Hozir tarifni tanlang va ishlashda davom eting.</p>
+          <button class="btn btn-primary btn-lg btn-block" onclick="closeModal();navigate('subscription')">💎 Hozir tarifni tanlash</button>
+        </div>`,
+        footer: ''
+      });
+    }, 800);
+    return;
+  }
+  // Expired: mandatory
+  if (st === 'expired') {
+    setTimeout(() => {
+      openModal({
+        title: '🔒 Hisob <em>bloklandi</em>',
+        body: `<div style="text-align:center;padding:16px 0">
+          <div style="font-size:48px;margin-bottom:16px">🔒</div>
+          <div style="font-family:var(--fd);font-size:22px;margin-bottom:8px">Tarif muddati tugadi</div>
+          <p style="color:var(--ink3);margin-bottom:28px">Davom etish uchun tarif tanlang. Barcha ma'lumotlaringiz saqlanib qolgan.</p>
+          <button class="btn btn-primary btn-lg btn-block" onclick="closeModal();navigate('subscription')">💎 Tarifni tanlash</button>
+        </div>`,
+        footer: ''
+      });
+    }, 500);
+  }
+}
 
 /* ─── API ─── */
 async function api(path, opts = {}) {
@@ -587,7 +773,7 @@ $('#form-register').onsubmit = async e => {
   } catch(err) { toast(err.message, 'error'); btn.disabled=false; btn.textContent='Yaratish'; }
 };
 function logout() {
-  S.token=null; S.owner=null; S.restaurant=null;
+  S.token=null; S.owner=null; S.restaurant=null; S.subscription=null;
   localStorage.removeItem('ot_owner_token'); localStorage.removeItem('ot_owner_data');
   if (S.socket) { S.socket.disconnect(); S.socket=null; }
   showAuth();
@@ -596,7 +782,7 @@ $('#logout-btn').onclick = () => { if (confirm('Chiqasizmi?')) logout(); };
 
 /* ─── LOAD ALL DATA ─── */
 async function loadAll() {
-  const [rest, res, menu, zones, tables, reels, deposits, analytics, premium] = await Promise.all([
+  const [rest, res, menu, zones, tables, reels, deposits, analytics, premium, sub] = await Promise.all([
     api('/owner/restaurant').catch(() => null),
     api('/owner/reservations').catch(() => []),
     api('/owner/menu').catch(() => []),
@@ -605,29 +791,51 @@ async function loadAll() {
     api('/owner/reels').catch(() => []),
     api('/owner/deposits').catch(() => []),
     api('/owner/analytics').catch(() => null),
-    api('/owner/premium').catch(() => null)
+    api('/owner/premium').catch(() => null),
+    api('/owner/subscription').catch(() => null)   /* ← NEW */
   ]);
-  S.restaurant = rest?.restaurant || rest || null;
+  S.restaurant    = rest?.restaurant || rest || null;
   if (rest?.owner) { S.owner = rest.owner; localStorage.setItem('ot_owner_data', JSON.stringify(S.owner)); }
-  S.reservations = Array.isArray(res) ? res : [];
-  S.menu        = Array.isArray(menu) ? menu : [];
-  S.zones       = Array.isArray(zones) ? zones : [];
-  S.tables      = Array.isArray(tables) ? tables : [];
-  S.reels       = Array.isArray(reels) ? reels : [];
-  S.deposits    = Array.isArray(deposits) ? deposits : [];
-  S.analytics   = analytics;
-  S.premium     = premium;
-  S.todayRes    = S.reservations.filter(r => String(r.date).slice(0,10) === todayISO());
+  S.reservations  = Array.isArray(res) ? res : [];
+  S.menu          = Array.isArray(menu) ? menu : [];
+  S.zones         = Array.isArray(zones) ? zones : [];
+  S.tables        = Array.isArray(tables) ? tables : [];
+  S.reels         = Array.isArray(reels) ? reels : [];
+  S.deposits      = Array.isArray(deposits) ? deposits : [];
+  S.analytics     = analytics;
+  S.premium       = premium;
+  S.subscription  = sub?.subscription || sub || null;  /* ← NEW */
+  S.todayRes      = S.reservations.filter(r => String(r.date).slice(0,10) === todayISO());
   updateSidebar();
 }
+
 function updateSidebar() {
   $('#side-rest-name').textContent = S.restaurant?.name || "Restoran yo'q";
   const o = S.owner || {};
   $('#side-user-name').textContent = o.full_name || o.email || 'Egasi';
   $('#side-avatar').textContent = (o.full_name || o.email || 'A')[0].toUpperCase();
+
+  // Plan badge
+  const lbl = getPlanLabel();
+  const days = getDaysLeft();
+  const daysStr = days !== null ? ` · ${days}k` : '';
+  $('#side-plan-badge').innerHTML = `<span class="plan-badge ${lbl.cls}">${lbl.text}${daysStr}</span>`;
+
+  // Premium nav lock
+  const navPremium = document.getElementById('nav-premium');
+  if (navPremium) {
+    if (!hasFeature('top_placement')) {
+      navPremium.classList.add('locked-nav');
+    } else {
+      navPremium.classList.remove('locked-nav');
+    }
+  }
+
+  // Today badge
   const pt = S.todayRes.filter(r => r.status === 'pending').length;
   const bt = $('#badge-today');
   pt > 0 ? (bt.textContent = pt, bt.style.display = '') : bt.style.display = 'none';
+  // Deposits badge
   const pd = S.deposits.filter(d => ['payment_submitted','under_review'].includes(d.status)).length;
   const bd = $('#badge-deposits');
   pd > 0 ? (bd.textContent = pd, bd.style.display = '') : bd.style.display = 'none';
@@ -642,6 +850,7 @@ function connectSocket() {
     S.socket.on('new_reservation', () => { toast('🔔 Yangi bron!','success'); loadAll().then(()=>navigate(S.page)); });
     S.socket.on('reservation_updated', () => { loadAll().then(()=>navigate(S.page)); });
     S.socket.on('deposit_submitted', () => { toast('💳 Yangi depozit!','warn'); loadAll().then(()=>navigate(S.page)); });
+    S.socket.on('subscription_updated', () => { loadAll().then(()=>navigate(S.page)); });  /* ← NEW */
   } catch(e) {}
 }
 
@@ -660,7 +869,25 @@ function renderOverview() {
   const c = t.filter(r=>r.status==='confirmed').length;
   const pd = S.deposits.filter(d=>['payment_submitted','under_review'].includes(d.status)).length;
   const recent = [...S.reservations].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,7);
+  const days = getDaysLeft();
+  const st = getSubStatus();
+
+  // Subscription warning banner
+  let subBanner = '';
+  if (st === 'grace_period') {
+    subBanner = `<div class="info-box danger" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div>🚨 <strong>Grace period:</strong> ${days !== null ? days+' kun' : ''} ichida hisob bloklanadi. Hozir tarifni tanlang!</div>
+      <button class="btn btn-danger btn-sm" onclick="navigate('subscription')">Tarifni tanlash</button>
+    </div>`;
+  } else if (st === 'trial' && days !== null && days <= 7) {
+    subBanner = `<div class="info-box warning" style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px">
+      <div>⏳ <strong>Trial:</strong> ${days} kun qoldi. Tarifni tanlashni unutmang.</div>
+      <button class="btn btn-ghost btn-sm" onclick="navigate('subscription')">Ko'rish</button>
+    </div>`;
+  }
+
   $('#page-wrap').innerHTML = `
+  ${subBanner}
   <div class="page-head">
     <div><div class="eyebrow">Xush kelibsiz</div><h1>${esc((S.owner?.full_name||'').split(' ')[0])},<br><em>bugun ${t.length} ta bron</em></h1></div>
     <div class="page-head-actions">
@@ -697,7 +924,7 @@ function renderOverview() {
           <button class="qa-row" onclick="navigate('deposits')"><div class="qa-icon teal">💳</div><div class="qa-text"><div class="qa-title">Depozitlar${pd>0?` (${pd})`:''}</div><div class="qa-desc">Ko'rib chiqish va tasdiqlash</div></div></button>
           <button class="qa-row" onclick="navigate('media')"><div class="qa-icon">📸</div><div class="qa-text"><div class="qa-title">Restoran rasmlari</div><div class="qa-desc">${Array.isArray(S.restaurant?.gallery)?S.restaurant.gallery.length:0}/5 ta rasm qo'shilgan</div></div></button>
           <button class="qa-row" onclick="openMenuModal()"><div class="qa-icon">+</div><div class="qa-text"><div class="qa-title">Yangi taom</div><div class="qa-desc">Menuga qo'shish</div></div></button>
-          <button class="qa-row" onclick="navigate('premium')"><div class="qa-icon gold">⭐</div><div class="qa-text"><div class="qa-title">Premium katalog</div><div class="qa-desc">Ko'rinish va joylashuv</div></div></button>
+          <button class="qa-row" onclick="navigate('subscription')"><div class="qa-icon gold">💎</div><div class="qa-text"><div class="qa-title">${getPlanLabel().text}</div><div class="qa-desc">${getDaysLeft()!==null?getDaysLeft()+' kun qoldi':'Tarif boshqaruvi'}</div></div></button>
         </div>
       </div>
     </div>
@@ -904,7 +1131,7 @@ function renderAnalytics() {
   <div class="hero-stats stagger" style="margin-bottom:20px">
     <div class="stat-card"><div class="stat-label">Jami bronlar</div><div class="stat-value">${total}</div></div>
     <div class="stat-card"><div class="stat-label">Tasdiqlangan</div><div class="stat-value">${confirmed}</div></div>
-    <div class="stat-card"><div class="stat-label">No-show</div><div class="stat-value">${noshow}</div><div class="stat-sub ${noshow>0?'danger':''}">${total?Math.round(noshow/total*100):0}%</div></div>
+    <div class="stat-card"><div class="stat-label">No-show</div><div class="stat-value">${noshow}</div><div class="stat-sub ${noshow>0?'danger':''}"> ${total?Math.round(noshow/total*100):0}%</div></div>
     <div class="stat-card"><div class="stat-label">Depozit tushum</div><div class="stat-value" style="font-size:32px">${fmt(depAmt)}<small style="font-size:10px">so'm</small></div></div>
   </div>
   <div class="analytics-grid">
@@ -914,7 +1141,14 @@ function renderAnalytics() {
   <div class="analytics-grid">
     <div class="panel"><div class="panel-head"><div class="panel-title">Soatlar bo'yicha</div></div><div class="chart-wrap tall"><canvas id="ch-hours"></canvas></div></div>
     <div class="panel"><div class="panel-head"><div class="panel-title">Depozit <em>holati</em></div></div><div class="chart-wrap"><canvas id="ch-deps"></canvas></div></div>
-  </div>`;
+  </div>
+  ${!hasFeature('ai_analytics') ? `
+  <div class="locked-page" style="margin-top:20px">
+    <div class="lock-icon">🤖</div>
+    <h2>AI Analitika</h2>
+    <p>Bashoratli analitika, mijozlar segmentatsiyasi va aqlli tavsiyalar Elite tarifida mavjud.</p>
+    <button class="btn btn-primary" onclick="navigate('subscription')">💎 Elite tarifga o'tish</button>
+  </div>` : ''}`;
   setTimeout(buildCharts, 50);
 }
 function buildCharts() {
@@ -929,14 +1163,13 @@ function buildCharts() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PAGE: MEDIA — Restoran rasmlari (cover + gallery max 5)
+   PAGE: MEDIA
 ═══════════════════════════════════════════════════════════ */
 function renderMedia() {
   const r = S.restaurant || {};
   const gallery = Array.isArray(r.gallery) ? r.gallery : [];
   const MAX = 5;
   const remaining = MAX - gallery.length;
-
   $('#page-wrap').innerHTML = `
   <div class="page-head">
     <div><div class="eyebrow">Kontent</div><h1>Restoran <em>rasmlari</em></h1></div>
@@ -945,8 +1178,6 @@ function renderMedia() {
     📱 <strong>Mini-app:</strong> Ushbu rasmlar foydalanuvchilarga restoran kartasida va detail sahifasida ko'rsatiladi.
     Sifatli rasmlar bronlar sonini oshiradi.
   </div>
-
-  <!-- ── ASOSIY RASM ── -->
   <div class="panel" style="margin-bottom:20px">
     <div class="panel-head">
       <div class="panel-title">Asosiy <em>cover rasm</em></div>
@@ -975,81 +1206,42 @@ function renderMedia() {
       </div>
     </div>
   </div>
-
-  <!-- ── GALLEREYA (max 5) ── -->
   <div class="panel">
     <div class="panel-head">
       <div class="panel-title">Gallereya <em>${gallery.length} / ${MAX}</em></div>
       <span style="font-size:12px;color:var(--ink3)">Restoran detail sahifasida slayder sifatida ko'rsatiladi</span>
     </div>
     <div class="panel-body">
-      ${gallery.length === 0 && remaining > 0 ? `
-      <div style="margin-bottom:16px;padding:14px;background:var(--bg4);border-radius:var(--r);border:1px dashed var(--line3)">
-        <div style="font-size:13px;color:var(--ink3)">📷 Hali rasm qo'shilmagan. Interyerni, ovqatlarni va atmosferani ko'rsatuvchi ${MAX} tagacha rasm yuklang.</div>
-      </div>` : ''}
-
+      ${gallery.length === 0 && remaining > 0 ? `<div style="margin-bottom:16px;padding:14px;background:var(--bg4);border-radius:var(--r);border:1px dashed var(--line3)"><div style="font-size:13px;color:var(--ink3)">📷 Hali rasm qo'shilmagan. Interyerni, ovqatlarni va atmosferani ko'rsatuvchi ${MAX} tagacha rasm yuklang.</div></div>` : ''}
       <div class="gallery-grid" style="margin-bottom:16px">
-        ${gallery.map((url, i) => `
-        <div class="gallery-item">
-          <img src="${esc(url)}" loading="lazy" alt="Gallery ${i+1}">
-          <button class="gi-remove" onclick="removeGallery(${i})" title="O'chirish">✕</button>
-        </div>`).join('')}
-
-        ${remaining > 0 ? `
-        <div class="gallery-add-slot" title="${remaining} ta rasm qo'shishingiz mumkin">
-          <div class="gallery-slot-icon">➕</div>
-          <div class="gallery-slot-text">${remaining} ta qoldi<br><span style="font-size:10px;opacity:.7">Bir vaqtda bir nechta</span></div>
-          <input type="file" accept="image/*" multiple onchange="uploadGalleryFiles(this)">
-        </div>` : `
-        <div style="aspect-ratio:4/3;border:1.5px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg3)">
-          <div style="text-align:center;padding:12px"><div style="font-size:18px;margin-bottom:6px">✅</div><div style="font-size:11px;font-weight:700;color:var(--ink3)">Maksimal ${MAX} ta<br>rasm to'ldirildi</div></div>
-        </div>`}
+        ${gallery.map((url, i) => `<div class="gallery-item"><img src="${esc(url)}" loading="lazy" alt="Gallery ${i+1}"><button class="gi-remove" onclick="removeGallery(${i})" title="O'chirish">✕</button></div>`).join('')}
+        ${remaining > 0 ? `<div class="gallery-add-slot" title="${remaining} ta rasm qo'shishingiz mumkin"><div class="gallery-slot-icon">➕</div><div class="gallery-slot-text">${remaining} ta qoldi<br><span style="font-size:10px;opacity:.7">Bir vaqtda bir nechta</span></div><input type="file" accept="image/*" multiple onchange="uploadGalleryFiles(this)"></div>` : `<div style="aspect-ratio:4/3;border:1.5px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg3)"><div style="text-align:center;padding:12px"><div style="font-size:18px;margin-bottom:6px">✅</div><div style="font-size:11px;font-weight:700;color:var(--ink3)">Maksimal ${MAX} ta<br>rasm to'ldirildi</div></div></div>`}
       </div>
-
-      ${gallery.length > 0 ? `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line2)">
-        <div style="font-size:12px;color:var(--ink3)">💡 Rasm ustidagi ✕ tugmasini bosib o'chirishingiz mumkin</div>
-        <button class="btn btn-danger btn-sm" onclick="if(confirm('Barcha gallereya rasmlarini o\\'chirasizmi?')) clearAllGallery()">Hammasini o'chirish</button>
-      </div>` : ''}
+      ${gallery.length > 0 ? `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line2)"><div style="font-size:12px;color:var(--ink3)">💡 Rasm ustidagi ✕ tugmasini bosib o'chirishingiz mumkin</div><button class="btn btn-danger btn-sm" onclick="if(confirm('Barcha gallereya rasmlarini o\\'chirasizmi?')) clearAllGallery()">Hammasini o'chirish</button></div>` : ''}
     </div>
   </div>`;
 }
-
-/* ── Media helper functions ── */
 async function uploadRestImg(file, field) {
   if (!file) return;
-  try {
-    toast('Yuklanmoqda...');
-    const r = await uploadFile(file, 'image');
-    await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ [field]: r.url }) });
-    toast('✅ Saqlandi', 'success');
-    await loadAll(); renderMedia();
-  } catch(e) { toast(e.message, 'error'); }
+  try { toast('Yuklanmoqda...'); const r = await uploadFile(file, 'image'); await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ [field]: r.url }) }); toast('✅ Saqlandi', 'success'); await loadAll(); renderMedia(); }
+  catch(e) { toast(e.message, 'error'); }
 }
 window.clearImg = async field => {
   if (!confirm("Bu rasmni o'chirasizmi?")) return;
-  try {
-    await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ [field]: null }) });
-    toast("O'chirildi", 'success');
-    await loadAll(); renderMedia();
-  } catch(e) { toast(e.message, 'error'); }
+  try { await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ [field]: null }) }); toast("O'chirildi", 'success'); await loadAll(); renderMedia(); }
+  catch(e) { toast(e.message, 'error'); }
 };
 window.uploadGalleryFiles = async input => {
-  const files = Array.from(input.files);
-  if (!files.length) return;
+  const files = Array.from(input.files); if (!files.length) return;
   const cur = Array.isArray(S.restaurant?.gallery) ? S.restaurant.gallery : [];
-  const MAX = 5;
-  const canAdd = MAX - cur.length;
+  const MAX = 5, canAdd = MAX - cur.length;
   if (canAdd <= 0) { toast(`Gallereya to'liq (maks ${MAX} ta)`, 'error'); return; }
   const toUpload = files.slice(0, canAdd);
-  if (toUpload.length < files.length) toast(`Faqat ${toUpload.length} ta yuklash mumkin (${MAX - cur.length} ta qolgan)`, 'warn');
+  if (toUpload.length < files.length) toast(`Faqat ${toUpload.length} ta yuklash mumkin`, 'warn');
   try {
     toast(`${toUpload.length} ta rasm yuklanmoqda...`);
     const uploaded = [];
-    for (const f of toUpload) {
-      const r = await uploadFile(f, 'image');
-      uploaded.push(r.url);
-    }
+    for (const f of toUpload) { const r = await uploadFile(f, 'image'); uploaded.push(r.url); }
     await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ gallery:[...cur,...uploaded] }) });
     toast(`✅ ${uploaded.length} ta rasm qo'shildi`, 'success');
     await loadAll(); renderMedia();
@@ -1057,20 +1249,13 @@ window.uploadGalleryFiles = async input => {
 };
 window.removeGallery = async idx => {
   if (!confirm("Bu rasmni o'chirasizmi?")) return;
-  const cur = [...(S.restaurant?.gallery||[])];
-  cur.splice(idx, 1);
-  try {
-    await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ gallery:cur }) });
-    toast("O'chirildi", 'success');
-    await loadAll(); renderMedia();
-  } catch(e) { toast(e.message, 'error'); }
+  const cur = [...(S.restaurant?.gallery||[])]; cur.splice(idx, 1);
+  try { await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ gallery:cur }) }); toast("O'chirildi", 'success'); await loadAll(); renderMedia(); }
+  catch(e) { toast(e.message, 'error'); }
 };
 window.clearAllGallery = async () => {
-  try {
-    await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ gallery:[] }) });
-    toast("Gallereya tozalandi", 'success');
-    await loadAll(); renderMedia();
-  } catch(e) { toast(e.message, 'error'); }
+  try { await api('/owner/restaurant', { method:'PUT', body:JSON.stringify({ gallery:[] }) }); toast("Gallereya tozalandi", 'success'); await loadAll(); renderMedia(); }
+  catch(e) { toast(e.message, 'error'); }
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -1086,28 +1271,14 @@ function renderMenu() {
     <div class="item-card" style="padding:0;overflow:hidden">
       ${m.image_url ? `<img src="${esc(m.image_url)}" class="ic-img" style="border-radius:0;margin-bottom:0" loading="lazy">` : `<div style="height:140px;background:linear-gradient(135deg,var(--bg4),var(--bg5));display:flex;align-items:center;justify-content:center;font-size:36px">🍽</div>`}
       <div style="padding:16px">
-        <div class="ic-head">
-          <div class="ic-name">${esc(m.name)}</div>
-          <div style="display:flex;gap:4px">
-            <button class="row-action" title="Tahrirlash" onclick="openMenuModal(${m.id})">✏</button>
-            <button class="row-action danger" title="O'chirish" onclick="delMenu(${m.id})">🗑</button>
-          </div>
-        </div>
+        <div class="ic-head"><div class="ic-name">${esc(m.name)}</div><div style="display:flex;gap:4px"><button class="row-action" title="Tahrirlash" onclick="openMenuModal(${m.id})">✏</button><button class="row-action danger" title="O'chirish" onclick="delMenu(${m.id})">🗑</button></div></div>
         ${m.description ? `<div class="ic-desc">${esc(m.description)}</div>` : ''}
         ${m.category ? `<div style="margin-bottom:10px"><span style="padding:3px 10px;background:var(--bg5);border-radius:100px;font-size:10px;font-weight:700;color:var(--ink3)">${esc(m.category)}</span></div>` : ''}
-        <div class="ic-foot">
-          <div class="ic-price">${fmt(m.price)}<small>so'm</small></div>
-          <span class="pill ${m.is_available!==false?'confirmed':'cancelled'}">${m.is_available!==false?'Mavjud':"Yo'q"}</span>
-        </div>
+        <div class="ic-foot"><div class="ic-price">${fmt(m.price)}<small>so'm</small></div><span class="pill ${m.is_available!==false?'confirmed':'cancelled'}">${m.is_available!==false?'Mavjud':"Yo'q"}</span></div>
       </div>
     </div>`).join('')}</div>`
-  : `<div class="empty" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)">
-      <div class="icon">🍽</div><h3>Menyu bo'sh</h3>
-      <p>Birinchi taomni qo'shing. Rasm bilan birga qo'shilgan taomlar ko'proq buyurtma oladi.</p>
-      <button class="btn btn-primary" onclick="openMenuModal()">Taom qo'shish</button>
-    </div>`}`;
+  : `<div class="empty" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)"><div class="icon">🍽</div><h3>Menyu bo'sh</h3><p>Birinchi taomni qo'shing.</p><button class="btn btn-primary" onclick="openMenuModal()">Taom qo'shish</button></div>`}`;
 }
-
 window.openMenuModal = (id=null) => {
   const item = id ? S.menu.find(m=>m.id===id) : null;
   openModal({
@@ -1115,131 +1286,70 @@ window.openMenuModal = (id=null) => {
     body: `<form id="mf">
       <div class="field"><label class="field-label">Taom nomi *</label><input class="field-input" name="name" required value="${esc(item?.name||'')}" placeholder="Masalan: Osh, Shashlik, Caesar salati"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div class="field" style="margin:0"><label class="field-label">Kategoriya</label><input class="field-input" name="category" value="${esc(item?.category||'')}" placeholder="Asosiy taomlar, Ichimliklar..."></div>
+        <div class="field" style="margin:0"><label class="field-label">Kategoriya</label><input class="field-input" name="category" value="${esc(item?.category||'')}" placeholder="Asosiy taomlar..."></div>
         <div class="field" style="margin:0"><label class="field-label">Narxi (so'm) *</label><input class="field-input" name="price" type="number" required min="0" value="${item?.price||''}" placeholder="50000"></div>
       </div>
-      <div class="field"><label class="field-label">Tavsif</label><textarea class="field-input" name="description" rows="2" placeholder="Tarkibi, tayyorlanishi haqida qisqa ma'lumot">${esc(item?.description||'')}</textarea></div>
-
-      <!-- RASM YUKLASH -->
+      <div class="field"><label class="field-label">Tavsif</label><textarea class="field-input" name="description" rows="2">${esc(item?.description||'')}</textarea></div>
       <div class="field">
         <label class="field-label">Taom rasmi</label>
         <div id="mi-preview-wrap">
-          ${item?.image_url ? `
-          <div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px">
-            <img src="${esc(item.image_url)}" id="mi-preview-img">
-            <button type="button" class="up-remove" onclick="clearMenuImg()" title="Rasmni o'chirish">✕</button>
-          </div>
-          <div style="margin-top:10px">
-          <div class="dropzone" style="padding:12px 16px"><div class="dz-title" style="font-size:12px">Yangi rasm bilan almashtirish</div><input type="file" accept="image/*" id="mi-file"></div>
-          </div>` : `
-          <div class="dropzone" id="mi-dropzone">
-            <div class="dz-icon">📷</div>
-            <div class="dz-title">Rasm yuklang</div>
-            <div class="dz-sub">JPG, PNG, WebP · tavsiya: 600×600px kvadrat</div>
-            <input type="file" accept="image/*" id="mi-file">
-          </div>`}
+          ${item?.image_url ? `<div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px"><img src="${esc(item.image_url)}" id="mi-preview-img"><button type="button" class="up-remove" onclick="clearMenuImg()" title="O'chirish">✕</button></div><div style="margin-top:10px"><div class="dropzone" style="padding:12px 16px"><div class="dz-title" style="font-size:12px">Yangi rasm bilan almashtirish</div><input type="file" accept="image/*" id="mi-file"></div></div>` : `<div class="dropzone" id="mi-dropzone"><div class="dz-icon">📷</div><div class="dz-title">Rasm yuklang</div><div class="dz-sub">JPG, PNG, WebP · 600×600px</div><input type="file" accept="image/*" id="mi-file"></div>`}
         </div>
         <input type="hidden" name="image_url" id="mi-url" value="${esc(item?.image_url||'')}">
       </div>
-
-      <div class="toggle-row">
-        <div class="toggle-row-info"><div class="toggle-row-label">Mavjud</div><div class="toggle-row-sub">Mini-appda ko'rinadi</div></div>
-        <div class="toggle ${item?.is_available!==false?'on':''}" id="mi-avail" onclick="this.classList.toggle('on')"></div>
-      </div>
+      <div class="toggle-row"><div class="toggle-row-info"><div class="toggle-row-label">Mavjud</div><div class="toggle-row-sub">Mini-appda ko'rinadi</div></div><div class="toggle ${item?.is_available!==false?'on':''}" id="mi-avail" onclick="this.classList.toggle('on')"></div></div>
     </form>`,
     footer:`<button class="btn btn-ghost" onclick="closeModal()">Bekor</button><button class="btn btn-primary" id="save-menu-btn" onclick="saveMenu(${id||'null'})">💾 Saqlash</button>`
   });
-
-  // Rasm yuklash handler
   setTimeout(() => {
-    const fi = document.getElementById('mi-file');
-    if (!fi) return;
+    const fi = document.getElementById('mi-file'); if (!fi) return;
     fi.onchange = async e => {
       const f = e.target.files[0]; if (!f) return;
       const dz = document.getElementById('mi-dropzone');
       const wrap = document.getElementById('mi-preview-wrap');
-      if (dz) { dz.innerHTML = '<span class="spin"></span> Yuklanmoqda...'; }
+      if (dz) dz.innerHTML = '<span class="spin"></span> Yuklanmoqda...';
       try {
         const r = await uploadFile(f, 'image');
         document.getElementById('mi-url').value = r.url;
-        wrap.innerHTML = `
-          <div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px">
-            <img src="${r.url}" id="mi-preview-img">
-            <button type="button" class="up-remove" onclick="clearMenuImg()" title="O'chirish">✕</button>
-          </div>
-          <div style="margin-top:10px">
-            <div class="dropzone" style="padding:12px 16px"><div class="dz-title" style="font-size:12px">Yangi rasm bilan almashtirish</div><input type="file" accept="image/*" id="mi-file"></div>
-          </div>`;
-        // Reattach handler to new input
-        const newFi = document.getElementById('mi-file');
-        if (newFi) newFi.onchange = fi.onchange;
+        wrap.innerHTML = `<div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px"><img src="${r.url}" id="mi-preview-img"><button type="button" class="up-remove" onclick="clearMenuImg()" title="O'chirish">✕</button></div><div style="margin-top:10px"><div class="dropzone" style="padding:12px 16px"><div class="dz-title" style="font-size:12px">Yangi rasm bilan almashtirish</div><input type="file" accept="image/*" id="mi-file"></div></div>`;
+        const newFi = document.getElementById('mi-file'); if (newFi) newFi.onchange = fi.onchange;
         toast('✅ Rasm yuklandi', 'success');
-      } catch(err) {
-        toast(err.message, 'error');
-        if (dz) { dz.innerHTML = '<div class="dz-icon">📷</div><div class="dz-title">Qayta urinib ko\'ring</div><input type="file" accept="image/*" id="mi-file">'; }
-      }
+      } catch(err) { toast(err.message, 'error'); }
     };
   }, 100);
 };
-
 window.clearMenuImg = () => {
   const urlInput = document.getElementById('mi-url');
   const wrap = document.getElementById('mi-preview-wrap');
   if (urlInput) urlInput.value = '';
   if (wrap) {
-    wrap.innerHTML = `
-      <div class="dropzone" id="mi-dropzone">
-        <div class="dz-icon">📷</div>
-        <div class="dz-title">Rasm yuklang</div>
-        <div class="dz-sub">JPG, PNG, WebP · tavsiya: 600×600px kvadrat</div>
-        <input type="file" accept="image/*" id="mi-file">
-      </div>`;
-    const fi = document.getElementById('mi-file');
-    if (fi) fi.onchange = async e => { /* will be handled by openMenuModal's handler */ };
-    // Re-trigger the setup
+    wrap.innerHTML = `<div class="dropzone" id="mi-dropzone"><div class="dz-icon">📷</div><div class="dz-title">Rasm yuklang</div><div class="dz-sub">JPG, PNG, WebP · 600×600px</div><input type="file" accept="image/*" id="mi-file"></div>`;
     setTimeout(() => {
-      const fi2 = document.getElementById('mi-file');
-      if (!fi2) return;
+      const fi2 = document.getElementById('mi-file'); if (!fi2) return;
       fi2.onchange = async e => {
         const f = e.target.files[0]; if (!f) return;
         const dz2 = document.getElementById('mi-dropzone');
-        if (dz2) dz2.innerHTML = '<span class="spin"></span> Yuklanmoqda...';
+        if (dz2) dz2.innerHTML = '<span class="spin"></span>';
         try {
           const r = await uploadFile(f,'image');
           document.getElementById('mi-url').value = r.url;
-          document.getElementById('mi-preview-wrap').innerHTML = `
-            <div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px">
-              <img src="${r.url}">
-              <button type="button" class="up-remove" onclick="clearMenuImg()">✕</button>
-            </div>`;
+          document.getElementById('mi-preview-wrap').innerHTML = `<div class="upload-preview" style="max-width:100%;aspect-ratio:auto;height:160px"><img src="${r.url}"><button type="button" class="up-remove" onclick="clearMenuImg()">✕</button></div>`;
           toast('✅ Rasm yuklandi','success');
         } catch(err) { toast(err.message,'error'); }
       };
     }, 50);
   }
 };
-
 window.saveMenu = async id => {
   const btn = document.getElementById('save-menu-btn');
-  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span> Saqlanmoqda...'; }
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span>'; }
   const fd = new FormData(document.getElementById('mf'));
-  const body = {
-    name: fd.get('name'),
-    category: fd.get('category') || null,
-    description: fd.get('description') || null,
-    price: Number(fd.get('price')) || 0,
-    image_url: fd.get('image_url') || null,
-    is_available: document.getElementById('mi-avail')?.classList.contains('on') !== false
-  };
+  const body = { name:fd.get('name'), category:fd.get('category')||null, description:fd.get('description')||null, price:Number(fd.get('price'))||0, image_url:fd.get('image_url')||null, is_available:document.getElementById('mi-avail')?.classList.contains('on')!==false };
   try {
     if (id) await api(`/owner/menu/${id}`, { method:'PUT', body:JSON.stringify(body) });
-    else     await api('/owner/menu',        { method:'POST', body:JSON.stringify(body) });
-    toast('✅ Saqlandi', 'success');
-    closeModal(); await loadAll(); renderMenu();
-  } catch(e) {
-    toast(e.message, 'error');
-    if (btn) { btn.disabled=false; btn.innerHTML='💾 Saqlash'; }
-  }
+    else     await api('/owner/menu', { method:'POST', body:JSON.stringify(body) });
+    toast('✅ Saqlandi', 'success'); closeModal(); await loadAll(); renderMenu();
+  } catch(e) { toast(e.message, 'error'); if (btn) { btn.disabled=false; btn.innerHTML='💾 Saqlash'; } }
 };
 window.delMenu = async id => {
   if (!confirm("Bu taomni o'chirasizmi?")) return;
@@ -1256,11 +1366,9 @@ function renderZones() {
   ${S.zones.length ? `<div class="grid-cards stagger">${S.zones.map(z => `
     <div class="item-card" style="padding:0;overflow:hidden">
       ${z.image_url?`<img src="${esc(z.image_url)}" class="ic-img" style="height:120px;border-radius:0;margin-bottom:0" loading="lazy">`:`<div style="height:100px;background:linear-gradient(135deg,var(--bg4),var(--bg5));display:flex;align-items:center;justify-content:center;font-size:32px">🏛</div>`}
-      <div style="padding:14px">
-        <div class="ic-head"><div class="ic-name">${esc(z.name)}</div><div style="display:flex;gap:4px"><button class="row-action" onclick="openZoneModal(${z.id})">✏</button><button class="row-action danger" onclick="delZone(${z.id})">🗑</button></div></div>
-        ${z.description ? `<div class="ic-desc">${esc(z.description)}</div>` : ''}
-        <div class="ic-foot"><div><strong style="font-family:var(--fd);font-size:18px">${z.capacity||0}</strong> kishilik</div><span class="pill ${z.is_available!==false?'confirmed':'cancelled'}">${z.is_available!==false?'Faol':"Yopiq"}</span></div>
-      </div>
+      <div style="padding:14px"><div class="ic-head"><div class="ic-name">${esc(z.name)}</div><div style="display:flex;gap:4px"><button class="row-action" onclick="openZoneModal(${z.id})">✏</button><button class="row-action danger" onclick="delZone(${z.id})">🗑</button></div></div>
+      ${z.description ? `<div class="ic-desc">${esc(z.description)}</div>` : ''}
+      <div class="ic-foot"><div><strong style="font-family:var(--fd);font-size:18px">${z.capacity||0}</strong> kishilik</div><span class="pill ${z.is_available!==false?'confirmed':'cancelled'}">${z.is_available!==false?'Faol':"Yopiq"}</span></div></div>
     </div>`).join('')}</div>`
   : `<div class="empty" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r2)"><div class="icon">🏗</div><h3>Zonalar yo'q</h3></div>`}`;
 }
@@ -1269,15 +1377,12 @@ window.openZoneModal = (id=null) => {
   openModal({
     title: z ? '<em>Zona tahrirlash</em>' : 'Yangi <em>zona</em>',
     body: `<form id="zf">
-      <div class="field"><label class="field-label">Nomi</label><input class="field-input" name="name" required value="${esc(z?.name||'')}" placeholder="VIP zal, Terassa, Asosiy zal..."></div>
+      <div class="field"><label class="field-label">Nomi</label><input class="field-input" name="name" required value="${esc(z?.name||'')}" placeholder="VIP zal, Terassa..."></div>
       <div class="field"><label class="field-label">Tavsif</label><input class="field-input" name="description" value="${esc(z?.description||'')}"></div>
       <div class="field"><label class="field-label">Sig'imi (kishi)</label><input class="field-input" name="capacity" type="number" required value="${z?.capacity||''}"></div>
-      <div class="field"><label class="field-label">Zona rasmi <span style="color:var(--ink3);font-weight:400">(mini-appda bron jarayonida ko'rinadi)</span></label>
+      <div class="field"><label class="field-label">Zona rasmi</label>
         <div id="zi-prev">${z?.image_url?`<div class="upload-preview" style="height:130px"><img src="${esc(z.image_url)}"><button type="button" class="up-remove" onclick="document.getElementById('zi-url').value='';document.getElementById('zi-prev').innerHTML='';document.getElementById('zi-dz').style.display=''">✕</button></div>`:''}</div>
-        <div class="dropzone" id="zi-dz" style="${z?.image_url?'display:none':''}">
-          <div class="dz-icon">🖼</div><div class="dz-title">Zona rasmi</div><div class="dz-sub">Bron qilishda ko'rinadi</div>
-          <input type="file" accept="image/*" id="zi-file">
-        </div>
+        <div class="dropzone" id="zi-dz" style="${z?.image_url?'display:none':''}"><div class="dz-icon">🖼</div><div class="dz-title">Zona rasmi</div><input type="file" accept="image/*" id="zi-file"></div>
         <input type="hidden" name="image_url" id="zi-url" value="${esc(z?.image_url||'')}">
       </div>
     </form>`,
@@ -1288,24 +1393,16 @@ window.openZoneModal = (id=null) => {
     fi.onchange = async e => {
       const f = e.target.files[0]; if (!f) return;
       const dz = document.getElementById('zi-dz'); if (dz) dz.innerHTML='<span class="spin"></span>';
-      try {
-        const r = await uploadFile(f,'image');
-        document.getElementById('zi-url').value = r.url;
-        document.getElementById('zi-prev').innerHTML = `<div class="upload-preview" style="height:130px"><img src="${r.url}"><button type="button" class="up-remove" onclick="document.getElementById('zi-url').value='';document.getElementById('zi-prev').innerHTML='';document.getElementById('zi-dz').style.display=''">✕</button></div>`;
-        if (dz) dz.style.display='none';
-        toast('Rasm yuklandi','success');
-      } catch(err) { toast(err.message,'error'); }
+      try { const r = await uploadFile(f,'image'); document.getElementById('zi-url').value = r.url; document.getElementById('zi-prev').innerHTML = `<div class="upload-preview" style="height:130px"><img src="${r.url}"><button type="button" class="up-remove" onclick="document.getElementById('zi-url').value='';document.getElementById('zi-prev').innerHTML='';document.getElementById('zi-dz').style.display=''">✕</button></div>`; if (dz) dz.style.display='none'; toast('Rasm yuklandi','success'); }
+      catch(err) { toast(err.message,'error'); }
     };
   }, 100);
 };
 window.saveZone = async id => {
   const fd = new FormData(document.getElementById('zf'));
   const body = { name:fd.get('name'), description:fd.get('description'), capacity:Number(fd.get('capacity')), image_url:fd.get('image_url')||null };
-  try {
-    if (id) await api(`/owner/zones/${id}`,{method:'PUT',body:JSON.stringify(body)});
-    else     await api('/owner/zones',{method:'POST',body:JSON.stringify(body)});
-    toast('Saqlandi','success'); closeModal(); await loadAll(); renderZones();
-  } catch(e) { toast(e.message,'error'); }
+  try { if (id) await api(`/owner/zones/${id}`,{method:'PUT',body:JSON.stringify(body)}); else await api('/owner/zones',{method:'POST',body:JSON.stringify(body)}); toast('Saqlandi','success'); closeModal(); await loadAll(); renderZones(); }
+  catch(e) { toast(e.message,'error'); }
 };
 window.delZone = async id => {
   if (!confirm("O'chirish?")) return;
@@ -1345,12 +1442,9 @@ window.openTableModal = (id=null) => {
         <div class="field" style="margin:0"><label class="field-label">Stol raqami</label><input class="field-input" name="table_number" required value="${esc(tb?.table_number||'')}"></div>
         <div class="field" style="margin:0"><label class="field-label">Sig'imi</label><input class="field-input" name="capacity" type="number" required value="${tb?.capacity||4}"></div>
       </div>
-      <div class="field"><label class="field-label">Stol rasmi <span style="color:var(--ink3);font-weight:400">(mini-appda ko'rinadi)</span></label>
+      <div class="field"><label class="field-label">Stol rasmi</label>
         <div id="ti-prev">${tb?.image_url?`<div class="upload-preview" style="height:130px"><img src="${esc(tb.image_url)}"><button type="button" class="up-remove" onclick="document.getElementById('ti-url').value='';document.getElementById('ti-prev').innerHTML='';document.getElementById('ti-dz').style.display=''">✕</button></div>`:''}</div>
-        <div class="dropzone" id="ti-dz" style="${tb?.image_url?'display:none':''}">
-          <div class="dz-icon">📷</div><div class="dz-title">Stol rasmi</div><div class="dz-sub">Bron qilishda ko'rsatiladi</div>
-          <input type="file" accept="image/*" id="ti-file">
-        </div>
+        <div class="dropzone" id="ti-dz" style="${tb?.image_url?'display:none':''}"><div class="dz-icon">📷</div><div class="dz-title">Stol rasmi</div><input type="file" accept="image/*" id="ti-file"></div>
         <input type="hidden" name="image_url" id="ti-url" value="${esc(tb?.image_url||'')}">
       </div>
     </form>`,
@@ -1361,29 +1455,254 @@ window.openTableModal = (id=null) => {
     fi.onchange = async e => {
       const f = e.target.files[0]; if (!f) return;
       const dz = document.getElementById('ti-dz'); if (dz) dz.innerHTML='<span class="spin"></span>';
-      try {
-        const r = await uploadFile(f,'image');
-        document.getElementById('ti-url').value = r.url;
-        document.getElementById('ti-prev').innerHTML = `<div class="upload-preview" style="height:130px"><img src="${r.url}"><button type="button" class="up-remove" onclick="document.getElementById('ti-url').value='';document.getElementById('ti-prev').innerHTML='';document.getElementById('ti-dz').style.display=''">✕</button></div>`;
-        if (dz) dz.style.display='none';
-        toast('Rasm yuklandi','success');
-      } catch(err) { toast(err.message,'error'); }
+      try { const r = await uploadFile(f,'image'); document.getElementById('ti-url').value = r.url; document.getElementById('ti-prev').innerHTML = `<div class="upload-preview" style="height:130px"><img src="${r.url}"><button type="button" class="up-remove" onclick="document.getElementById('ti-url').value='';document.getElementById('ti-prev').innerHTML='';document.getElementById('ti-dz').style.display=''">✕</button></div>`; if (dz) dz.style.display='none'; toast('Rasm yuklandi','success'); }
+      catch(err) { toast(err.message,'error'); }
     };
   }, 100);
 };
 window.saveTable = async (id=null) => {
   const fd = new FormData(document.getElementById('tf'));
   const body = { zone_id:Number(fd.get('zone_id')), table_number:fd.get('table_number'), capacity:Number(fd.get('capacity')), image_url:fd.get('image_url')||null };
-  try {
-    if (id) await api(`/owner/tables/${id}`,{method:'PUT',body:JSON.stringify(body)});
-    else     await api('/owner/tables',{method:'POST',body:JSON.stringify(body)});
-    toast('Saqlandi','success'); closeModal(); await loadAll(); renderTables();
-  } catch(e) { toast(e.message,'error'); }
+  try { if (id) await api(`/owner/tables/${id}`,{method:'PUT',body:JSON.stringify(body)}); else await api('/owner/tables',{method:'POST',body:JSON.stringify(body)}); toast('Saqlandi','success'); closeModal(); await loadAll(); renderTables(); }
+  catch(e) { toast(e.message,'error'); }
 };
 window.delTable = async id => {
   if (!confirm("O'chirish?")) return;
   try { await api(`/owner/tables/${id}`,{method:'DELETE'}); toast("O'chirildi",'success'); await loadAll(); renderTables(); }
   catch(e) { toast(e.message,'error'); }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: PREMIUM KATALOG
+═══════════════════════════════════════════════════════════ */
+function renderPremium() {
+  // Premium katalog = Business+ feature (top_placement)
+  if (!hasFeature('top_placement')) {
+    $('#page-wrap').innerHTML = `
+    <div class="page-head"><div><div class="eyebrow">Katalog</div><h1>Premium <em>katalog</em></h1></div></div>
+    ${renderLockedPage('Premium katalog joylashuvi', 'business')}`;
+    return;
+  }
+  const ip = S.restaurant?.is_premium;
+  $('#page-wrap').innerHTML = `
+  <div class="page-head"><div><div class="eyebrow">Katalog</div><h1>Premium <em>katalog</em></h1></div></div>
+  <div style="background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--accent);border-radius:var(--r3);padding:40px;margin-bottom:24px">
+    <div style="display:inline-flex;padding:5px 12px;background:var(--accent);color:#fff;border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">${ip?'✓ Faol':'Yangi'}</div>
+    <h2 style="font-family:var(--fd);font-size:38px;font-weight:300;line-height:1;margin-bottom:16px">Restoraningizni<br><em style="font-style:italic;color:var(--accent);font-weight:200">ko'rinarli qiling</em></h2>
+    <p style="color:var(--ink2);max-width:460px;margin-bottom:28px">Business va Elite tariflaridagi restoranlar katalogda yuqorida ko'rsatiladi.</p>
+    ${ip ? `<div style="display:inline-flex;padding:14px 20px;background:var(--green-s);border:1px solid rgba(107,155,111,.3);border-radius:var(--r2)"><div style="color:var(--green);font-weight:700">✓ Top joylashuv faol</div></div>` : `<div class="info-box success">✅ Business tarifingiz faol — restoraningiz katalogda premium joylashuvda ko'rsatiladi.</div>`}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: SUBSCRIPTION (TARIF)  — NEW
+═══════════════════════════════════════════════════════════ */
+function renderSubscription() {
+  const sub = S.subscription;
+  const plan = getCurrentPlan();
+  const st = getSubStatus();
+  const days = getDaysLeft();
+  const pct = sub?.expires_at && sub?.started_at
+    ? Math.min(100, Math.round((new Date() - new Date(sub.started_at)) / (new Date(sub.expires_at) - new Date(sub.started_at)) * 100))
+    : 0;
+
+  // Timer card
+  let timerCard = '';
+  if (sub) {
+    const isWarn = days !== null && days <= 7;
+    const isDanger = st === 'grace_period' || st === 'expired';
+    timerCard = `<div class="sub-timer ${isDanger?'danger':isWarn?'warn':''}">
+      <div class="st-icon">${isDanger?'🚨':isWarn?'⏳':'✅'}</div>
+      <div class="st-body">
+        <div class="st-title">${PLAN_NAMES[plan] || plan} · <span class="pill ${st}">${st==='trial'?"Bepul sinov":st==='active'?"Faol":st==='grace_period'?"Grace period":st==='expired'?"Muddati tugagan":"Noma'lum"}</span></div>
+        <div style="margin:6px 0">
+          ${sub.expires_at ? `<div class="progress-bar"><div class="progress-bar-fill ${isDanger?'rose':isWarn?'gold':'green'}" style="width:${pct}%"></div></div>` : ''}
+          <div class="st-sub">${sub.expires_at ? `Tugaydi: ${fmtDate(sub.expires_at)} · ${days !== null ? days+' kun qoldi' : ''}` : "Muddatsiz"}</div>
+        </div>
+      </div>
+      ${st !== 'expired' ? `<button class="btn btn-primary btn-sm" onclick="document.getElementById('plan-select-section').scrollIntoView({behavior:'smooth'})">Yangilash</button>` : ''}
+    </div>`;
+  }
+
+  // Plan definitions
+  const PLANS = [
+    {
+      key: 'basic', name:'Basic', price:'499 000', period:'oy',
+      desc:'Kichik kafe va restoranlar uchun',
+      features: ['Cheksiz bronlar','Cheksiz stollar','Depozit tizimi','Mijoz CRM','Asosiy analitika'],
+      no: ['Reels (qisqa video)','Marketing vositalari','Top katalog joylashuvi','AI analitika']
+    },
+    {
+      key:'business', name:'Business', price:'999 000', period:'oy',
+      desc:"O'rta va rivojlanayotgan restoranlar uchun", recommended:true,
+      features: ['Cheksiz bronlar','Depozit tizimi','Reels (qisqa video)','Kengaytirilgan analitika','Marketing vositalari','Premium katalog joylashuvi'],
+      no: ['AI analitika','Prioritet qo\'llab-quvvatlash']
+    },
+    {
+      key:'elite', name:'Elite', price:'1 999 000', period:'oy',
+      desc:"Premium restoran va peshqadam korxonalar uchun",
+      features: ['Hammasi', 'AI analitika va bashorat','Top katalog joylashuvi','Prioritet qo\'llab-quvvatlash','Kengaytirilgan marketing'],
+      no: []
+    },
+    {
+      key:'chain', name:'Chain', price:'Individual', period:'',
+      desc:'5+ filial va zanjir restoranlar uchun',
+      features: ['White-label yechim','API integratsiya','Shaxsiy menejer','Hammasi Elite\'dan'],
+      no: []
+    }
+  ];
+
+  $('#page-wrap').innerHTML = `
+  <div class="page-head">
+    <div><div class="eyebrow">Tarif</div><h1>Tarif & <em>To'lov</em></h1></div>
+    <button class="btn btn-ghost" onclick="loadAll().then(()=>renderSubscription())">↻ Yangilash</button>
+  </div>
+
+  ${timerCard}
+
+  <!-- Payment history -->
+  ${sub?.payments?.length ? `
+  <div class="panel" style="margin-bottom:24px">
+    <div class="panel-head"><div class="panel-title">To'lov <em>tarixi</em></div></div>
+    <div style="overflow-x:auto"><table class="data-table">
+      <thead><tr><th>Tarif</th><th>Summa</th><th>Holat</th><th>Sana</th><th>Izoh</th></tr></thead>
+      <tbody>${sub.payments.map(p=>`<tr>
+        <td><div class="name">${PLAN_NAMES[p.plan]||p.plan||'—'}</div></td>
+        <td>${p.amount ? fmt(p.amount)+' so\'m' : '—'}</td>
+        <td><span class="pill ${p.status||'pending'}">${p.status==='approved'?'Tasdiqlangan':p.status==='rejected'?'Rad etildi':p.status==='pending'?'Kutilmoqda':p.status||'—'}</span></td>
+        <td style="font-size:12px">${fmtDatetime(p.created_at)}</td>
+        <td style="font-size:12px;color:var(--ink3)">${esc(p.admin_note||p.rejected_reason||'—')}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>` : ''}
+
+  <!-- Plan selector -->
+  <div id="plan-select-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="eyebrow">Tarifni tanlang</div>
+      <div style="font-size:12px;color:var(--ink3)">To'lov: Click / Payme / Uzum (tez kunda)</div>
+    </div>
+    <div class="info-box info" style="margin-bottom:20px">
+      💳 <strong>Hozirgi to'lov usuli:</strong> Karta o'tkazma. Tarif tanlangach karta ma'lumotlari va summa ko'rsatiladi. Screenshot yuborasiz — admin 1-2 soat ichida tasdiqlaydi.
+    </div>
+    <div class="plan-cards stagger">
+      ${PLANS.map(p => `
+      <div class="plan-card ${plan===p.key?'current':''} ${p.recommended&&plan!==p.key?'recommended':''}">
+        ${plan===p.key ? '<div class="pc-tag green">✓ Hozirgi tarif</div>' : p.recommended ? '<div class="pc-tag accent">⭐ Tavsiya</div>' : ''}
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-price">${p.price} <small>${p.period ? 'so\'m/'+p.period : 'narx kelishiladi'}</small></div>
+        <div class="pc-desc">${p.desc}</div>
+        <div class="pc-features">
+          ${p.features.map(f=>`<div class="pc-feature yes">${f}</div>`).join('')}
+          ${p.no.map(f=>`<div class="pc-feature no">${f}</div>`).join('')}
+        </div>
+        ${plan===p.key
+          ? `<div class="btn btn-ghost btn-block" style="cursor:default;opacity:.6">Faol tarif</div>`
+          : p.key === 'chain'
+            ? `<button class="btn btn-ghost btn-block" onclick="contactChain()">Bog'lanish</button>`
+            : `<button class="btn ${p.recommended?'btn-primary':'btn-ghost'} btn-block" onclick="openPaymentModal('${p.key}','${p.price}')">Tanlash</button>`
+        }
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="panel" style="margin-top:24px">
+    <div class="panel-head"><div class="panel-title">Ko'p so'raladigan <em>savollar</em></div></div>
+    <div class="panel-body" style="display:flex;flex-direction:column;gap:14px">
+      <div><div style="font-weight:700;margin-bottom:4px">Trial davri tugagandan so'ng nima bo'ladi?</div><div style="font-size:13px;color:var(--ink3)">3 kun grace period beriladi. Shu vaqt ichida tarif tanlamagan bo'lsangiz, hisobingiz faqat o'qish rejimiga o'tadi va yangi bronlar qabul qilinmaydi.</div></div>
+      <div><div style="font-weight:700;margin-bottom:4px">To'lov qanday amalga oshiriladi?</div><div style="font-size:13px;color:var(--ink3)">Hozircha: karta o'tkazmasi orqali. Tez orada Click, Payme va Uzum integratsiyasi qo'shiladi.</div></div>
+      <div><div style="font-weight:700;margin-bottom:4px">Ma'lumotlarim saqlanadimi?</div><div style="font-size:13px;color:var(--ink3)">Ha, tarif tugaganda yoki o'zgartirilganda barcha ma'lumotlaringiz (bronlar, menyu, stollar) to'liq saqlanadi.</div></div>
+    </div>
+  </div>`;
+}
+
+/* ── Payment modal ── */
+window.openPaymentModal = (planKey, price) => {
+  const planName = PLAN_NAMES[planKey] || planKey;
+  // Card info from restaurant settings (or fallback)
+  const card = S.restaurant?.deposit_card_masked || '**** **** **** ****';
+  const holder = S.restaurant?.deposit_card_holder || 'Egasi';
+  const bank = S.restaurant?.deposit_bank_name || '';
+  openModal({
+    title: `💎 <em>${planName}</em> tarifga o'tish`,
+    body: `<div style="display:flex;flex-direction:column;gap:18px">
+      <div class="info-box info">To'lov amalga oshirilgandan keyin screenshot yuboring. Admin 1-2 soat ichida tasdiqlab, tarif avtomatik faollashadi.</div>
+      <!-- Karta ma'lumotlari -->
+      <div style="background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--r2);padding:22px;color:#fff">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.15em;opacity:.7;margin-bottom:12px">TO'LOV KARTASI</div>
+        <div style="font-family:var(--fm);font-size:20px;font-weight:600;letter-spacing:.1em;margin-bottom:12px">${esc(card)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <div><div style="font-size:9px;opacity:.7">KARTA EGASI</div><div style="font-weight:700">${esc(holder)}</div></div>
+          ${bank?`<div><div style="font-size:9px;opacity:.7">BANK</div><div style="font-weight:700">${esc(bank)}</div></div>`:''}
+          <div><div style="font-size:9px;opacity:.7">SUMMA</div><div style="font-family:var(--fm);font-weight:800;font-size:18px">${price} so'm</div></div>
+        </div>
+      </div>
+      <!-- Izoh -->
+      <div style="padding:12px 16px;background:var(--gold-s);border:1px solid rgba(212,160,91,.3);border-radius:var(--r);font-size:13px;color:var(--gold)">
+        ⚠️ To'lov izohiga email manzilingizni yoki restoran nomini yozing.
+      </div>
+      <!-- Screenshot yuklash -->
+      <div>
+        <label class="field-label">To'lov screenshoti *</label>
+        <div class="dropzone" id="pay-dz"><div class="dz-icon">📸</div><div class="dz-title">Screenshot yuklang</div><div class="dz-sub">PNG, JPG · bank ilovasi yoki SMS</div><input type="file" accept="image/*" id="pay-file" onchange="handlePayScreenshot(this)"></div>
+        <div id="pay-preview"></div>
+        <input type="hidden" id="pay-screenshot-url">
+      </div>
+      <div class="field" style="margin:0">
+        <label class="field-label">Reference / Izoh raqam</label>
+        <input class="field-input" id="pay-ref" placeholder="To'lov cheki raqami (ixtiyoriy)">
+      </div>
+    </div>`,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Bekor</button>
+    <button class="btn btn-primary" id="pay-submit-btn" onclick="submitPayment('${planKey}','${price}')">📤 Yuborish</button>`
+  });
+};
+
+window.handlePayScreenshot = async input => {
+  const f = input.files[0]; if (!f) return;
+  const dz = document.getElementById('pay-dz');
+  if (dz) dz.innerHTML = '<span class="spin"></span> Yuklanmoqda...';
+  try {
+    const r = await uploadFile(f, 'image');
+    document.getElementById('pay-screenshot-url').value = r.url;
+    document.getElementById('pay-preview').innerHTML = `<img src="${r.url}" style="width:100%;max-height:220px;object-fit:contain;border-radius:var(--r);margin-top:10px;border:1px solid var(--line)">`;
+    if (dz) dz.style.display = 'none';
+    toast('✅ Screenshot yuklandi', 'success');
+  } catch(e) { toast(e.message, 'error'); if (dz) dz.innerHTML = '<div class="dz-icon">📸</div><div class="dz-title">Qayta urinib ko\'ring</div><input type="file" accept="image/*" id="pay-file" onchange="handlePayScreenshot(this)">'; }
+};
+
+window.submitPayment = async (planKey, price) => {
+  const screenshotUrl = document.getElementById('pay-screenshot-url').value;
+  const ref = document.getElementById('pay-ref')?.value || '';
+  if (!screenshotUrl) { toast('Iltimos, to\'lov screenshotini yuklang', 'error'); return; }
+  const btn = document.getElementById('pay-submit-btn');
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span> Yuklanmoqda...'; }
+  try {
+    await api('/owner/subscription/request', {
+      method: 'POST',
+      body: JSON.stringify({ plan: planKey, screenshot_url: screenshotUrl, payment_reference: ref })
+    });
+    closeModal();
+    toast('✅ To\'lov yuborildi! Admin 1-2 soat ichida tasdiqlaydi.', 'success');
+    await loadAll(); renderSubscription();
+  } catch(e) {
+    toast(e.message, 'error');
+    if (btn) { btn.disabled=false; btn.innerHTML='📤 Yuborish'; }
+  }
+};
+
+window.contactChain = () => {
+  openModal({
+    title: '🔗 Chain <em>tarifi</em>',
+    body: `<div style="text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:16px">🏢</div>
+      <h3 style="font-family:var(--fd);font-size:24px;margin-bottom:8px">5+ filial uchun maxsus taklif</h3>
+      <p style="color:var(--ink3);margin-bottom:24px">White-label, API integratsiya va shaxsiy menejer. Narx va shartlar individual kelishiladi.</p>
+      <a href="https://t.me/onetable_support" target="_blank" class="btn btn-primary btn-lg">Telegram orqali bog'lanish</a>
+    </div>`,
+    footer:`<button class="btn btn-ghost" onclick="closeModal()">Yopish</button>`
+  });
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -1404,7 +1723,7 @@ function renderRestaurant() {
     <div class="field"><label class="field-label">Restoran nomi</label><input class="field-input" name="name" required value="${esc(r.name||'')}"></div>
     <div class="field"><label class="field-label">Tavsif</label><textarea class="field-input" name="description" rows="3">${esc(r.description||'')}</textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-      <div class="field" style="margin:0"><label class="field-label">Ish vaqti</label><input class="field-input" name="working_hours" value="${esc(r.working_hours||'10:00-23:00')}" placeholder="10:00-23:00"></div>
+      <div class="field" style="margin:0"><label class="field-label">Ish vaqti</label><input class="field-input" name="working_hours" value="${esc(r.working_hours||'10:00-23:00')}"></div>
       <div class="field" style="margin:0"><label class="field-label">Sig'im</label><input class="field-input" name="capacity" type="number" value="${r.capacity||50}"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -1506,55 +1825,23 @@ function renderLocation() {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PAGE: PREMIUM
-═══════════════════════════════════════════════════════════ */
-function renderPremium() {
-  const ip = S.restaurant?.is_premium;
-  $('#page-wrap').innerHTML = `
-  <div class="page-head"><div><div class="eyebrow">Obuna</div><h1>OneTable <em>Premium</em></h1></div></div>
-  <div style="background:linear-gradient(135deg,#1B1814,#2A1814);border:1px solid var(--accent);border-radius:var(--r3);padding:40px;margin-bottom:24px">
-    <div style="display:inline-flex;padding:5px 12px;background:var(--accent);color:var(--ink);border-radius:100px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">${ip?'✓ Faol':'Yangi'}</div>
-    <h2 style="font-family:var(--fd);font-size:38px;font-weight:300;line-height:1;margin-bottom:16px">Restoraningizni<br><em style="font-style:italic;color:var(--accent);font-weight:200">ko'rinarli qiling</em></h2>
-    <p style="color:var(--ink2);max-width:460px;margin-bottom:28px">Premium restoranlar ro'yxat boshida, verified belgisi, to'liq analitika.</p>
-    ${!ip ? `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:500px">
-      <div style="background:var(--bg3);border:1.5px solid var(--line);border-radius:var(--r2);padding:22px;cursor:pointer;transition:border-color .2s" onmouseover="this.style.borderColor='var(--line3)'" onmouseout="this.style.borderColor='var(--line)'" onclick="reqPrem('monthly')">
-        <div style="font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Oylik</div>
-        <div style="font-family:var(--fd);font-size:30px">150 000 <small style="font-family:var(--fb);font-size:11px;color:var(--ink3)">so'm/oy</small></div>
-      </div>
-      <div style="background:var(--bg3);border:1.5px solid var(--accent);border-radius:var(--r2);padding:22px;cursor:pointer" onclick="reqPrem('yearly')">
-        <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Yillik · −33%</div>
-        <div style="font-family:var(--fd);font-size:30px">1 200 000 <small style="font-family:var(--fb);font-size:11px;color:var(--ink3)">so'm/yil</small></div>
-      </div>
-    </div>` : `<div style="display:inline-flex;padding:14px 20px;background:var(--green-s);border:1px solid rgba(107,155,111,.3);border-radius:var(--r2)"><div style="color:var(--green);font-weight:700">✓ Premium faol</div></div>`}
-  </div>`;
-}
-window.reqPrem = async plan => {
-  try {
-    const r = await api('/owner/premium/request',{method:'POST',body:JSON.stringify({plan})});
-    const p = r?.payment_instructions||{};
-    openModal({ title:"💳 To'lov ma'lumoti", body:`<div style="line-height:1.7"><p style="color:var(--ink3);margin-bottom:16px">Karta raqamiga o'tkazma qiling:</p><div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:18px"><div class="eyebrow">Karta</div><div style="font-family:var(--fm);font-size:18px;font-weight:700;margin-top:4px">${p.card_number||'—'}</div></div><div class="eyebrow">Summa</div><div style="font-family:var(--fd);font-size:28px;color:var(--accent);margin-top:4px">${fmt(p.amount||0)} so'm</div></div>`,
-      footer:`<button class="btn btn-primary" onclick="closeModal()">Tushunarli</button>`});
-  } catch(e) { toast(e.message,'error'); }
-};
-
-/* ═══════════════════════════════════════════════════════════
    NAVIGATION
 ═══════════════════════════════════════════════════════════ */
 const pages = {
-  overview: renderOverview,
-  today: renderToday,
-  reservations: renderReservations,
-  deposits: renderDeposits,
-  analytics: renderAnalytics,
-  media: renderMedia,
-  menu: renderMenu,
-  zones: renderZones,
-  tables: renderTables,
-  restaurant: renderRestaurant,
+  overview:         renderOverview,
+  today:            renderToday,
+  reservations:     renderReservations,
+  deposits:         renderDeposits,
+  analytics:        renderAnalytics,
+  media:            renderMedia,
+  menu:             renderMenu,
+  zones:            renderZones,
+  tables:           renderTables,
+  restaurant:       renderRestaurant,
   'deposit-settings': renderDepositSettings,
-  location: renderLocation,
-  premium: renderPremium
+  location:         renderLocation,
+  premium:          renderPremium,
+  subscription:     renderSubscription   /* ← NEW */
 };
 
 function navigate(p) {
@@ -1583,8 +1870,13 @@ async function initApp() {
     const startPage = S.restaurant?.id ? 'overview' : 'restaurant';
     navigate(startPage);
     if (!S.restaurant?.id) toast("Restoran profilingizni to'ldiring");
+
+    // Deposit pending notification
     const pd = S.deposits.filter(d=>['payment_submitted','under_review'].includes(d.status)).length;
     if (pd > 0) setTimeout(() => toast(`💳 ${pd} ta depozit ko'rib chiqishni kutmoqda`, 'warn'), 1500);
+
+    // Subscription status check  ← NEW
+    checkSubscriptionModal();
   } catch(e) { toast("Yuklab bo'lmadi",'error'); console.error(e); }
 }
 
