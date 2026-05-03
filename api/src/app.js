@@ -57,16 +57,19 @@ app.use(xssProtection)
 app.use(requestLogger)
 app.set('trust proxy', 1)
 
-// ── Static: uploads ──────────────────────────────────────────
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads')
-if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true })
-app.use('/uploads', express.static(UPLOAD_DIR, {
-  maxAge: '7d',
-  setHeaders: (res) => {
-    res.setHeader('Cache-Control', 'public, max-age=604800')
-    res.setHeader('Access-Control-Allow-Origin', '*')
-  }
-}))
+// ── Legacy: eski rasmlar uchun /uploads static (migratsiya davrida) ──
+// Eslatma: yangi rasmlar ImageKit'ga yuklanadi va doimiy URL oladi.
+// Bu papka faqat eski rasmlar uchun saqlanadi (agar bo'lsa)
+const LEGACY_UPLOAD_DIR = path.join(__dirname, '..', 'uploads')
+if (fs.existsSync(LEGACY_UPLOAD_DIR)) {
+  app.use('/uploads', express.static(LEGACY_UPLOAD_DIR, {
+    maxAge: '7d',
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800')
+      res.setHeader('Access-Control-Allow-Origin', '*')
+    }
+  }))
+}
 
 // ── Static: webapp ───────────────────────────────────────────
 const WEBAPP_DIR = path.join(__dirname, '..', '..', 'webapp')
@@ -81,7 +84,6 @@ if (fs.existsSync(WEBAPP_DIR)) {
   })
 
   // ── /dashboard — Dashboard (dashboard.html) ──
-  // express.static YO'Q — aks holda index.html qaytariladi
   app.get('/dashboard', (req, res) => {
     const fp = path.join(WEBAPP_DIR, 'dashboard.html')
     if (fs.existsSync(fp)) res.sendFile(fp)
@@ -124,6 +126,9 @@ app.use('/api', apiRateLimiter)
 app.use('/api/auth', authRateLimiter)
 app.use('/api/owner/login', authRateLimiter)
 app.use('/api/owner/register', authRateLimiter)
+
+// ── ImageKit upload routes (Railway redeploy'dan keyin rasmlar qoladi) ──
+require('./uploads-imagekit').registerUploadRoutes(app, null)
 
 // ── API routes ───────────────────────────────────────────────
 app.use('/api', require('./routes'))
