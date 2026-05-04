@@ -31,7 +31,7 @@ const state = { langs: {}, reviews: {}, ai: {}, aiHistory: {} }
 
 const i18n = {
   uz: {
-    welcome: n => `Salom, ${n}! 👋\n\n🍽 OneTable — Toshkentdagi eng yaxshi restoranlar.`,
+    welcome: n => `Salom, ${n}! 👋\n\n🍽 OneTable — Restoran bron qilishni osonlashtiramiz.`,
     btn_open: '🍽 Restoranlar',
     btn_bookings: '📅 Bronlarim',
     btn_ai: '🤖 AI Yordamchi',
@@ -47,7 +47,7 @@ const i18n = {
     ai_exit: '👋 AI o\'chirildi.'
   },
   ru: {
-    welcome: n => `Привет, ${n}! 👋\n\n🍽 OneTable — лучшие рестораны Ташкента.`,
+    welcome: n => `Привет, ${n}! 👋\n\n🍽 OneTable — Упрощаем бронирование столиков в ресторанах.`,
     btn_open: '🍽 Рестораны',
     btn_bookings: '📅 Мои брони',
     btn_ai: '🤖 AI',
@@ -63,7 +63,7 @@ const i18n = {
     ai_exit: '👋 AI выключен.'
   },
   en: {
-    welcome: n => `Hello, ${n}! 👋\n\n🍽 OneTable — best restaurants in Tashkent.`,
+    welcome: n => `Hello, ${n}! 👋\n\n🍽 OneTable — Simplifying restaurant table reservations.`,
     btn_open: '🍽 Restaurants',
     btn_bookings: '📅 Bookings',
     btn_ai: '🤖 AI',
