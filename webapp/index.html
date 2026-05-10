@@ -90,22 +90,58 @@ img,video{display:block;max-width:100%}
 .search input{flex:1;border:none;background:none;font-size:14.5px}
 .search input::placeholder{color:var(--ink4)}
 
-/* ── SMART FILTER ── */
-.smart-filter-panel{margin:8px 20px 10px;padding:14px;border-radius:var(--r3);background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--sh2);backdrop-filter:blur(16px)}
+/* ══════════════════════════════════════
+   SMART FILTER — COMPLETELY REWORKED
+══════════════════════════════════════ */
+.smart-filter-panel{margin:8px 20px 10px;border-radius:var(--r3);background:var(--glass-bg);border:1px solid var(--glass-border);box-shadow:var(--sh2);backdrop-filter:blur(16px);overflow:hidden}
 [data-theme="dark"] .smart-filter-panel{background:rgba(30,24,20,.80)}
-.smart-filter-title{font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px 4px}
-.smart-filter-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.smart-field{min-width:0;height:46px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg2);display:flex;align-items:center;gap:8px;padding:0 12px;transition:border-color .22s ease,box-shadow .22s ease,transform .22s var(--spring)}
-.smart-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(var(--accentRgb),.11);transform:translateY(-1px)}
-.smart-field span{font-size:16px;flex-shrink:0}
-.smart-field input{width:100%;border:0;background:transparent;font-size:13px;font-weight:700;color:var(--ink)}
-.smart-field input::placeholder{font-weight:600;color:var(--ink4)}
-.smart-filter-actions{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
-.smart-search-btn{height:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 10px 24px -12px rgba(var(--accentRgb),.65);padding:0 18px;transition:transform .22s var(--spring),opacity .22s ease}
-.smart-search-btn:active{transform:scale(.96)}
-.smart-reset-btn{height:44px;border-radius:14px;background:var(--bg3);color:var(--ink3);font-size:12px;font-weight:800;padding:0 14px;border:1px solid var(--line)}
-.smart-filter-note{font-size:11.5px;color:var(--ink3);font-weight:650;line-height:1.35;margin-top:9px;padding:8px 10px;border-radius:12px;background:var(--bg3);display:none}
-.smart-filter-note.show{display:block}
+
+/* Header toggle */
+.sfp-header{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;user-select:none}
+.sfp-header-left{display:flex;align-items:center;gap:9px}
+.sfp-header-icon{width:28px;height:28px;border-radius:8px;background:rgba(var(--accentRgb),.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px}
+.sfp-header-title{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.sfp-header-badge{padding:3px 9px;border-radius:100px;background:var(--accent);color:#fff;font-size:10px;font-weight:800}
+.sfp-chevron{color:var(--ink3);font-size:14px;transition:transform .3s var(--spring)}
+.sfp-chevron.open{transform:rotate(180deg)}
+
+/* Collapsible body */
+.sfp-body{padding:0 14px 14px;display:none}
+.sfp-body.open{display:block}
+
+/* Quick price chips */
+.sfp-section-label{font-size:9.5px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:9px}
+.sfp-price-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.sfp-price-chip{padding:8px 14px;border-radius:100px;border:1.5px solid var(--line);background:var(--bg2);font-size:12px;font-weight:800;color:var(--ink3);transition:all .22s var(--spring);cursor:pointer}
+.sfp-price-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 16px -6px rgba(var(--accentRgb),.6)}
+.sfp-price-chip:active{transform:scale(.92)}
+
+/* Custom price input */
+.sfp-custom-price{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r2);margin-bottom:14px;transition:border-color .22s,box-shadow .22s}
+.sfp-custom-price:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(var(--accentRgb),.1)}
+.sfp-custom-price input{flex:1;background:transparent;border:none;font-size:14px;font-weight:700;color:var(--ink)}
+.sfp-custom-price input::placeholder{color:var(--ink4);font-weight:600}
+.sfp-custom-price span{font-size:11px;font-weight:800;color:var(--ink4)}
+
+/* Dish search */
+.sfp-dish-wrap{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r2);margin-bottom:12px;transition:border-color .22s,box-shadow .22s}
+.sfp-dish-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(var(--accentRgb),.1)}
+.sfp-dish-wrap input{flex:1;background:transparent;border:none;font-size:14px;font-weight:700;color:var(--ink)}
+.sfp-dish-wrap input::placeholder{color:var(--ink4);font-weight:600}
+
+/* Actions row */
+.sfp-actions{display:flex;gap:8px}
+.sfp-search-btn{flex:1;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:12px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 8px 20px -8px rgba(var(--accentRgb),.7);transition:transform .2s var(--spring),opacity .2s}
+.sfp-search-btn:active{transform:scale(.96)}
+.sfp-reset-btn{height:44px;padding:0 14px;border-radius:14px;background:var(--bg3);color:var(--ink3);font-size:12px;font-weight:800;border:1px solid var(--line)}
+
+/* Result note */
+.sfp-result-note{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--bg3);font-size:12px;font-weight:700;color:var(--ink3);line-height:1.45;display:none}
+.sfp-result-note.show{display:block}
+.sfp-result-note.found{background:rgba(var(--accentRgb),.07);color:var(--accent)}
+.sfp-result-note.empty{background:rgba(139,40,40,.07);color:var(--danger)}
+
+/* Dish matches inside card */
 .dish-matches{margin-top:10px;border-top:1px solid var(--line2);padding-top:10px;display:flex;flex-direction:column;gap:5px}
 .dish-match{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--bg3);font-size:12px;cursor:pointer;transition:background .15s}
 .dish-match:active{background:var(--bg4)}
@@ -192,7 +228,7 @@ img,video{display:block;max-width:100%}
 .sheet-body{flex:1;overflow-y:auto;padding:16px 20px 10px;-webkit-overflow-scrolling:touch}
 .sheet-foot{padding:11px 20px calc(15px + var(--safe-b));border-top:1px solid var(--line);flex-shrink:0}
 
-/* ── DETAIL SHEET FULL ── */
+/* ── DETAIL SHEET ── */
 .detail-sheet{position:fixed;left:0;right:0;bottom:0;height:100dvh;background:var(--bg);z-index:102;transform:translateY(100%);transition:transform .5s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;will-change:transform}
 .detail-sheet.open{transform:translateY(0)}
 .detail-sheet-back{position:fixed;inset:0;z-index:101;opacity:0;pointer-events:none;transition:opacity .4s ease}
@@ -215,8 +251,19 @@ img,video{display:block;max-width:100%}
 .detail-tabs{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:100px;border:1px solid var(--line)}
 .detail-tab{flex:1;padding:9px;border-radius:100px;font-size:11.5px;font-weight:800;text-align:center;color:var(--ink3);transition:all .25s var(--spring);cursor:pointer}
 .detail-tab.active{background:var(--ink);color:var(--bg)}
-
 .detail-section{padding:16px 20px}
+
+/* Zone/Table cards in detail */
+.detail-zone-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;margin-bottom:10px}
+.detail-zone-img{width:100%;height:140px;object-fit:cover}
+.detail-zone-placeholder{width:100%;height:140px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:36px}
+.detail-zone-body{padding:12px 14px;display:flex;align-items:center;gap:10px}
+.detail-zone-info{flex:1}
+.detail-zone-name{font-size:14px;font-weight:800}
+.detail-zone-cap{font-size:12px;color:var(--ink3);margin-top:2px}
+.view-btn{padding:8px 16px;border-radius:100px;background:rgba(var(--accentRgb),.1);color:var(--accent);font-size:11px;font-weight:800;border:1px solid rgba(var(--accentRgb),.2);transition:all .2s var(--spring);flex-shrink:0}
+.view-btn:active{transform:scale(.92)}
+
 .detail-info-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;margin-bottom:12px}
 .dir{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}
 .dir:last-child{border-bottom:none}
@@ -232,7 +279,105 @@ img,video{display:block;max-width:100%}
 .book-primary-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:var(--r2);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 10px 28px -8px rgba(var(--accentRgb),.55);transition:all .3s var(--spring)}
 .book-primary-btn:active{transform:scale(.97)}
 
-/* ── MENU IN DETAIL ── */
+/* ══════════════════════════════════════
+   GALLERY OVERLAY (Zone/Table full-screen viewer)
+══════════════════════════════════════ */
+.gallery-overlay{position:fixed;inset:0;z-index:400;pointer-events:none;opacity:0;transition:opacity .35s ease}
+.gallery-overlay.open{pointer-events:auto;opacity:1}
+.gallery-overlay-bg{position:absolute;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(20px)}
+.gallery-panel{position:absolute;left:0;right:0;bottom:0;max-height:94dvh;background:var(--bg);border-radius:24px 24px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .45s cubic-bezier(.32,.72,0,1)}
+.gallery-overlay.open .gallery-panel{transform:translateY(0)}
+.gallery-handle{width:40px;height:4px;border-radius:2px;background:var(--line);margin:12px auto 6px;flex-shrink:0}
+.gallery-topbar{display:flex;align-items:center;gap:12px;padding:8px 20px 14px;border-bottom:1px solid var(--line);flex-shrink:0}
+.gallery-close-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink2);flex-shrink:0}
+.gallery-close-btn:active{transform:scale(.88)}
+.gallery-topbar-info{flex:1;min-width:0}
+.gallery-panel-name{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:500}
+.gallery-panel-meta{font-size:12px;color:var(--ink3)}
+.gallery-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.gallery-hero{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--bg3);display:block}
+.gallery-hero-placeholder{width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:52px}
+.gallery-hero-video{width:100%;aspect-ratio:16/9;object-fit:cover;background:#000;display:block}
+.gallery-thumbs{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;scrollbar-width:none;border-top:1px solid var(--line2)}
+.gallery-thumbs::-webkit-scrollbar{display:none}
+.gallery-thumb{width:80px;height:60px;object-fit:cover;border-radius:10px;border:2.5px solid transparent;flex-shrink:0;cursor:pointer;transition:border-color .2s,transform .2s var(--spring)}
+.gallery-thumb.active{border-color:var(--accent);transform:scale(1.06)}
+.gallery-thumb-video{width:80px;height:60px;border-radius:10px;border:2.5px solid transparent;flex-shrink:0;cursor:pointer;object-fit:cover}
+.gallery-thumb-placeholder{width:80px;height:60px;border-radius:10px;border:2.5px solid var(--line);flex-shrink:0;cursor:pointer;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:22px}
+.gallery-info-section{padding:16px 20px calc(20px + var(--safe-b))}
+.gallery-info-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line2)}
+.gallery-info-row:last-child{border-bottom:none}
+.gallery-info-icon{font-size:16px;width:28px;text-align:center}
+.gallery-info-text{font-size:13.5px;font-weight:700;color:var(--ink)}
+.gallery-info-sub{font-size:11px;color:var(--ink3);margin-top:2px}
+
+/* ══════════════════════════════════════
+   BOOKING FLOW — ZONE & TABLE REWORKED
+══════════════════════════════════════ */
+
+/* Zone list (full-width, taller cards) */
+.zone-list{display:flex;flex-direction:column;gap:10px}
+.zone-list-card{background:var(--glass-bg);backdrop-filter:blur(12px);border:2.5px solid var(--glass-border);border-radius:var(--r3);overflow:hidden;cursor:pointer;transition:all .3s var(--spring);box-shadow:var(--sh1);position:relative}
+.zone-list-card:active{transform:scale(.98)}
+.zone-list-card.active{border-color:var(--ink);box-shadow:0 12px 32px -8px rgba(0,0,0,.3)}
+.zone-list-img-wrap{position:relative;width:100%;height:160px;overflow:hidden;background:var(--bg3)}
+.zone-list-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.zone-list-card:hover .zone-list-img-wrap img{transform:scale(1.05)}
+.zone-list-placeholder{width:100%;height:160px;background:linear-gradient(135deg,var(--bg3),var(--bg4));display:flex;align-items:center;justify-content:center;font-size:44px}
+.zone-list-check{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;opacity:0;transform:scale(.3) rotate(-45deg);transition:all .35s var(--spring);box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:3}
+.zone-list-card.active .zone-list-check{opacity:1;transform:scale(1) rotate(0deg)}
+.zone-list-view-btn{position:absolute;bottom:10px;right:10px;padding:7px 14px;border-radius:100px;background:rgba(0,0,0,.55);backdrop-filter:blur(12px);color:#fff;font-size:11px;font-weight:800;border:1px solid rgba(255,255,255,.2);z-index:3}
+.zone-list-view-btn:active{transform:scale(.92)}
+.zone-list-body{padding:12px 14px 14px;display:flex;align-items:flex-start;gap:10px}
+.zone-list-info{flex:1}
+.zone-list-name{font-size:15px;font-weight:800;line-height:1.2}
+.zone-list-cap{font-size:12px;color:var(--ink3);margin-top:4px;display:flex;align-items:center;gap:5px}
+.zone-list-desc{font-size:12px;color:var(--ink3);margin-top:3px;line-height:1.4}
+.zone-list-galleries{display:flex;gap:4px;flex-shrink:0}
+.zone-list-mini-img{width:40px;height:40px;border-radius:8px;object-fit:cover;border:1.5px solid var(--line)}
+
+/* Zone preview panel (after selecting zone) */
+.zone-preview-panel{border-radius:var(--r2);border:1px solid var(--line);overflow:hidden;margin-bottom:16px;background:var(--bg2);animation:previewSlide .4s var(--spring)}
+@keyframes previewSlide{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.zone-preview-img-scroll{display:flex;gap:6px;padding:10px 12px;overflow-x:auto;scrollbar-width:none;background:var(--bg3)}
+.zone-preview-img-scroll::-webkit-scrollbar{display:none}
+.zone-preview-mini{width:96px;height:72px;border-radius:var(--r);object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,255,255,.3);cursor:pointer;transition:transform .2s var(--spring)}
+.zone-preview-mini:active{transform:scale(.94)}
+.zone-preview-mini.placeholder{background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:28px}
+.zone-preview-info{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.zone-preview-name{flex:1;font-size:14px;font-weight:800}
+.zone-preview-expand{padding:7px 14px;border-radius:100px;background:rgba(var(--accentRgb),.1);color:var(--accent);font-size:11px;font-weight:800;border:1px solid rgba(var(--accentRgb),.18)}
+.zone-preview-expand:active{transform:scale(.92)}
+
+/* Table grid — 2 column, larger */
+.table-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.table-card-xl{background:var(--glass-bg);backdrop-filter:blur(10px);border:2.5px solid var(--glass-border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .25s var(--spring);box-shadow:var(--sh1);position:relative;text-align:center}
+.table-card-xl:active{transform:scale(.93)}
+.table-card-xl.active{border-color:var(--ink);background:var(--bg2);box-shadow:0 8px 20px -6px rgba(0,0,0,.25)}
+.table-card-xl.conflict{border-color:rgba(139,40,40,.35);opacity:.6;cursor:not-allowed}
+.tci-img-wrap{position:relative;width:100%;height:100px;overflow:hidden;background:linear-gradient(135deg,var(--bg3),var(--bg4))}
+.tci-img-wrap img{width:100%;height:100%;object-fit:cover}
+.tci-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tci-check{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;opacity:0;transform:scale(.3) rotate(-45deg);transition:all .3s var(--spring);box-shadow:0 3px 8px rgba(0,0,0,.3)}
+.table-card-xl.active .tci-check{opacity:1;transform:scale(1) rotate(0deg)}
+.tci-conflict-badge{position:absolute;top:6px;left:6px;padding:3px 8px;border-radius:100px;background:rgba(139,40,40,.82);color:#fff;font-size:9px;font-weight:800;backdrop-filter:blur(8px);letter-spacing:.04em}
+.tci-view-btn{position:absolute;bottom:5px;right:5px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;border:none}
+.tci-view-btn:active{transform:scale(.88)}
+.tci-body{padding:9px 8px 11px}
+.tci-num{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:500;line-height:1}
+.tci-cap{font-size:10.5px;color:var(--ink3);margin-top:3px;font-weight:700}
+.table-card-xl.active .tci-num,.table-card-xl.active .tci-cap{color:var(--accent)}
+.table-conflict-note{padding:10px 12px;border-radius:var(--r);background:rgba(139,40,40,.08);border:1px solid rgba(139,40,40,.2);font-size:12px;color:var(--danger);font-weight:700;margin-top:8px}
+.table-any-btn2{grid-column:1 / -1;padding:14px;border:2px dashed var(--line);border-radius:var(--r2);font-size:13px;font-weight:800;color:var(--ink3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
+.table-any-btn2.active{border-style:solid;border-color:var(--ink);background:var(--bg3);color:var(--ink)}
+.table-suggestion-box{margin-top:10px;padding:12px 14px;border-radius:var(--r2);background:rgba(58,104,53,.08);border:1px solid rgba(58,104,53,.2);animation:fadeInUp .3s var(--spring)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.table-suggestion-box .ts-title{font-size:11px;font-weight:800;color:var(--success);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.ts-chips{display:flex;gap:6px;flex-wrap:wrap}
+.ts-chip{padding:6px 12px;border-radius:100px;background:var(--success);color:#fff;font-size:11.5px;font-weight:800;transition:all .2s var(--spring)}
+.ts-chip:active{transform:scale(.92)}
+
+/* ── MENU (Detail) ── */
 .menu-category-label{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin:14px 0 8px;padding-left:2px}
 .menu-item-card{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r2);margin-bottom:7px;transition:all .22s var(--spring);position:relative;overflow:hidden}
 .menu-item-card.selected{border-color:var(--accent);background:rgba(var(--accentRgb),.05)}
@@ -250,7 +395,7 @@ img,video{display:block;max-width:100%}
 .add-btn-pill{padding:7px 14px;border-radius:100px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;border:none;box-shadow:0 4px 10px -2px rgba(var(--accentRgb),.4);transition:all .2s var(--spring)}
 .add-btn-pill:active{transform:scale(.92)}
 
-/* ── PRE-ORDER FLOATING BAR ── */
+/* ── PRE-ORDER BAR ── */
 .preorder-bar{position:sticky;top:62px;z-index:4;margin:0 20px 12px;padding:14px 16px;border-radius:var(--r2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 8px 24px -6px rgba(var(--accentRgb),.5);animation:cartPop .35s var(--spring)}
 @keyframes cartPop{from{opacity:0;transform:translateY(-6px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 .po-left{display:flex;align-items:center;gap:10px;min-width:0}
@@ -258,7 +403,6 @@ img,video{display:block;max-width:100%}
 .po-info{font-size:11.5px;opacity:.9;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .po-total{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:500;line-height:1;margin-top:2px}
 .po-clear{padding:7px 12px;border-radius:100px;background:rgba(255,255,255,.18);color:#fff;font-size:11px;font-weight:800;border:none;flex-shrink:0}
-.po-clear:active{transform:scale(.92)}
 
 /* ── ORDER SUMMARY ── */
 .order-summary-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);padding:14px 16px;margin-bottom:10px}
@@ -281,12 +425,9 @@ img,video{display:block;max-width:100%}
 .rs-bar-track{flex:1;height:5px;background:var(--bg3);border-radius:100px;overflow:hidden}
 .rs-bar-fill{height:100%;background:var(--star);border-radius:100px;transition:width .6s ease}
 .rs-bar-row-num{font-size:10px;color:var(--ink3);font-weight:700;min-width:20px;text-align:right}
-
 .review-cta{padding:14px 16px;background:linear-gradient(135deg,rgba(var(--accentRgb),.06),rgba(var(--accentRgb),.02));border:1.5px solid rgba(var(--accentRgb),.18);border-radius:var(--r2);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .review-cta-text{flex:1;font-size:12.5px;font-weight:700;color:var(--ink2);line-height:1.35}
 .review-cta-btn{padding:8px 16px;border-radius:100px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:800;border:none;flex-shrink:0;box-shadow:0 4px 10px -2px rgba(var(--accentRgb),.4)}
-.review-cta-btn:active{transform:scale(.92)}
-
 .review-item{padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);margin-bottom:10px}
 .ri-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .ri-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',Georgia,serif;font-size:15px;flex-shrink:0}
@@ -298,51 +439,20 @@ img,video{display:block;max-width:100%}
 .ri-reply{margin-top:10px;padding:10px 12px;background:var(--bg3);border-left:3px solid var(--accent);border-radius:var(--r);font-size:12px;color:var(--ink2);line-height:1.5}
 .ri-reply b{color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
 
-/* Star input */
+/* ── STAR INPUT ── */
 .star-input{display:flex;gap:6px;justify-content:center;padding:14px 0}
 .star-input button{width:42px;height:42px;border-radius:50%;background:var(--bg3);border:1.5px solid var(--line);font-size:20px;color:var(--ink4);transition:all .2s var(--spring);cursor:pointer}
 .star-input button.on{background:var(--star);border-color:var(--star);color:#fff;transform:scale(1.08)}
 .star-input button:active{transform:scale(.88)}
 .review-textarea{width:100%;padding:12px 14px;background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r2);font-size:13.5px;color:var(--ink);min-height:90px;resize:vertical;transition:border-color .2s}
-.review-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(var(--accentRgb),.1)}
+.review-textarea:focus{border-color:var(--accent)}
 
-/* ── BOOKING FLOW common ── */
+/* ── BOOKING COMMON ── */
 .steps-bar{display:flex;gap:5px;margin-bottom:18px}
 .step-seg{flex:1;height:3px;border-radius:2px;background:var(--line);transition:background .4s ease}
 .step-seg.done{background:var(--accent)}.step-seg.active{background:var(--ink)}
 .field-block{margin-bottom:18px}
 .field-label{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-
-.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.zone-card{padding:0;background:var(--glass-bg);backdrop-filter:blur(12px);border:2px solid var(--glass-border);border-radius:var(--r2);text-align:left;cursor:pointer;display:flex;flex-direction:column;box-shadow:var(--sh1);transition:all .3s var(--spring);overflow:hidden;position:relative}
-.zone-card:active{transform:scale(.95)}
-.zone-card.active{border-color:var(--ink);box-shadow:0 8px 24px -8px rgba(0,0,0,.3)}
-.zone-card-img-wrap{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--bg3)}
-.zone-card-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
-.zone-card-img-wrap .zone-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,var(--bg3),var(--bg4))}
-.zone-card-check{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;opacity:0;transform:scale(.4);transition:all .3s var(--spring);box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2}
-.zone-card.active .zone-card-check{opacity:1;transform:scale(1)}
-.zone-card-body{padding:10px 12px 12px;flex:1}
-.zone-card-name{font-weight:800;font-size:13.5px;line-height:1.2}
-.zone-card-cap{font-size:11px;color:var(--ink3);margin-top:3px;display:flex;align-items:center;gap:4px}
-
-.tables-section{animation:tablesSlide .4s var(--spring)}
-@keyframes tablesSlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-.table-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.table-card-item{background:var(--glass-bg);backdrop-filter:blur(10px);border:2px solid var(--glass-border);border-radius:var(--r2);overflow:hidden;cursor:pointer;transition:all .25s var(--spring);text-align:center;padding:0;box-shadow:var(--sh1);position:relative}
-.table-card-item:active{transform:scale(.93)}
-.table-card-item.active{border-color:var(--ink);background:var(--bg2);box-shadow:0 8px 20px -6px rgba(0,0,0,.25)}
-.table-card-item-img-wrap{position:relative;width:100%;height:70px;overflow:hidden;background:linear-gradient(135deg,var(--bg3),var(--bg4))}
-.table-card-item-img-wrap img{width:100%;height:100%;object-fit:cover}
-.table-card-item-img-wrap .tc-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px}
-.tc-check{position:absolute;top:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;opacity:0;transform:scale(.3) rotate(-45deg);transition:all .3s var(--spring);box-shadow:0 3px 8px rgba(0,0,0,.3)}
-.table-card-item.active .tc-check{opacity:1;transform:scale(1) rotate(0deg)}
-.tc-body{padding:8px 4px 10px}
-.tc-num{font-family:'Fraunces',Georgia,serif;font-size:15px;font-weight:500;line-height:1}
-.tc-cap{font-size:10px;color:var(--ink3);margin-top:2px}
-.table-card-item.active .tc-num,.table-card-item.active .tc-cap{color:var(--accent)}
-.table-any-btn{grid-column:1 / -1;padding:12px;border:2px dashed var(--line);border-radius:var(--r2);font-size:12px;font-weight:800;color:var(--ink3);background:transparent;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
-.table-any-btn.active{border-style:solid;border-color:var(--ink);background:var(--bg3);color:var(--ink)}
 
 .date-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
 .date-row::-webkit-scrollbar{display:none}
@@ -360,6 +470,7 @@ img,video{display:block;max-width:100%}
 .time-card.active{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 .time-card[disabled]{opacity:.28;text-decoration:line-through;pointer-events:none}
 
+/* Deposit */
 .deposit-box{background:var(--goldLight);border:1.5px solid rgba(168,114,42,.3);border-radius:var(--r2);padding:18px;margin-bottom:16px;text-align:center}
 .deposit-amount{font-family:'Fraunces',Georgia,serif;font-size:38px;font-weight:300;color:var(--gold);line-height:1}
 .payment-card-box{background:var(--bg2);border:1.5px solid var(--line);border-radius:var(--r2);padding:16px;margin-bottom:12px}
@@ -397,7 +508,7 @@ img,video{display:block;max-width:100%}
 .bk-detail .bk-val{font-size:13px;font-weight:800}
 
 /* ── TOAST ── */
-.toast{position:fixed;top:calc(var(--safe-t) + 16px);left:16px;right:16px;background:var(--ink);color:var(--bg);padding:13px 20px;border-radius:var(--r2);font-size:13.5px;font-weight:700;text-align:center;z-index:400;transform:translateY(-140%);transition:transform .45s var(--spring);box-shadow:var(--sh3)}
+.toast{position:fixed;top:calc(var(--safe-t) + 16px);left:16px;right:16px;background:var(--ink);color:var(--bg);padding:13px 20px;border-radius:var(--r2);font-size:13.5px;font-weight:700;text-align:center;z-index:500;transform:translateY(-140%);transition:transform .45s var(--spring);box-shadow:var(--sh3)}
 .toast.show{transform:translateY(0)}
 .toast.success{background:var(--success)}
 .toast.error{background:var(--danger)}
@@ -405,7 +516,6 @@ img,video{display:block;max-width:100%}
 
 .skeleton{background:linear-gradient(90deg,var(--bg3) 0%,var(--line) 45%,var(--bg3) 100%);background-size:200% 100%;animation:shimmer 1.6s ease-in-out infinite;border-radius:var(--r2)}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-
 .empty{padding:50px 32px;text-align:center}
 .empty h3{font-family:'Fraunces',Georgia,serif;font-size:20px;font-weight:400;font-style:italic;margin-bottom:7px}
 .empty p{font-size:13.5px;color:var(--ink3);max-width:240px;margin:0 auto}
@@ -415,7 +525,6 @@ img,video{display:block;max-width:100%}
 </head>
 <body>
 
-<!-- SPLASH -->
 <div id="splash">
   <div class="splash-mark">
     <div class="splash-wordmark">One<em>Table</em></div>
@@ -446,23 +555,48 @@ img,video{display:block;max-width:100%}
     </div>
   </div>
 
-  <div class="smart-filter-panel">
-    <div class="smart-filter-title">Narx va taom bo'yicha qidirish</div>
-    <div class="smart-filter-grid">
-      <label class="smart-field">
+  <!-- SMART FILTER — Redesigned -->
+  <div class="smart-filter-panel" id="smart-filter-panel">
+    <div class="sfp-header" id="sfp-toggle">
+      <div class="sfp-header-left">
+        <div class="sfp-header-icon">🎯</div>
+        <div class="sfp-header-title" id="sfp-header-title">Narx & Taom filtri</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="sfp-header-badge" id="sfp-active-badge" style="display:none">Faol</div>
+        <div class="sfp-chevron" id="sfp-chevron">⌄</div>
+      </div>
+    </div>
+    <div class="sfp-body" id="sfp-body">
+      <!-- Quick price chips -->
+      <div class="sfp-section-label">Tezkor narx tanlash</div>
+      <div class="sfp-price-chips" id="sfp-price-chips">
+        <button class="sfp-price-chip" data-price="">Barchasi</button>
+        <button class="sfp-price-chip" data-price="50000">50k gacha</button>
+        <button class="sfp-price-chip" data-price="100000">100k gacha</button>
+        <button class="sfp-price-chip" data-price="200000">200k gacha</button>
+        <button class="sfp-price-chip" data-price="500000">500k gacha</button>
+      </div>
+      <!-- Custom price -->
+      <div class="sfp-custom-price">
         <span>💵</span>
-        <input type="number" inputmode="numeric" id="price-filter-input" min="0" step="1000" placeholder="Maks narx...">
-      </label>
-      <label class="smart-field">
+        <input type="number" inputmode="numeric" id="price-filter-input" placeholder="Yoki maxsus narx kiriting..." min="0" step="5000">
+        <span>so'm</span>
+      </div>
+      <!-- Dish search -->
+      <div class="sfp-section-label">Taom bo'yicha qidirish</div>
+      <div class="sfp-dish-wrap">
         <span>🍽</span>
-        <input type="text" id="dish-filter-input" placeholder="Osh, steak...">
-      </label>
+        <input type="text" id="dish-filter-input" placeholder="Osh, steak, shashlik...">
+      </div>
+      <!-- Actions -->
+      <div class="sfp-actions">
+        <button class="sfp-reset-btn" id="smart-reset-btn">✕ Tozalash</button>
+        <button class="sfp-search-btn" id="smart-search-btn">Qidirish →</button>
+      </div>
+      <!-- Result note -->
+      <div class="sfp-result-note" id="smart-filter-note"></div>
     </div>
-    <div class="smart-filter-actions">
-      <button class="smart-reset-btn" id="smart-reset-btn">Tozalash</button>
-      <button class="smart-search-btn" id="smart-search-btn">Qidirish</button>
-    </div>
-    <div class="smart-filter-note" id="smart-filter-note"></div>
   </div>
 
   <div class="chip-row" id="chip-row"></div>
@@ -534,7 +668,7 @@ img,video{display:block;max-width:100%}
     <span id="nav-profile">Profil</span>
   </button>
 </nav>
-</div>
+</div><!-- /app -->
 
 <!-- LANG POPUP -->
 <div class="lang-popup" id="lang-popup">
@@ -610,10 +744,34 @@ img,video{display:block;max-width:100%}
     </div>
     <div style="margin:14px 0 6px;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3)">Izoh (ixtiyoriy)</div>
     <textarea class="review-textarea" id="review-text" placeholder="Tajribangizni boshqalar bilan baham ko'ring..."></textarea>
-    <div style="font-size:11px;color:var(--ink4);margin-top:8px">Sharhingiz boshqa foydalanuvchilarga ko'rinadi</div>
   </div>
   <div class="sheet-foot">
     <button class="btn-primary accent-btn" id="review-submit-btn" disabled>Yuborish</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     GALLERY OVERLAY (Zone / Table viewer)
+════════════════════════════════════ -->
+<div class="gallery-overlay" id="gallery-overlay">
+  <div class="gallery-overlay-bg" id="gallery-overlay-bg"></div>
+  <div class="gallery-panel">
+    <div class="gallery-handle"></div>
+    <div class="gallery-topbar">
+      <button class="gallery-close-btn" id="gallery-close-btn">←</button>
+      <div class="gallery-topbar-info">
+        <div class="gallery-panel-name" id="gallery-panel-name"></div>
+        <div class="gallery-panel-meta" id="gallery-panel-meta"></div>
+      </div>
+    </div>
+    <div class="gallery-scroll">
+      <!-- Main media -->
+      <div id="gallery-main-media"></div>
+      <!-- Thumbnails -->
+      <div class="gallery-thumbs" id="gallery-thumbs"></div>
+      <!-- Info rows -->
+      <div class="gallery-info-section" id="gallery-info-section"></div>
+    </div>
   </div>
 </div>
 
@@ -633,7 +791,9 @@ window.addEventListener('load', () => {
   }, 1800);
 });
 
-/* ── I18N ── */
+/* ════════════════════════
+   I18N
+════════════════════════ */
 const T = {
   uz:{
     welcome:"Xush kelibsiz",greet_m:"Xayrli tong,",greet_d:"Xayrli kun,",greet_e:"Xayrli oqshom,",greet_n:"Xayrli kech,",
@@ -647,8 +807,7 @@ const T = {
     zone_l:"Zona tanlang",table_l:"Stol tanlang",table_any:"Ixtiyoriy stol",date_l:"Sana",guests_l:"Mehmonlar",guests_s:"kishi",time_l:"Vaqt",
     no_tables:"Bu zona uchun stollar kiritilmagan",
     deposit_l:"Depozit",deposit_required:"Depozit talab qilinadi",
-    deposit_reason_peak:"Peak soatlar (Juma-Shanba kechasi)",
-    deposit_reason_large:"Katta guruh",
+    deposit_reason_peak:"Peak soatlar (Juma-Shanba kechasi)",deposit_reason_large:"Katta guruh",
     deposit_card:"Karta orqali o'tkazma",deposit_ref:"Reference / izoh",deposit_screenshot:"Screenshot yuklash (ixtiyoriy)",
     deposit_paid:"Men to'ladim",
     cont1:"Davom etish →",cont2:"Davom →",confirm_btn:"Tasdiqlash",
@@ -659,26 +818,23 @@ const T = {
     months:["Yan","Fev","Mar","Apr","May","Iyun","Iyul","Avg","Sen","Okt","Noy","Dek"],
     status:{pending:"Kutilmoqda",confirmed:"Tasdiqlangan",cancelled:"Bekor",completed:"Tugallangan",pending_deposit:"Depozit kutilmoqda"},
     chips:[["all","Barchasi"],["uzbek","O'zbek"],["european","Yevropa"],["italian","Italyan"],["asian","Osiyo"],["family","Oilaviy"]],
-    smart_title:"Narx va taom bo'yicha qidirish",smart_search:"Qidirish",smart_reset:"Tozalash",
-    smart_found:"ta mos restoran",smart_no:"Mos restoran topilmadi",smart_hint:"Narx yoki taom turini kiriting",
-    dish_matches:"Mos taomlar",
+    view_gallery:"Ko'rish",capacity_label:"Sig'im",
+    table_conflict:"Bu stol tanlangan vaqtda band",table_suggest:"Bo'sh stollar:",
+    table_auto_moved:"Stol band — alternativ tavsiya etildi",
     pre_order:"Oldindan buyurtma (ixtiyoriy)",pre_order_sub:"Tanlang — kelganda tezroq xizmat ko'rasiz",
-    order_total:"Jami taxminiy",
-    add_to_order:"Qo'shish",working_hours:"Ish vaqti",phone:"Telefon",address:"Manzil",
-    capacity:"Sig'im",price_cat:"Narx darajasi",cuisine:"Taom turi",
+    order_total:"Jami taxminiy",add_to_order:"Qo'shish",
+    working_hours:"Ish vaqti",phone:"Telefon",address:"Manzil",capacity:"Sig'im",cuisine:"Taom turi",
     menu_lang:"Tilni o'zgartirish",menu_support:"Yordam",menu_about:"OneTable haqida",
     copy_ok:"Nusxalandi!",upload_ok:"Screenshot yuklandi",map_view:"Xaritada ko'rish",
-    no_menu:"Menyu ma'lumoti kiritilmagan",rating:"Reyting",reviews_count:"ta sharh",
+    no_menu:"Menyu ma'lumoti kiritilmagan",
     fav_added:"Sevimlilarga qo'shildi",fav_removed:"Sevimlilardan olib tashlandi",
-    items_selected:"ta mahsulot tanlandi",
-    review_title:"Sharhlar",no_reviews:"Hali sharh qoldirilmagan",no_reviews_sub:"Birinchi bo'lib o'z fikringizni ulashing",
+    review_title:"Sharhlar",no_reviews:"Hali sharh qoldirilmagan",no_reviews_sub:"Birinchi bo'lib fikringizni ulashing",
     review_cta_title:"Tashriffingizdan keyin sharh qoldiring",review_cta_btn:"Sharh yozish",
-    review_login_required:"Sharh qoldirish uchun bron qiling",
-    review_submit:"Yuborish",review_thanks:"Sharhingiz uchun rahmat!",
+    review_thanks:"Sharhingiz uchun rahmat!",
     star_labels:["","Yomon","O'rtacha","Yaxshi","Ajoyib","Mukammal!"],
-    review_must_visit:"Faqat tashrif buyurganingizdan keyin sharh qoldira olasiz",
-    owner_reply:"Restoran javobi",
-    your_order:"Sizning buyurtmangiz",total_qty:"ta",
+    owner_reply:"Restoran javobi",your_order:"Sizning buyurtmangiz",
+    sfp_title:"Narx & Taom filtri",sfp_found:"ta mos restoran",sfp_none:"Mos restoran topilmadi",
+    zones_title:"Zonalar",tables_section:"Stollar",
   },
   ru:{
     welcome:"Добро пожаловать",greet_m:"Доброе утро,",greet_d:"Добрый день,",greet_e:"Добрый вечер,",greet_n:"Доброй ночи,",
@@ -702,26 +858,23 @@ const T = {
     months:["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"],
     status:{pending:"Ожидание",confirmed:"Подтверждено",cancelled:"Отменено",completed:"Завершено",pending_deposit:"Депозит ожидается"},
     chips:[["all","Все"],["uzbek","Узбекская"],["european","Европейская"],["italian","Итальянская"],["asian","Азиатская"],["family","Семейная"]],
-    smart_title:"Поиск по цене и блюду",smart_search:"Найти",smart_reset:"Очистить",
-    smart_found:"ресторанов",smart_no:"Ничего не найдено",smart_hint:"Введите цену или блюдо",
-    dish_matches:"Подходящие блюда",
+    view_gallery:"Смотреть",capacity_label:"Вместимость",
+    table_conflict:"Этот стол занят на выбранное время",table_suggest:"Свободные столы:",
+    table_auto_moved:"Стол занят — предложена альтернатива",
     pre_order:"Предзаказ (необязательно)",pre_order_sub:"Выберите — быстрее обслужат",
-    order_total:"Итого примерно",
-    add_to_order:"Добавить",working_hours:"Часы работы",phone:"Телефон",address:"Адрес",
-    capacity:"Вместимость",price_cat:"Ценовая категория",cuisine:"Кухня",
+    order_total:"Итого примерно",add_to_order:"Добавить",
+    working_hours:"Часы работы",phone:"Телефон",address:"Адрес",capacity:"Вместимость",cuisine:"Кухня",
     menu_lang:"Сменить язык",menu_support:"Поддержка",menu_about:"О OneTable",
     copy_ok:"Скопировано!",upload_ok:"Скриншот загружен",map_view:"На карте",
-    no_menu:"Меню не добавлено",rating:"Рейтинг",reviews_count:"отзывов",
+    no_menu:"Меню не добавлено",
     fav_added:"Добавлено в избранное",fav_removed:"Удалено из избранного",
-    items_selected:"выбрано",
     review_title:"Отзывы",no_reviews:"Пока нет отзывов",no_reviews_sub:"Будьте первым",
     review_cta_title:"Оставьте отзыв после посещения",review_cta_btn:"Написать",
-    review_login_required:"Сначала забронируйте",
-    review_submit:"Отправить",review_thanks:"Спасибо за отзыв!",
+    review_thanks:"Спасибо за отзыв!",
     star_labels:["","Плохо","Средне","Хорошо","Отлично","Превосходно!"],
-    review_must_visit:"Отзыв можно оставить только после посещения",
-    owner_reply:"Ответ ресторана",
-    your_order:"Ваш заказ",total_qty:"шт",
+    owner_reply:"Ответ ресторана",your_order:"Ваш заказ",
+    sfp_title:"Фильтр: цена & блюдо",sfp_found:"совпадений",sfp_none:"Ничего не найдено",
+    zones_title:"Зоны",tables_section:"Столы",
   },
   en:{
     welcome:"Welcome back",greet_m:"Good morning,",greet_d:"Good afternoon,",greet_e:"Good evening,",greet_n:"Good night,",
@@ -745,26 +898,23 @@ const T = {
     months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     status:{pending:"Pending",confirmed:"Confirmed",cancelled:"Cancelled",completed:"Completed",pending_deposit:"Deposit pending"},
     chips:[["all","All"],["uzbek","Uzbek"],["european","European"],["italian","Italian"],["asian","Asian"],["family","Family"]],
-    smart_title:"Filter by price & dish",smart_search:"Search",smart_reset:"Clear",
-    smart_found:"matching",smart_no:"No matches found",smart_hint:"Enter price or dish name",
-    dish_matches:"Matching dishes",
+    view_gallery:"View",capacity_label:"Capacity",
+    table_conflict:"This table is booked at the selected time",table_suggest:"Available tables:",
+    table_auto_moved:"Table busy — alternative suggested",
     pre_order:"Pre-order (optional)",pre_order_sub:"Select dishes for faster service",
-    order_total:"Total estimate",
-    add_to_order:"Add",working_hours:"Working hours",phone:"Phone",address:"Address",
-    capacity:"Capacity",price_cat:"Price range",cuisine:"Cuisine",
+    order_total:"Total estimate",add_to_order:"Add",
+    working_hours:"Working hours",phone:"Phone",address:"Address",capacity:"Capacity",cuisine:"Cuisine",
     menu_lang:"Change language",menu_support:"Support",menu_about:"About OneTable",
     copy_ok:"Copied!",upload_ok:"Screenshot uploaded",map_view:"View on map",
-    no_menu:"Menu not available",rating:"Rating",reviews_count:"reviews",
+    no_menu:"Menu not available",
     fav_added:"Added to favorites",fav_removed:"Removed from favorites",
-    items_selected:"selected",
     review_title:"Reviews",no_reviews:"No reviews yet",no_reviews_sub:"Be the first",
     review_cta_title:"Share your experience after visiting",review_cta_btn:"Write review",
-    review_login_required:"Book first to leave a review",
-    review_submit:"Submit",review_thanks:"Thank you for your review!",
+    review_thanks:"Thank you for your review!",
     star_labels:["","Poor","Average","Good","Great","Excellent!"],
-    review_must_visit:"Reviews can be left only after visiting",
-    owner_reply:"Restaurant reply",
-    your_order:"Your order",total_qty:"pcs",
+    owner_reply:"Restaurant reply",your_order:"Your order",
+    sfp_title:"Price & Dish filter",sfp_found:"matches",sfp_none:"No matches found",
+    zones_title:"Zones",tables_section:"Tables",
   }
 };
 
@@ -779,6 +929,7 @@ const S = {
   favorites: JSON.parse(localStorage.getItem('ot_favs') || '[]'),
   coords: null, tab: 'home', chip: 'all', q: '',
   priceMax: null, dishQ: '', smartFilterActive: false,
+  sfpOpen: false, sfpPriceChip: '',
   detail: { restaurant: null, menu: [], zones: [], reviews: [], reviewsStats: null, dtab: 'info', order: {} },
   review: { rating: 0, comment: '', restaurantId: null, bookingId: null },
   booking: {
@@ -786,11 +937,12 @@ const S = {
     step: 1, zones: [], tables: [], menu: [],
     zone: null, table: null,
     date: null, time: null, guests: 2,
-    availability: [],
+    availability: [], tableBookings: {},
     depositRequired: false, depositAmount: 0, depositReason: '', depositInfo: null,
     screenshotUrl: '', paymentRef: '',
     preOrder: {}
-  }
+  },
+  gallery: { items: [], currentIndex: 0 }
 };
 
 const t = k => (T[S.lang] || T.uz)[k] ?? k;
@@ -800,16 +952,9 @@ const isoDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0'
 const addDays = n => { const d = new Date(); d.setDate(d.getDate() + n); return d; };
 const humanDate = iso => { const d = new Date(iso); return `${d.getDate()} ${t('months')[d.getMonth()]}`; };
 const pickImage = obj => obj && (obj.image_url || obj.imageUrl || obj.image || obj.photo_url || obj.photo || obj.thumbnail_url || obj.thumbnail || null);
+const pickVideo = obj => obj && (obj.video_url || obj.video || obj.reel_url || null);
 const stars = n => '★★★★★'.slice(0,n) + '☆☆☆☆☆'.slice(0,5-n);
-const relTime = iso => {
-  if (!iso) return '';
-  const d = new Date(iso), now = new Date(), diff = (now - d) / 1000;
-  if (diff < 60) return 'hozirgina';
-  if (diff < 3600) return Math.floor(diff/60) + ' daq oldin';
-  if (diff < 86400) return Math.floor(diff/3600) + ' soat oldin';
-  if (diff < 604800) return Math.floor(diff/86400) + ' kun oldin';
-  return humanDate(iso);
-};
+const timeToMins = t2 => { const [h,m] = String(t2||'0:0').split(':').map(Number); return h*60+(m||0); };
 
 function isOpen(wh) {
   if (!wh) return null;
@@ -838,7 +983,103 @@ async function api(path, opts = {}) {
   return d;
 }
 
-/* ── THEME ── */
+/* ════════════════════════
+   GALLERY OVERLAY
+════════════════════════ */
+function openGallery(items, startIndex, name, meta) {
+  S.gallery = { items: [...items], currentIndex: startIndex || 0 };
+  document.getElementById('gallery-panel-name').textContent = name || '';
+  document.getElementById('gallery-panel-meta').textContent = meta || '';
+  renderGalleryMedia();
+  document.getElementById('gallery-overlay').classList.add('open');
+  tg?.HapticFeedback?.impactOccurred('light');
+}
+window.openGallery = openGallery;
+
+function closeGallery() {
+  document.getElementById('gallery-overlay').classList.remove('open');
+}
+
+function renderGalleryMedia() {
+  const { items, currentIndex } = S.gallery;
+  const item = items[currentIndex];
+  const mainEl = document.getElementById('gallery-main-media');
+  const thumbEl = document.getElementById('gallery-thumbs');
+
+  if (!item) {
+    mainEl.innerHTML = '<div class="gallery-hero-placeholder">🏛</div>';
+    thumbEl.innerHTML = '';
+    return;
+  }
+
+  if (item.type === 'video' || (item.url && /\.(mp4|mov|webm)/i.test(item.url))) {
+    mainEl.innerHTML = `<video class="gallery-hero-video" src="${esc(item.url)}" controls playsinline autoplay muted loop></video>`;
+  } else {
+    mainEl.innerHTML = `<img class="gallery-hero" src="${esc(item.url)}" alt="${esc(item.label||'')}" onerror="this.parentNode.innerHTML='<div class=\\'gallery-hero-placeholder\\'>🏛</div>'">`;
+  }
+
+  if (items.length > 1) {
+    thumbEl.innerHTML = items.map((it, i) => {
+      const isV = it.type === 'video' || (it.url && /\.(mp4|mov|webm)/i.test(it.url));
+      return isV
+        ? `<div class="gallery-thumb-placeholder${i === currentIndex ? ' active' : ''}" onclick="selectGalleryItem(${i})">▶</div>`
+        : `<img class="gallery-thumb${i === currentIndex ? ' active' : ''}" src="${esc(it.url)}" loading="lazy" onclick="selectGalleryItem(${i})" onerror="this.style.display='none'">`;
+    }).join('');
+    thumbEl.style.display = 'flex';
+  } else {
+    thumbEl.style.display = 'none';
+  }
+}
+window.selectGalleryItem = function(i) {
+  S.gallery.currentIndex = i;
+  renderGalleryMedia();
+  tg?.HapticFeedback?.selectionChanged?.();
+};
+
+document.getElementById('gallery-close-btn').addEventListener('click', closeGallery);
+document.getElementById('gallery-overlay-bg').addEventListener('click', closeGallery);
+
+/* Gallery helpers */
+function buildMediaItems(obj) {
+  const items = [];
+  const img = pickImage(obj);
+  const vid = pickVideo(obj);
+  if (vid) items.push({ url: vid, type: 'video', label: obj.name || '' });
+  if (img) items.push({ url: img, type: 'image', label: obj.name || '' });
+  const gallery = Array.isArray(obj.gallery) ? obj.gallery : [];
+  gallery.forEach(url => { if (url && url !== img) items.push({ url, type: 'image', label: '' }); });
+  const reels = Array.isArray(obj.reels) ? obj.reels : [];
+  reels.forEach(r => { const u = r.video_url || r.url || r; if (u && typeof u === 'string') items.push({ url: u, type: 'video', label: '' }); });
+  return items.length ? items : [{ url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800', type: 'image', label: '' }];
+}
+
+function openZoneGallery(zone) {
+  const items = buildMediaItems(zone);
+  const infoEl = document.getElementById('gallery-info-section');
+  infoEl.innerHTML = `
+    ${zone.description ? `<div class="gallery-info-row"><div class="gallery-info-icon">📝</div><div class="gallery-info-text">${esc(zone.description)}</div></div>` : ''}
+    <div class="gallery-info-row"><div class="gallery-info-icon">👥</div><div><div class="gallery-info-text">${zone.capacity || '?'} ${t('guests_s')}</div><div class="gallery-info-sub">${t('capacity_label')}</div></div></div>
+    ${zone.working_hours ? `<div class="gallery-info-row"><div class="gallery-info-icon">🕐</div><div class="gallery-info-text">${esc(zone.working_hours)}</div></div>` : ''}
+  `;
+  openGallery(items, 0, zone.name, `${zone.capacity || '?'} ${t('guests_s')}`);
+}
+window.openZoneGallery = openZoneGallery;
+
+function openTableGallery(table) {
+  const items = buildMediaItems(table);
+  const infoEl = document.getElementById('gallery-info-section');
+  const conflict = S.booking.time ? isTableConflict(table.id) : false;
+  infoEl.innerHTML = `
+    <div class="gallery-info-row"><div class="gallery-info-icon">🪑</div><div><div class="gallery-info-text">Stol #${esc(table.table_number || table.number || '—')}</div><div class="gallery-info-sub">${table.capacity || '?'} ${t('guests_s')}</div></div></div>
+    <div class="gallery-info-row"><div class="gallery-info-icon">${conflict ? '🔴' : '🟢'}</div><div class="gallery-info-text">${conflict ? t('table_conflict') : "Bo'sh"}</div></div>
+  `;
+  openGallery(items, 0, `Stol #${table.table_number || table.number}`, `${table.capacity || '?'} ${t('guests_s')}`);
+}
+window.openTableGallery = openTableGallery;
+
+/* ════════════════════════
+   THEME
+════════════════════════ */
 function applyTheme(force) {
   let scheme = force || S.theme;
   if (scheme === 'auto') scheme = tg?.colorScheme || (window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
@@ -852,8 +1093,14 @@ function toggleTheme() {
 }
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
-/* ── LANG ── */
+/* ════════════════════════
+   LANG
+════════════════════════ */
 const FLAGS = { uz: '🇺🇿', ru: '🇷🇺', en: '🇬🇧' };
+function greetingText() {
+  const h = new Date().getHours();
+  return h<6?t('greet_n'):h<12?t('greet_m'):h<18?t('greet_d'):h<22?t('greet_e'):t('greet_n');
+}
 function applyLang() {
   document.documentElement.lang = S.lang;
   document.getElementById('lang-btn').textContent = FLAGS[S.lang];
@@ -864,9 +1111,6 @@ function applyLang() {
   document.getElementById('search-input').placeholder = t('search');
   document.getElementById('nearby-title').innerHTML = `${t('nearby')} <em>${t('nearby_em')}</em>`;
   [['nav-home','nav_home'],['nav-bookings','nav_bk'],['nav-favorites','nav_fav'],['nav-profile','nav_prof']].forEach(([id,k]) => { const el = document.getElementById(id); if (el) el.textContent = t(k); });
-  document.getElementById('smart-search-btn').textContent = t('smart_search');
-  document.getElementById('smart-reset-btn').textContent = t('smart_reset');
-  document.querySelector('.smart-filter-title').textContent = t('smart_title');
   document.getElementById('bk-eyebrow').textContent = t('bk_eye');
   document.getElementById('bk-title').textContent = t('bk_ttl');
   document.getElementById('fav-eyebrow').textContent = t('fav_eye');
@@ -878,10 +1122,6 @@ function applyLang() {
   document.getElementById('menu-support').textContent = t('menu_support');
   document.getElementById('menu-about').textContent = t('menu_about');
   renderChips(); applyFilters(); renderBookings(); renderFavorites();
-}
-function greetingText() {
-  const h = new Date().getHours();
-  return h<6?t('greet_n'):h<12?t('greet_m'):h<18?t('greet_d'):h<22?t('greet_e'):t('greet_n');
 }
 document.getElementById('lang-btn').addEventListener('click', e => {
   e.stopPropagation();
@@ -898,7 +1138,96 @@ document.querySelectorAll('.lang-option').forEach(el => {
 });
 document.addEventListener('click', () => document.getElementById('lang-popup').classList.remove('open'));
 
-/* ── AUTH ── */
+/* ════════════════════════
+   SMART FILTER — Enhanced
+════════════════════════ */
+// Toggle panel
+document.getElementById('sfp-toggle').addEventListener('click', () => {
+  S.sfpOpen = !S.sfpOpen;
+  document.getElementById('sfp-body').classList.toggle('open', S.sfpOpen);
+  document.getElementById('sfp-chevron').classList.toggle('open', S.sfpOpen);
+});
+
+// Price chips
+document.getElementById('sfp-price-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.sfp-price-chip');
+  if (!chip) return;
+  const price = chip.dataset.price;
+  S.sfpPriceChip = price;
+  document.querySelectorAll('.sfp-price-chip').forEach(c => c.classList.toggle('active', c.dataset.price === price));
+  document.getElementById('price-filter-input').value = price || '';
+  S.priceMax = price ? Number(price) : null;
+  if (!S.dishQ) { S.smartFilterActive = !!price; applyFilters(); updateSmartFilterBadge(); }
+  tg?.HapticFeedback?.selectionChanged?.();
+});
+
+// Search button
+document.getElementById('smart-search-btn').addEventListener('click', runSmartFilter);
+document.getElementById('smart-reset-btn').addEventListener('click', resetSmartFilter);
+
+// Enter key
+['price-filter-input','dish-filter-input'].forEach(id => {
+  document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') runSmartFilter(); });
+});
+
+async function runSmartFilter() {
+  const pi = document.getElementById('price-filter-input');
+  const di = document.getElementById('dish-filter-input');
+  S.priceMax = Number(pi?.value || 0) || null;
+  S.dishQ = (di?.value || '').trim();
+  S.smartFilterActive = !!(S.priceMax || S.dishQ);
+  if (!S.smartFilterActive) { updateSmartFilterNote(); updateSmartFilterBadge(); return; }
+
+  const btn = document.getElementById('smart-search-btn');
+  if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
+
+  // Load menus for all restaurants
+  await Promise.all(S.restaurants.map(async r => {
+    if (S.menuCache[String(r.id)] !== undefined) return;
+    try {
+      const raw = await api(`/restaurants/${r.id}/menu`);
+      S.menuCache[String(r.id)] = Array.isArray(raw) ? raw : (raw?.menu || raw?.data || raw?.items || []);
+    } catch { S.menuCache[String(r.id)] = []; }
+  }));
+
+  if (btn) { btn.textContent = t('sfp_title').split('&')[1] ? 'Qidirish →' : 'Search →'; btn.disabled = false; }
+  applyFilters();
+  updateSmartFilterNote();
+  updateSmartFilterBadge();
+}
+
+function resetSmartFilter() {
+  document.getElementById('price-filter-input').value = '';
+  document.getElementById('dish-filter-input').value = '';
+  S.priceMax = null; S.dishQ = ''; S.smartFilterActive = false; S._menuMatches = {};
+  S.sfpPriceChip = '';
+  document.querySelectorAll('.sfp-price-chip').forEach(c => c.classList.toggle('active', c.dataset.price === ''));
+  updateSmartFilterNote(); updateSmartFilterBadge(); applyFilters();
+}
+
+function updateSmartFilterBadge() {
+  const badge = document.getElementById('sfp-active-badge');
+  badge.style.display = S.smartFilterActive ? '' : 'none';
+}
+
+function updateSmartFilterNote() {
+  const note = document.getElementById('smart-filter-note');
+  if (!note) return;
+  if (!S.smartFilterActive) { note.classList.remove('show','found','empty'); return; }
+  note.className = `sfp-result-note show ${S.filtered.length ? 'found' : 'empty'}`;
+  if (S.filtered.length) {
+    const parts = [];
+    if (S.dishQ) parts.push(`"${S.dishQ}" taomi`);
+    if (S.priceMax) parts.push(`${fmt(S.priceMax)} so'mgacha`);
+    note.textContent = `${S.filtered.length} ${t('sfp_found')}${parts.length ? ' · '+parts.join(', ') : ''}`;
+  } else {
+    note.textContent = t('sfp_none');
+  }
+}
+
+/* ════════════════════════
+   AUTH
+════════════════════════ */
 async function auth() {
   const u = tg?.initDataUnsafe?.user || { id: 9999, first_name: 'Demo', username: 'demo' };
   try {
@@ -911,7 +1240,9 @@ async function auth() {
   } catch { S.user = u; }
 }
 
-/* ── MENU NORMALIZATION ── */
+/* ════════════════════════
+   MENU NORMALIZE
+════════════════════════ */
 function normalizeMenuItems(menu) {
   const out = [];
   const walk = (node, cat = '') => {
@@ -942,7 +1273,9 @@ function getMenuMatches(r, maxPrice, dishQ) {
   }).sort((a, b) => (a.price || 999999) - (b.price || 999999));
 }
 
-/* ── RESTAURANTS ── */
+/* ════════════════════════
+   RESTAURANTS
+════════════════════════ */
 async function loadRestaurants() {
   try {
     let url = '/restaurants';
@@ -980,62 +1313,18 @@ function applyFilters() {
         const okPrice = !maxPrice || (approxP > 0 && approxP <= maxPrice);
         if (!(okDish && okPrice)) return false;
       } else {
-        S._menuMatches = S._menuMatches || {};
-        S._menuMatches[r.id] = matches.slice(0, 4);
+        S._menuMatches[r.id] = matches.slice(0, 3);
       }
     }
     return true;
   });
   renderRestaurants();
-  updateSmartFilterNote();
 }
-
-function updateSmartFilterNote() {
-  const note = document.getElementById('smart-filter-note');
-  if (!note) return;
-  if (!S.smartFilterActive) { note.classList.remove('show'); return; }
-  note.textContent = S.filtered.length
-    ? `${S.filtered.length} ${t('smart_found')}${S.dishQ ? ' · ' + S.dishQ : ''}${S.priceMax ? ' · ' + fmt(S.priceMax) + " so'mgacha" : ''}`
-    : t('smart_no');
-  note.classList.add('show');
-}
-
-async function runSmartFilter() {
-  const pi = document.getElementById('price-filter-input');
-  const di = document.getElementById('dish-filter-input');
-  S.priceMax = Number(pi?.value || 0) || null;
-  S.dishQ = (di?.value || '').trim();
-  S.smartFilterActive = !!(S.priceMax || S.dishQ);
-  if (!S.smartFilterActive) { updateSmartFilterNote(); toast(t('smart_hint')); return; }
-  const btn = document.getElementById('smart-search-btn');
-  if (btn) { btn.innerHTML = '<span class="spin"></span>'; btn.disabled = true; }
-  await Promise.all(S.restaurants.map(async r => {
-    if (S.menuCache[String(r.id)] !== undefined) return;
-    try {
-      const raw = await api(`/restaurants/${r.id}/menu`);
-      S.menuCache[String(r.id)] = Array.isArray(raw) ? raw : (raw?.menu || raw?.data || raw?.items || []);
-    } catch { S.menuCache[String(r.id)] = []; }
-  }));
-  if (btn) { btn.textContent = t('smart_search'); btn.disabled = false; }
-  applyFilters();
-}
-function resetSmartFilter() {
-  document.getElementById('price-filter-input').value = '';
-  document.getElementById('dish-filter-input').value = '';
-  S.priceMax = null; S.dishQ = ''; S.smartFilterActive = false; S._menuMatches = {};
-  applyFilters();
-}
-document.getElementById('smart-search-btn').addEventListener('click', runSmartFilter);
-document.getElementById('smart-reset-btn').addEventListener('click', resetSmartFilter);
-['price-filter-input','dish-filter-input'].forEach(id => {
-  document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') runSmartFilter(); });
-});
 
 function renderDishMatchesHtml(rid) {
   const matches = (S._menuMatches || {})[rid] || [];
   if (!matches.length) return '';
   return `<div class="dish-matches">
-    <div style="font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px">${t('dish_matches')}</div>
     ${matches.map(item => `
       <div class="dish-match">
         <b>${esc(item.name)}</b>
@@ -1068,15 +1357,8 @@ function renderRestaurants() {
           <div class="c-name">${esc(r.name)}</div>
           <div class="c-rating"><span class="star">★</span> ${rating}${reviewCount?`<span class="c-rating-count">(${reviewCount})</span>`:''}</div>
         </div>
-        ${r.address ? `<div class="c-meta">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          <span>${esc(r.address)}</span>
-        </div>` : ''}
-        ${r.working_hours ? `<div class="c-meta" style="margin-top:2px">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          <span>${esc(r.working_hours)}</span>
-          ${o !== null ? `<span class="open-badge ${o?'open':'closed'}" style="font-size:9px">${o?t('open_now'):t('closed_now')}</span>` : ''}
-        </div>` : ''}
+        ${r.address ? `<div class="c-meta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${esc(r.address)}</span></div>` : ''}
+        ${r.working_hours ? `<div class="c-meta" style="margin-top:2px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>${esc(r.working_hours)}</span>${o!==null?`<span class="open-badge ${o?'open':'closed'}" style="font-size:9px">${o?t('open_now'):t('closed_now')}</span>`:''}</div>` : ''}
         ${renderDishMatchesHtml(r.id)}
         <div class="c-foot">
           <div style="display:flex;gap:5px;flex-wrap:wrap">
@@ -1104,7 +1386,9 @@ function renderChips() {
   }));
 }
 
-/* ── FAVORITES ── */
+/* ════════════════════════
+   FAVORITES
+════════════════════════ */
 function toggleFav(id) {
   const idx = S.favorites.indexOf(id);
   if (idx >= 0) { S.favorites.splice(idx, 1); toast(t('fav_removed')); }
@@ -1123,26 +1407,21 @@ function renderFavorites() {
     const img = pickImage(r) || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800';
     const o = isOpen(r.working_hours);
     return `<div class="rest-card" onclick="openDetail(${r.id})">
-      <div class="c-image">
-        <img src="${esc(img)}" loading="lazy">
-        ${o===true?`<div class="badge-open"><span class="dot"></span>${t('open_now')}</div>`:''}
-      </div>
+      <div class="c-image"><img src="${esc(img)}" loading="lazy">${o===true?`<div class="badge-open"><span class="dot"></span>${t('open_now')}</div>`:''}</div>
       <div class="c-body">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
           <div class="c-name">${esc(r.name)}</div>
           <div class="c-rating"><span class="star">★</span> ${r.rating ? Number(r.rating).toFixed(1) : '—'}</div>
         </div>
-        <div class="c-foot"><span></span>
-          <button class="book-btn" onclick="event.stopPropagation();openDetail(${r.id})">${t('book')}</button>
-        </div>
+        <div class="c-foot"><span></span><button class="book-btn" onclick="event.stopPropagation();openDetail(${r.id})">${t('book')}</button></div>
       </div>
     </div>`;
   }).join('');
 }
 
-/* ═══════════════════════════════════════════════════════════
+/* ════════════════════════
    RESTAURANT DETAIL
-═══════════════════════════════════════════════════════════ */
+════════════════════════ */
 async function openDetail(rid) {
   const r = S.restaurants.find(x => String(x.id) === String(rid));
   if (!r) return;
@@ -1179,11 +1458,10 @@ async function openDetail(rid) {
     S.detail.reviews = reviewsRaw?.reviews || (Array.isArray(reviewsRaw) ? reviewsRaw : []);
     S.detail.reviewsStats = reviewsRaw?.stats || null;
     S.menuCache[String(rid)] = Array.isArray(menuRaw) ? menuRaw : (menuRaw?.menu || []);
-    S.reviewsCache[String(rid)] = S.detail.reviews;
     renderDetailBody();
     document.getElementById('detail-name').textContent = S.detail.restaurant.name || r.name;
     document.getElementById('detail-tags').innerHTML = buildDetailTags(S.detail.restaurant);
-  } catch (e) { /* ignore */ }
+  } catch {}
 }
 window.openDetail = openDetail;
 
@@ -1223,6 +1501,27 @@ function renderDetailBody() {
     const o = isOpen(r.working_hours);
     const cs = Array.isArray(r.cuisine) ? r.cuisine : (r.cuisine ? [r.cuisine] : []);
     const gallery = Array.isArray(r.gallery) ? r.gallery : [];
+
+    // Zones with Ko'rish button
+    const zonesHtml = S.detail.zones.length ? `
+    <div style="margin-top:16px">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:12px">${t('zones_title')}</div>
+      ${S.detail.zones.map((z, i) => {
+        const zImg = pickImage(z);
+        const items = buildMediaItems(z);
+        return `<div class="detail-zone-card">
+          ${zImg ? `<img class="detail-zone-img" src="${esc(zImg)}" loading="lazy" onerror="this.style.display='none'">` : `<div class="detail-zone-placeholder">🏛</div>`}
+          <div class="detail-zone-body">
+            <div class="detail-zone-info">
+              <div class="detail-zone-name">${esc(z.name)}</div>
+              <div class="detail-zone-cap">👥 ${z.capacity || '?'} ${t('guests_s')}${z.description ? ' · '+esc(z.description).slice(0,40) : ''}</div>
+            </div>
+            <button class="view-btn" onclick="openDetailZoneGallery(${i})">👁 ${t('view_gallery')}</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
     body.innerHTML = `
     <div class="detail-section">
       ${gallery.length ? `
@@ -1231,67 +1530,30 @@ function renderDetailBody() {
       </div>` : ''}
       ${r.description ? `<div style="font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:16px;padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2)">${esc(r.description)}</div>` : ''}
       <div class="detail-info-card">
-        ${r.working_hours ? `<div class="dir"><div class="dir-icon">🕐</div><div class="dir-text"><div class="dir-label">${t('working_hours')}</div><div class="dir-val" style="display:flex;align-items:center;gap:8px">${esc(r.working_hours)}${o !== null ? `<span class="open-badge ${o?'open':'closed'}">${o?t('open_now'):t('closed_now')}</span>` : ''}</div></div></div>` : ''}
+        ${r.working_hours ? `<div class="dir"><div class="dir-icon">🕐</div><div class="dir-text"><div class="dir-label">${t('working_hours')}</div><div class="dir-val" style="display:flex;align-items:center;gap:8px">${esc(r.working_hours)}${o!==null?`<span class="open-badge ${o?'open':'closed'}">${o?t('open_now'):t('closed_now')}</span>`:''}</div></div></div>` : ''}
         ${r.phone ? `<div class="dir" style="cursor:pointer" onclick="window.open('tel:${esc(r.phone)}')"><div class="dir-icon">📞</div><div class="dir-text"><div class="dir-label">${t('phone')}</div><div class="dir-val" style="color:var(--accent)">${esc(r.phone)}</div></div><div class="dir-action">›</div></div>` : ''}
-        ${r.address ? `<div class="dir" ${hasLoc?`style="cursor:pointer" onclick="window.open('${mapsUrl}','_blank')"`:''}><div class="dir-icon">📍</div><div class="dir-text"><div class="dir-label">${t('address')}</div><div class="dir-val">${esc(r.address)}</div></div>${hasLoc?`<div class="dir-action" style="color:var(--accent)">🗺</div>`:''}</div>` : ''}
+        ${r.address ? `<div class="dir" ${hasLoc?`style="cursor:pointer" onclick="window.open('${mapsUrl}','_blank')"` : ''}><div class="dir-icon">📍</div><div class="dir-text"><div class="dir-label">${t('address')}</div><div class="dir-val">${esc(r.address)}</div></div>${hasLoc?`<div class="dir-action" style="color:var(--accent)">🗺</div>`:''}</div>` : ''}
         ${r.capacity ? `<div class="dir"><div class="dir-icon">👥</div><div class="dir-text"><div class="dir-label">${t('capacity')}</div><div class="dir-val">${r.capacity} ${t('guests_s')}</div></div></div>` : ''}
         ${cs.length ? `<div class="dir"><div class="dir-icon">🍽</div><div class="dir-text"><div class="dir-label">${t('cuisine')}</div><div class="dir-val">${cs.map(c=>esc(c)).join(', ')}</div></div></div>` : ''}
         ${r.average_bill ? `<div class="dir"><div class="dir-icon">🧾</div><div class="dir-text"><div class="dir-label">O'rtacha chek</div><div class="dir-val">${fmt(r.average_bill)} so'm</div></div></div>` : ''}
       </div>
-      ${S.detail.zones.length ? `
-      <div style="margin-top:16px">
-        <div style="font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">Zonalar</div>
-        <div class="zone-grid">
-          ${S.detail.zones.map(z => {
-            const zImg = pickImage(z);
-            return `<div style="background:var(--bg2);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden">
-              ${zImg ? `<img src="${esc(zImg)}" style="width:100%;height:80px;object-fit:cover" loading="lazy">` : `<div style="height:80px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:26px">🏛</div>`}
-              <div style="padding:8px 10px">
-                <div style="font-size:12.5px;font-weight:800">${esc(z.name)}</div>
-                <div style="font-size:11px;color:var(--ink3);margin-top:2px">${z.capacity||'?'} ${t('guests_s')}</div>
-              </div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>` : ''}
+      ${zonesHtml}
     </div>`;
   }
-
-  /* ── MENU TAB ── */
   else if (S.detail.dtab === 'menu') {
     const menu = S.detail.menu;
-    if (!menu.length) {
-      body.innerHTML = `<div class="detail-section"><div class="empty"><h3>${t('no_menu')}</h3></div></div>`;
-      return;
-    }
+    if (!menu.length) { body.innerHTML = `<div class="detail-section"><div class="empty"><h3>${t('no_menu')}</h3></div></div>`; return; }
     const cats = {};
     menu.forEach(item => { const cat = item.category || 'Boshqa'; if (!cats[cat]) cats[cat] = []; cats[cat].push(item); });
     const order = S.detail.order;
     const totalQty = Object.values(order).reduce((s,x)=>s+x,0);
-    const totalPrice = menu.reduce((s, item) => {
-      const key = String(item.id || item.name);
-      return s + (item.price || 0) * (order[key] || 0);
-    }, 0);
-
+    const totalPrice = menu.reduce((s, item) => s + (item.price||0)*(order[String(item.id||item.name)]||0), 0);
     body.innerHTML = `
-    ${totalQty > 0 ? `
-    <div class="preorder-bar" onclick="document.querySelector('.detail-sheet-body').scrollTo({top:document.querySelector('.detail-sheet-body').scrollHeight,behavior:'smooth'})">
-      <div class="po-left">
-        <div class="po-badge">${totalQty}</div>
-        <div>
-          <div class="po-info">${t('your_order')}</div>
-          <div class="po-total">${fmt(totalPrice)} so'm</div>
-        </div>
-      </div>
-      <button class="po-clear" onclick="event.stopPropagation();clearOrder()">Tozalash</button>
+    ${totalQty > 0 ? `<div class="preorder-bar">
+      <div class="po-left"><div class="po-badge">${totalQty}</div><div><div class="po-info">${t('your_order')}</div><div class="po-total">${fmt(totalPrice)} so'm</div></div></div>
+      <button class="po-clear" onclick="clearOrder()">Tozalash</button>
     </div>` : ''}
-
-    <div style="padding:14px 20px 0">
-      <div style="font-size:12.5px;color:var(--ink3);line-height:1.4;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:4px">
-        💡 ${t('pre_order_sub')}
-      </div>
-    </div>
-
+    <div style="padding:14px 20px 0"><div style="font-size:12.5px;color:var(--ink3);line-height:1.4;padding:10px 12px;background:var(--bg3);border-radius:var(--r2);margin-bottom:4px">💡 ${t('pre_order_sub')}</div></div>
     <div style="padding:14px 20px 16px">
     ${Object.entries(cats).map(([cat, items]) => `
       <div class="menu-category-label">${esc(cat)}</div>
@@ -1299,126 +1561,79 @@ function renderDetailBody() {
         const key = String(item.id || item.name);
         const qty = order[key] || 0;
         return `<div class="menu-item-card${qty>0?' selected':''}">
-          ${item.img
-            ? `<img class="menu-item-img" src="${esc(item.img)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;menu-item-img-placeholder&quot;>🍽</div>'">`
-            : `<div class="menu-item-img-placeholder">🍽</div>`}
+          ${item.img ? `<img class="menu-item-img" src="${esc(item.img)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;menu-item-img-placeholder&quot;>🍽</div>'">` : `<div class="menu-item-img-placeholder">🍽</div>`}
           <div class="menu-item-info">
             <div class="menu-item-name">${esc(item.name)}</div>
             ${item.desc ? `<div class="menu-item-desc">${esc(item.desc)}</div>` : ''}
             <div style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:8px">
               ${item.price ? `<div class="menu-item-price">${fmt(item.price)} so'm</div>` : '<div></div>'}
-              ${qty > 0 ? `
-              <div class="menu-item-qty">
-                <button class="qty-btn minus" onclick="changeQty('${esc(key)}',-1)">−</button>
-                <div class="qty-num">${qty}</div>
-                <button class="qty-btn" onclick="changeQty('${esc(key)}',1)">+</button>
-              </div>` : `<button class="add-btn-pill" onclick="changeQty('${esc(key)}',1)">+ ${t('add_to_order')}</button>`}
+              ${qty > 0 ? `<div class="menu-item-qty"><button class="qty-btn minus" onclick="changeQty('${esc(key)}',-1)">−</button><div class="qty-num">${qty}</div><button class="qty-btn" onclick="changeQty('${esc(key)}',1)">+</button></div>` : `<button class="add-btn-pill" onclick="changeQty('${esc(key)}',1)">+ ${t('add_to_order')}</button>`}
             </div>
           </div>
         </div>`;
-      }).join('')}
-    `).join('')}
-
-    ${totalQty > 0 ? `
-    <div class="order-summary-card" style="margin-top:18px">
+      }).join('')}`).join('')}
+    ${totalQty > 0 ? `<div class="order-summary-card" style="margin-top:18px">
       <div style="font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">${t('your_order')}</div>
       ${menu.filter(item => order[String(item.id||item.name)] > 0).map(item => {
-        const key = String(item.id || item.name);
-        const qty = order[key] || 0;
-        return `<div class="os-item">
-          <span class="os-name">${esc(item.name)}</span>
-          <span class="os-qty">x${qty}</span>
-          <span class="os-price">${fmt(item.price * qty)} so'm</span>
-        </div>`;
+        const key = String(item.id||item.name), qty = order[key]||0;
+        return `<div class="os-item"><span class="os-name">${esc(item.name)}</span><span class="os-qty">x${qty}</span><span class="os-price">${fmt(item.price*qty)} so'm</span></div>`;
       }).join('')}
       <div class="os-total"><span>${t('order_total')}</span><span style="color:var(--accent);font-family:'Fraunces',Georgia,serif;font-size:18px">${fmt(totalPrice)} so'm</span></div>
     </div>` : ''}
     </div>`;
   }
-
-  /* ── REVIEWS TAB ── */
   else if (S.detail.dtab === 'reviews') {
     const reviews = S.detail.reviews || [];
     const stats = S.detail.reviewsStats;
     const userReviewed = reviews.some(rv => rv.user_id === S.user?.id);
     const completedBookings = S.bookings.filter(bk => bk.restaurant_id === r.id && ['completed','confirmed'].includes(bk.status));
     const canReview = completedBookings.length > 0 && !userReviewed;
-
     body.innerHTML = `
     <div class="detail-section">
-      ${stats && stats.total > 0 ? `
-      <div class="reviews-stats">
-        <div class="rs-big">
-          <div class="rs-avg">${Number(stats.avg || 0).toFixed(1)}</div>
-          <div class="rs-stars">${stars(Math.round(stats.avg || 0))}</div>
-          <div class="rs-count">${stats.total} ${t('reviews_count')}</div>
-        </div>
-        <div class="rs-bars">
-          ${[5,4,3,2,1].map(n => {
-            const count = stats[`s${n}`] || 0;
-            const pct = stats.total ? (count / stats.total * 100) : 0;
-            return `<div class="rs-bar-row">
-              <div class="rs-bar-row-label">${n}</div>
-              <div class="rs-bar-track"><div class="rs-bar-fill" style="width:${pct}%"></div></div>
-              <div class="rs-bar-row-num">${count}</div>
-            </div>`;
-          }).join('')}
-        </div>
+      ${stats && stats.total > 0 ? `<div class="reviews-stats">
+        <div class="rs-big"><div class="rs-avg">${Number(stats.avg||0).toFixed(1)}</div><div class="rs-stars">${stars(Math.round(stats.avg||0))}</div><div class="rs-count">${stats.total} sharh</div></div>
+        <div class="rs-bars">${[5,4,3,2,1].map(n => { const count = stats[`s${n}`]||0, pct = stats.total?(count/stats.total*100):0;
+          return `<div class="rs-bar-row"><div class="rs-bar-row-label">${n}</div><div class="rs-bar-track"><div class="rs-bar-fill" style="width:${pct}%"></div></div><div class="rs-bar-row-num">${count}</div></div>`;
+        }).join('')}</div>
       </div>` : ''}
-
-      ${canReview ? `
-      <div class="review-cta">
-        <div class="review-cta-text">⭐ ${t('review_cta_title')}</div>
-        <button class="review-cta-btn" onclick="openReviewSheet(${r.id}, ${completedBookings[0]?.id || 'null'})">${t('review_cta_btn')}</button>
-      </div>` : userReviewed ? `
-      <div class="review-cta">
-        <div class="review-cta-text">✅ Siz allaqachon sharh qoldirgansiz</div>
-      </div>` : ''}
-
+      ${canReview ? `<div class="review-cta"><div class="review-cta-text">⭐ ${t('review_cta_title')}</div><button class="review-cta-btn" onclick="openReviewSheet(${r.id},${completedBookings[0]?.id||'null'})">${t('review_cta_btn')}</button></div>` : ''}
       ${reviews.length ? reviews.map(rv => `
         <div class="review-item">
-          <div class="ri-head">
-            <div class="ri-avatar">${esc((rv.user_name || 'M')[0].toUpperCase())}</div>
-            <div class="ri-name-wrap">
-              <div class="ri-name">${esc(rv.user_name || 'Mehmon')}</div>
-              <div class="ri-date">${relTime(rv.created_at)}</div>
-            </div>
-            <div class="ri-stars">${stars(rv.rating || 0)}</div>
+          <div class="ri-head"><div class="ri-avatar">${esc((rv.user_name||'M')[0].toUpperCase())}</div>
+            <div class="ri-name-wrap"><div class="ri-name">${esc(rv.user_name||'Mehmon')}</div><div class="ri-date">${rv.created_at || ''}</div></div>
+            <div class="ri-stars">${stars(rv.rating||0)}</div>
           </div>
           ${rv.comment ? `<div class="ri-text">${esc(rv.comment)}</div>` : ''}
-          ${rv.owner_reply ? `
-          <div class="ri-reply">
-            <b>↳ ${t('owner_reply')}</b>
-            ${esc(rv.owner_reply)}
-          </div>` : ''}
-        </div>
-      `).join('') : (!stats || stats.total === 0) ? `
-      <div class="empty">
-        <h3>${t('no_reviews')}</h3>
-        <p>${t('no_reviews_sub')}</p>
-      </div>` : ''}
+          ${rv.owner_reply ? `<div class="ri-reply"><b>↳ ${t('owner_reply')}</b>${esc(rv.owner_reply)}</div>` : ''}
+        </div>`).join('')
+      : `<div class="empty"><h3>${t('no_reviews')}</h3><p>${t('no_reviews_sub')}</p></div>`}
     </div>`;
   }
 }
 
+// Zone gallery from detail view
+window.openDetailZoneGallery = function(idx) {
+  const zone = S.detail.zones[idx];
+  if (!zone) return;
+  openZoneGallery(zone);
+};
+
 window.changeQty = function(key, delta) {
   const cur = S.detail.order[key] || 0;
   const next = cur + delta;
-  if (next <= 0) delete S.detail.order[key];
-  else S.detail.order[key] = next;
+  if (next <= 0) delete S.detail.order[key]; else S.detail.order[key] = next;
   tg?.HapticFeedback?.selectionChanged?.();
   renderDetailBody();
 };
 window.clearOrder = function() {
   if (!confirm("Tanlangan taomlarni tozalaysizmi?")) return;
   S.detail.order = {};
-  tg?.HapticFeedback?.impactOccurred('light');
   renderDetailBody();
 };
 
-/* ═══════════════════════════════════════════════════════════
+/* ════════════════════════
    REVIEW SHEET
-═══════════════════════════════════════════════════════════ */
+════════════════════════ */
 function openReviewSheet(rid, bookingId) {
   S.review = { rating: 0, comment: '', restaurantId: rid, bookingId: bookingId || null };
   const r = S.restaurants.find(x => x.id === rid);
@@ -1449,50 +1664,30 @@ document.querySelectorAll('#star-input button').forEach(btn => {
     tg?.HapticFeedback?.impactOccurred('light');
   });
 });
-document.getElementById('review-text').addEventListener('input', e => {
-  S.review.comment = e.target.value;
-});
-
+document.getElementById('review-text').addEventListener('input', e => { S.review.comment = e.target.value; });
 document.getElementById('review-submit-btn').addEventListener('click', async () => {
   if (!S.review.rating) return;
   const btn = document.getElementById('review-submit-btn');
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
   try {
-    await api(`/restaurants/${S.review.restaurantId}/reviews`, { method: 'POST', body: JSON.stringify({
-      rating: S.review.rating,
-      comment: S.review.comment || null,
-      booking_id: S.review.bookingId
-    })});
+    await api(`/restaurants/${S.review.restaurantId}/reviews`, { method:'POST', body:JSON.stringify({ rating:S.review.rating, comment:S.review.comment||null, booking_id:S.review.bookingId }) });
     toast(t('review_thanks'), 'success');
     closeReviewSheet();
-    // reload reviews for current detail
     if (S.detail.restaurant?.id === S.review.restaurantId) {
-      try {
-        const fresh = await api(`/restaurants/${S.review.restaurantId}/reviews`);
-        S.detail.reviews = fresh?.reviews || [];
-        S.detail.reviewsStats = fresh?.stats || null;
-        renderDetailBody();
-      } catch {}
+      try { const fresh = await api(`/restaurants/${S.review.restaurantId}/reviews`); S.detail.reviews = fresh?.reviews||[]; S.detail.reviewsStats = fresh?.stats||null; renderDetailBody(); } catch {}
     }
-    // also refresh restaurant list (rating may change)
     loadRestaurants();
-  } catch(e) {
-    toast(e.message || 'Xatolik', 'error');
-    btn.disabled = false; btn.textContent = t('review_submit');
-  }
+  } catch(e) { toast(e.message||'Xatolik','error'); btn.disabled=false; btn.textContent=t('review_submit')||'Yuborish'; }
 });
 
-/* ═══════════════════════════════════════════════════════════
+/* ════════════════════════
    BOOKINGS
-═══════════════════════════════════════════════════════════ */
+════════════════════════ */
 async function loadBookings() {
   const el = document.getElementById('bookings-list');
   el.innerHTML = `<div class="skeleton" style="height:108px;margin-bottom:12px;border-radius:var(--r3)"></div><div class="skeleton" style="height:108px;border-radius:var(--r3)"></div>`;
-  try {
-    const raw = await api('/reservations/my');
-    S.bookings = Array.isArray(raw) ? raw : [];
-    renderBookings();
-  } catch { S.bookings = []; renderBookings(); }
+  try { const raw = await api('/reservations/my'); S.bookings = Array.isArray(raw) ? raw : []; renderBookings(); }
+  catch { S.bookings = []; renderBookings(); }
 }
 function renderBookings() {
   const el = document.getElementById('bookings-list');
@@ -1502,17 +1697,14 @@ function renderBookings() {
     const st = bk.status || 'pending';
     const canReview = ['completed','confirmed'].includes(st) && !bk.has_review;
     return `<div class="booking-card status-${st}">
-      <div class="bk-head">
-        <div class="bk-name">${esc(bk.restaurant_name || '—')}</div>
-        <span class="bk-status ${st}">${t('status')[st] || st}</span>
-      </div>
+      <div class="bk-head"><div class="bk-name">${esc(bk.restaurant_name||'—')}</div><span class="bk-status ${st}">${t('status')[st]||st}</span></div>
       <div class="bk-details">
         <div class="bk-detail"><div class="bk-lbl">${t('date_l')}</div><div class="bk-val">${humanDate(bk.date)}</div></div>
-        <div class="bk-detail"><div class="bk-lbl">${t('time_l')}</div><div class="bk-val">${String(bk.time || '').slice(0,5)}</div></div>
+        <div class="bk-detail"><div class="bk-lbl">${t('time_l')}</div><div class="bk-val">${String(bk.time||'').slice(0,5)}</div></div>
         <div class="bk-detail"><div class="bk-lbl">${t('guests_l')}</div><div class="bk-val">${bk.guests}</div></div>
       </div>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line);padding-left:8px;display:flex;gap:8px;flex-wrap:wrap">
-        ${canReview ? `<button style="padding:9px 14px;border-radius:100px;font-size:11px;font-weight:800;border:1.5px solid var(--accent);color:var(--accent);background:rgba(var(--accentRgb),.06);text-transform:uppercase;letter-spacing:.05em" onclick="openReviewSheet(${bk.restaurant_id}, ${bk.id})">⭐ ${t('review_cta_btn')}</button>` : ''}
+        ${canReview ? `<button style="padding:9px 14px;border-radius:100px;font-size:11px;font-weight:800;border:1.5px solid var(--accent);color:var(--accent);background:rgba(var(--accentRgb),.06);text-transform:uppercase;letter-spacing:.05em" onclick="openReviewSheet(${bk.restaurant_id},${bk.id})">⭐ ${t('review_cta_btn')}</button>` : ''}
         ${['pending','confirmed'].includes(st) ? `<button style="padding:9px 14px;border-radius:100px;font-size:11px;font-weight:800;border:1.5px solid var(--danger);color:var(--danger);background:transparent;text-transform:uppercase;letter-spacing:.05em" onclick="cancelBooking(${bk.id})">${t('cancel_bk')}</button>` : ''}
       </div>
     </div>`;
@@ -1521,14 +1713,13 @@ function renderBookings() {
 }
 window.cancelBooking = async id => {
   if (!confirm(t('cancel_q'))) return;
-  try { await api(`/reservations/${id}`, { method: 'DELETE' }); toast(t('cancelled'), 'success'); loadBookings(); }
-  catch(e) { toast(e.message, 'error'); }
+  try { await api(`/reservations/${id}`,{method:'DELETE'}); toast(t('cancelled'),'success'); loadBookings(); }
+  catch(e) { toast(e.message,'error'); }
 };
 
-/* ── PROFILE ── */
 function renderProfile() {
   const u = S.user || {};
-  document.getElementById('profile-name').textContent = u.first_name || (S.lang==='uz'?'Mehmon':S.lang==='ru'?'Гость':'Guest');
+  document.getElementById('profile-name').textContent = u.first_name || 'Mehmon';
   document.getElementById('profile-handle').textContent = u.username ? `@${u.username}` : '';
   document.getElementById('profile-avatar').textContent = (u.first_name || 'M')[0].toUpperCase();
   updateStats();
@@ -1536,12 +1727,14 @@ function renderProfile() {
 function updateStats() {
   document.getElementById('stat-bookings').textContent = S.bookings.length;
   document.getElementById('stat-favs').textContent = S.favorites.length;
-  document.getElementById('stat-visited').textContent = new Set(S.bookings.filter(b => b.status === 'completed').map(b => b.restaurant_id)).size;
+  document.getElementById('stat-visited').textContent = new Set(S.bookings.filter(b=>b.status==='completed').map(b=>b.restaurant_id)).size;
 }
-function showAbout() { alert('OneTable — Toshkent restoranlari uchun bron platformasi\nv2.1'); }
+function showAbout() { alert('OneTable — Toshkent restoranlari uchun bron platformasi\nv3.0'); }
 window.showAbout = showAbout;
 
-/* ── TABS ── */
+/* ════════════════════════
+   TABS
+════════════════════════ */
 function switchTab(tab) {
   S.tab = tab;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1550,36 +1743,100 @@ function switchTab(tab) {
   if (tab === 'bookings') loadBookings();
   if (tab === 'favorites') renderFavorites();
   if (tab === 'profile') renderProfile();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top:0,behavior:'smooth'});
   tg?.HapticFeedback?.impactOccurred('light');
 }
 document.querySelectorAll('.tab').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
 
-/* ── DEPOSIT ── */
+/* ════════════════════════
+   TABLE CONFLICT DETECTION
+════════════════════════ */
+const BOOKING_DURATION_MINS = 120; // 2 soat = 1 bron
+
+function isTableConflict(tableId) {
+  if (!S.booking.time) return false;
+  const booked = (S.booking.tableBookings || {})[String(tableId)] || [];
+  const selMins = timeToMins(S.booking.time);
+  return booked.some(bt => {
+    const bMins = timeToMins(bt);
+    return Math.abs(selMins - bMins) < BOOKING_DURATION_MINS;
+  });
+}
+
+async function loadTableBookings() {
+  const { restaurant, date } = S.booking;
+  S.booking.tableBookings = {};
+  if (!restaurant?.id || !date) return;
+  try {
+    // Try batch endpoint first
+    const data = await api(`/restaurants/${restaurant.id}/table-bookings?date=${date}`);
+    if (data && typeof data === 'object' && !Array.isArray(data)) {
+      S.booking.tableBookings = data; // { "tableId": ["10:00","12:00"], ... }
+      return;
+    }
+  } catch {}
+  // Fallback: per-table requests (limit to 8 to avoid flooding)
+  const tables = S.booking.tables.slice(0, 8);
+  await Promise.all(tables.map(async tb => {
+    try {
+      const slots = await api(`/restaurants/${restaurant.id}/tables/${tb.id}/bookings?date=${date}`);
+      const times = Array.isArray(slots) ? slots.map(s => typeof s === 'string' ? s.slice(0,5) : (s.time||'').slice(0,5)).filter(Boolean) : [];
+      if (times.length) S.booking.tableBookings[String(tb.id)] = times;
+    } catch {}
+  }));
+}
+
+function getAvailableTables() {
+  if (!S.booking.time) return S.booking.tables;
+  const zoneTables = S.booking.zone
+    ? (S.booking.zone.__virtual
+        ? S.booking.tables.filter(tb => !tb.zone_id)
+        : S.booking.tables.filter(tb => String(tb.zone_id) === String(S.booking.zone.id)))
+    : S.booking.tables;
+  return zoneTables.filter(tb => !isTableConflict(tb.id));
+}
+
+function autoSuggestTable() {
+  // If selected table has conflict, auto-pick first available
+  if (S.booking.table && isTableConflict(S.booking.table.id)) {
+    const avail = getAvailableTables();
+    if (avail.length) {
+      S.booking.table = avail[0];
+      toast(t('table_auto_moved'), 'warn');
+    } else {
+      S.booking.table = null;
+    }
+  }
+}
+
+/* ════════════════════════
+   DEPOSIT CHECK
+════════════════════════ */
 function checkDepositRequired(rd, booking) {
   if (!rd?.deposit_enabled) return { required: false };
   if (rd.deposit_for_large_groups && booking.guests >= (rd.large_group_threshold || 6))
-    return { required: true, amount: rd.deposit_amount_default || 50000, reason: t('deposit_reason_large') + ` (${booking.guests} kishi)` };
+    return { required:true, amount:rd.deposit_amount_default||50000, reason:t('deposit_reason_large')+` (${booking.guests} kishi)` };
   if (rd.deposit_for_peak_hours && booking.time) {
-    const d = new Date(booking.date), day = d.getDay(), hour = parseInt(booking.time.split(':')[0] || '0');
-    if ((day === 5 || day === 6) && hour >= 18)
-      return { required: true, amount: rd.deposit_amount_default || 50000, reason: t('deposit_reason_peak') };
+    const d = new Date(booking.date), day = d.getDay(), hour = parseInt(booking.time.split(':')[0]||'0');
+    if ((day===5||day===6) && hour>=18)
+      return { required:true, amount:rd.deposit_amount_default||50000, reason:t('deposit_reason_peak') };
   }
   return { required: false };
 }
 
-/* ── BOOKING SHEET ── */
+/* ════════════════════════
+   BOOKING SHEET
+════════════════════════ */
 async function openSheet(rid) {
-  const restaurant = S.restaurants.find(x => String(x.id) === String(rid)) || { id: rid, name: 'Restoran', capacity: 50 };
+  const restaurant = S.restaurants.find(x => String(x.id) === String(rid)) || { id:rid, name:'Restoran', capacity:50 };
   const preOrder = S.detail.restaurant && String(S.detail.restaurant.id) === String(rid) ? { ...S.detail.order } : {};
   S.booking = {
     restaurant, restaurantData: null, step: 1,
     zones: [], tables: [], menu: [], zone: null, table: null,
     date: isoDate(new Date()), time: null, guests: 2,
-    availability: [],
+    availability: [], tableBookings: {},
     depositRequired: false, depositAmount: 0, depositReason: '', depositInfo: null,
-    screenshotUrl: '', paymentRef: '',
-    preOrder
+    screenshotUrl: '', paymentRef: '', preOrder
   };
   document.getElementById('sheet-title').textContent = restaurant.name;
   document.getElementById('sheet-eyebrow').textContent = t('book_now');
@@ -1601,13 +1858,7 @@ async function openSheet(rid) {
     S.booking.restaurantData = restaurantData?.restaurant || restaurantData || restaurant;
     const rd = S.booking.restaurantData;
     if (rd?.deposit_enabled) {
-      S.booking.depositInfo = {
-        card_masked: rd.deposit_card_masked || null,
-        card_holder: rd.deposit_card_holder || '',
-        bank_name: rd.deposit_bank_name || '',
-        instructions: rd.deposit_payment_instructions || '',
-        amount_default: rd.deposit_amount_default || 50000
-      };
+      S.booking.depositInfo = { card_masked:rd.deposit_card_masked||null, card_holder:rd.deposit_card_holder||'', bank_name:rd.deposit_bank_name||'', instructions:rd.deposit_payment_instructions||'', amount_default:rd.deposit_amount_default||50000 };
     }
     if (!S.menuCache[String(rid)]) S.menuCache[String(rid)] = Array.isArray(menu) ? menu : [];
   } catch {}
@@ -1625,66 +1876,99 @@ document.getElementById('sheet-backdrop').addEventListener('click', e => { if (e
 function getTotalSteps() { return S.booking.depositRequired ? 4 : 3; }
 function renderStepBar(active) {
   const max = getTotalSteps();
-  return `<div class="steps-bar">${Array.from({ length: max }, (_, i) => {
-    const n = i + 1;
-    return `<div class="step-seg ${n < active ? 'done' : n === active ? 'active' : ''}"></div>`;
-  }).join('')}</div>`;
+  return `<div class="steps-bar">${Array.from({length:max},(_,i)=>{const n=i+1;return `<div class="step-seg ${n<active?'done':n===active?'active':''}"></div>`;}).join('')}</div>`;
 }
 
+/* STEP RENDERER */
 function renderStep() {
   const b = S.booking;
   const body = document.getElementById('sheet-body');
   const foot = document.getElementById('sheet-foot');
 
+  /* ─── STEP 1: Zone + Table + Date + Guests ─── */
   if (b.step === 1) {
     const hasRealZones = b.zones.length > 0;
-    const zones = hasRealZones ? b.zones : [{ id: null, name: 'Asosiy zal', capacity: b.restaurant?.capacity || 50, __virtual: true }];
+    const zones = hasRealZones ? b.zones : [{ id:null, name:'Asosiy zal', capacity:b.restaurant?.capacity||50, __virtual:true }];
     const zoneTables = b.zone ? (b.zone.__virtual
       ? b.tables.filter(tb => !tb.zone_id)
       : b.tables.filter(tb => String(tb.zone_id) === String(b.zone.id))) : [];
-    const dates = Array.from({ length: 14 }, (_, i) => {
-      const d = addDays(i), iso = isoDate(d);
-      return { iso, dow: (i===0?t('today'):i===1?t('tomorrow'):t('days')[d.getDay()]).slice(0,3), day: d.getDate(), mon: t('months')[d.getMonth()] };
+    const dates = Array.from({length:14},(_,i)=>{
+      const d=addDays(i),iso=isoDate(d);
+      return {iso,dow:(i===0?t('today'):i===1?t('tomorrow'):t('days')[d.getDay()]).slice(0,3),day:d.getDate(),mon:t('months')[d.getMonth()]};
     });
-    body.innerHTML = `
-    ${renderStepBar(1)}
-    <div class="field-block">
-      <div class="field-label"><span>${t('zone_l')}</span></div>
-      <div class="zone-grid">${zones.map(z => {
-        const zImg = pickImage(z);
-        const isAct = b.zone && ((b.zone.__virtual && z.__virtual) || (!b.zone.__virtual && !z.__virtual && String(b.zone.id) === String(z.id)));
-        return `<button class="zone-card${isAct ? ' active' : ''}" onclick="selectZone('${z.__virtual ? '__v' : esc(String(z.id))}')">
-          <div class="zone-card-img-wrap">
-            ${zImg ? `<img src="${esc(zImg)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;zone-placeholder&quot;>🏛</div>'">` : `<div class="zone-placeholder">🏛</div>`}
-            <div class="zone-card-check">✓</div>
-          </div>
-          <div class="zone-card-body">
-            <div class="zone-card-name">${esc(z.name)}</div>
-            <div class="zone-card-cap">👥 ${z.capacity || '?'} ${t('guests_s')}</div>
-          </div>
-        </button>`;
-      }).join('')}</div>
-    </div>
-    ${b.zone ? `<div class="field-block tables-section">
-      <div class="field-label"><span>${t('table_l')}</span></div>
-      <div class="table-grid">
-        <button class="table-any-btn${!b.table ? ' active' : ''}" onclick="selectTable(null)">✨ ${t('table_any')}</button>
+
+    // Zone preview section
+    const zonePreview = b.zone ? (() => {
+      const zImg = pickImage(b.zone);
+      const zGallery = Array.isArray(b.zone.gallery) ? b.zone.gallery.slice(0,4) : [];
+      const mediaItems = [zImg, ...zGallery].filter(Boolean).slice(0,5);
+      if (!mediaItems.length && !zImg) return '';
+      return `<div class="zone-preview-panel">
+        ${mediaItems.length ? `<div class="zone-preview-img-scroll">
+          ${mediaItems.map((url, i) => `<img class="zone-preview-mini" src="${esc(url)}" loading="lazy" onclick="openZoneGalleryFromBooking()" onerror="this.style.display='none'">`).join('')}
+        </div>` : ''}
+        <div class="zone-preview-info">
+          <div class="zone-preview-name">📍 ${esc(b.zone.name)} · ${b.zone.capacity||'?'} ${t('guests_s')}</div>
+          <button class="zone-preview-expand" onclick="openZoneGalleryFromBooking()">👁 Batafsil</button>
+        </div>
+      </div>`;
+    })() : '';
+
+    // Table section with conflict badges
+    const tableSection = b.zone ? `<div class="field-block" style="animation:tablesSlide .4s var(--spring)">
+      <div class="field-label"><span>${t('table_l')}</span>${b.time?`<span style="font-size:10px;color:var(--ink4)">${t('time_l')}: ${b.time}</span>`:''}</div>
+      <div class="table-grid-2">
+        <button class="table-any-btn2${!b.table?' active':''}" onclick="selectTable(null)" style="grid-column:1/-1">✨ ${t('table_any')}</button>
         ${zoneTables.length ? zoneTables.map(tb => {
           const tImg = pickImage(tb);
           const isAct = b.table && String(b.table.id) === String(tb.id);
-          return `<button class="table-card-item${isAct ? ' active' : ''}" onclick="selectTable('${esc(String(tb.id))}')">
-            <div class="table-card-item-img-wrap">
-              ${tImg ? `<img src="${esc(tImg)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;tc-placeholder&quot;>🪑</div>'">` : `<div class="tc-placeholder">🪑</div>`}
-              <div class="tc-check">✓</div>
+          const isCon = b.time && isTableConflict(tb.id);
+          return `<button class="table-card-xl${isAct?' active':''}${isCon?' conflict':''}" onclick="${isCon?'void 0':'selectTable(\''+String(tb.id)+'\')'}">
+            <div class="tci-img-wrap">
+              ${tImg ? `<img src="${esc(tImg)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;tci-placeholder&quot;>🪑</div>'">` : `<div class="tci-placeholder">🪑</div>`}
+              ${isCon ? `<div class="tci-conflict-badge">Band</div>` : ''}
+              <div class="tci-check">✓</div>
+              <button class="tci-view-btn" onclick="event.stopPropagation();openTableGallery(${JSON.stringify(tb).replace(/"/g,'&quot;')})">👁</button>
             </div>
-            <div class="tc-body">
-              <div class="tc-num">#${esc(tb.table_number || tb.number || '—')}</div>
-              <div class="tc-cap">${tb.capacity || '?'} ${t('guests_s')}</div>
+            <div class="tci-body">
+              <div class="tci-num">#${esc(tb.table_number||tb.number||'—')}</div>
+              <div class="tci-cap">${tb.capacity||'?'} ${t('guests_s')}</div>
             </div>
           </button>`;
         }).join('') : `<div style="grid-column:1/-1;padding:14px;text-align:center;color:var(--ink3);font-size:12px">${t('no_tables')}</div>`}
       </div>
-    </div>` : ''}
+      ${b.time && zoneTables.filter(tb => !isTableConflict(tb.id)).length < zoneTables.length ? `
+        <div class="table-conflict-note">⚠️ ${t('table_conflict')}. Bo'sh stollar: ${zoneTables.filter(tb=>!isTableConflict(tb.id)).length} ta</div>
+      ` : ''}
+    </div>` : '';
+
+    body.innerHTML = `
+    ${renderStepBar(1)}
+    <div class="field-block">
+      <div class="field-label">${t('zone_l')}</div>
+      <div class="zone-list">
+        ${zones.map(z => {
+          const zImg = pickImage(z);
+          const isAct = b.zone && ((b.zone.__virtual && z.__virtual) || (!b.zone.__virtual && !z.__virtual && String(b.zone.id) === String(z.id)));
+          const zGallery = Array.isArray(z.gallery) ? z.gallery.slice(0,3) : [];
+          return `<button class="zone-list-card${isAct?' active':''}" onclick="selectZone('${z.__virtual?'__v':esc(String(z.id))}')">
+            <div class="zone-list-img-wrap">
+              ${zImg ? `<img src="${esc(zImg)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;zone-list-placeholder&quot;>🏛</div>'">` : `<div class="zone-list-placeholder">🏛</div>`}
+              <div class="zone-list-check">✓</div>
+              ${zGallery.length > 1 ? `<button class="zone-list-view-btn" onclick="event.stopPropagation();openZoneGalleryFromList(${zones.indexOf(z)})">📸 ${zGallery.length} ta rasm</button>` : ''}
+            </div>
+            <div class="zone-list-body">
+              <div class="zone-list-info">
+                <div class="zone-list-name">${esc(z.name)}</div>
+                <div class="zone-list-cap">👥 ${z.capacity||'?'} ${t('guests_s')}${z.description?` · ${esc(z.description).slice(0,50)}`:''}</div>
+              </div>
+            </div>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>
+    ${zonePreview}
+    ${tableSection}
     <div class="field-block">
       <div class="field-label">${t('date_l')}</div>
       <div class="date-row">${dates.map(d =>
@@ -1695,10 +1979,7 @@ function renderStep() {
     <div class="field-block">
       <div class="field-label">${t('guests_l')}</div>
       <div class="guests-control">
-        <div style="display:flex;align-items:baseline;gap:6px">
-          <div class="guests-num">${b.guests}</div>
-          <div style="font-size:12px;color:var(--ink3)">${t('guests_s')}</div>
-        </div>
+        <div style="display:flex;align-items:baseline;gap:6px"><div class="guests-num">${b.guests}</div><div style="font-size:12px;color:var(--ink3)">${t('guests_s')}</div></div>
         <div style="display:flex;gap:10px">
           <button class="g-btn" ${b.guests<=1?'disabled':''} onclick="if(S.booking.guests>1){S.booking.guests--;renderStep()}">−</button>
           <button class="g-btn" ${b.guests>=20?'disabled':''} onclick="if(S.booking.guests<20){S.booking.guests++;renderStep()}">+</button>
@@ -1707,23 +1988,30 @@ function renderStep() {
     </div>`;
     foot.innerHTML = `<button class="btn-primary" ${!b.zone?'disabled':''} onclick="S.booking.step=2;loadAvailability()">${t('cont1')}</button>`;
   }
+
+  /* ─── STEP 2: Time ─── */
   else if (b.step === 2) {
     const slots = [];
-    for (let h = 10; h <= 23; h++) { slots.push(`${String(h).padStart(2,'0')}:00`); if (h < 23) slots.push(`${String(h).padStart(2,'0')}:30`); }
-    const busy = new Set((b.availability || []).map(a => typeof a === 'string' ? a.slice(0,5) : (a.time || '').slice(0,5)));
+    for (let h=10;h<=23;h++) { slots.push(`${String(h).padStart(2,'0')}:00`); if(h<23) slots.push(`${String(h).padStart(2,'0')}:30`); }
+    const busy = new Set((b.availability||[]).map(a => typeof a==='string'?a.slice(0,5):(a.time||'').slice(0,5)));
     body.innerHTML = `
     ${renderStepBar(2)}
     <div class="field-block">
       <div class="field-label">${t('time_l')} · ${humanDate(b.date)}</div>
       <div class="time-grid">${slots.map(s =>
-        `<button class="time-card${b.time===s?' active':''}" ${busy.has(s)?'disabled':''} onclick="S.booking.time='${s}';renderStep()">${s}</button>`
+        `<button class="time-card${b.time===s?' active':''}" ${busy.has(s)?'disabled':''} onclick="S.booking.time='${s}';loadTableBookings().then(()=>{autoSuggestTable();renderStep()})">${s}</button>`
       ).join('')}</div>
+    </div>
+    <div style="padding:10px;background:var(--bg3);border-radius:var(--r2);font-size:12px;color:var(--ink3)">
+      💡 Vaqt tanlanganidan so'ng, band stollar avtomatik belgilanadi.
     </div>`;
     foot.innerHTML = `<div style="display:flex;gap:9px">
       <button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px;box-shadow:none;border-radius:var(--r2)" onclick="S.booking.step=1;renderStep()">←</button>
       <button class="btn-primary" style="flex:1" ${!b.time?'disabled':''} onclick="goAfterTime()">${t('cont2')}</button>
     </div>`;
   }
+
+  /* ─── STEP 3: Deposit ─── */
   else if (b.step === 3 && b.depositRequired) {
     const di = b.depositInfo || {};
     body.innerHTML = `
@@ -1733,49 +2021,39 @@ function renderStep() {
       <div style="font-family:'Fraunces',Georgia,serif;font-size:22px;margin-bottom:6px">${t('deposit_required')}</div>
       <div style="font-size:12.5px;color:var(--ink3)">${esc(b.depositReason)}</div>
     </div>
-    <div class="deposit-box">
-      <div class="deposit-amount">${fmt(b.depositAmount)}</div>
-      <div style="font-size:14px;color:var(--gold);margin-top:4px">so'm</div>
-    </div>
-    ${di.card_masked ? `
-    <div class="payment-card-box">
+    <div class="deposit-box"><div class="deposit-amount">${fmt(b.depositAmount)}</div><div style="font-size:14px;color:var(--gold);margin-top:4px">so'm</div></div>
+    ${di.card_masked ? `<div class="payment-card-box">
       <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--ink3);margin-bottom:10px">${t('deposit_card')}</div>
       <div class="payment-card-number">${esc(di.card_masked)}</div>
       <div style="font-size:12px;color:var(--ink3);margin-bottom:12px">${esc(di.card_holder)}${di.bank_name?' · '+esc(di.bank_name):''}</div>
       <button class="copy-btn" onclick="copyCard('${esc(di.card_masked)}')">📋 Nusxa olish</button>
-      ${di.instructions ? `<div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:var(--r);font-size:11.5px;color:var(--ink3)">${esc(di.instructions)}</div>` : ''}
+      ${di.instructions?`<div style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:var(--r);font-size:11.5px;color:var(--ink3)">${esc(di.instructions)}</div>`:''}
     </div>` : ''}
-    <div class="field-block">
-      <div class="field-label">${t('deposit_ref')}</div>
-      <input class="field-input-sm" id="dep-ref" placeholder="Transfer raqami" value="${esc(b.paymentRef)}" oninput="S.booking.paymentRef=this.value">
-    </div>
-    <div class="field-block">
-      <div class="field-label">${t('deposit_screenshot')}</div>
+    <div class="field-block"><div class="field-label">${t('deposit_ref')}</div><input class="field-input-sm" id="dep-ref" placeholder="Transfer raqami" value="${esc(b.paymentRef)}" oninput="S.booking.paymentRef=this.value"></div>
+    <div class="field-block"><div class="field-label">${t('deposit_screenshot')}</div>
       ${b.screenshotUrl ? `<img src="${esc(b.screenshotUrl)}" class="screenshot-preview-sm"><button onclick="S.booking.screenshotUrl='';renderStep()" style="font-size:11px;color:var(--danger);margin-top:6px">✕ O'chirish</button>` : `
-      <div class="dz-mini">
-        <div style="font-size:22px;margin-bottom:6px">📷</div>
-        <div style="font-size:12px;font-weight:700;color:var(--ink3)">Rasm yuklang</div>
-        <input type="file" accept="image/*" onchange="uploadScreenshot(this)">
-      </div>`}
+      <div class="dz-mini"><div style="font-size:22px;margin-bottom:6px">📷</div><div style="font-size:12px;font-weight:700;color:var(--ink3)">Rasm yuklang</div><input type="file" accept="image/*" onchange="uploadScreenshot(this)"></div>`}
     </div>`;
     foot.innerHTML = `<div style="display:flex;gap:9px">
       <button class="btn-primary" style="background:var(--bg3);color:var(--ink);flex:0 0 48px;box-shadow:none;border-radius:var(--r2)" onclick="S.booking.step=2;renderStep()">←</button>
       <button class="btn-primary accent-btn" style="flex:1" onclick="submitWithDeposit()">💳 ${t('deposit_paid')}</button>
     </div>`;
   }
+
+  /* ─── LAST STEP: Confirm ─── */
   else {
     const stepNum = b.depositRequired ? 4 : 3;
     const rd = b.restaurantData;
     const hasLoc = rd?.latitude && rd?.longitude;
-    const orderItems = b.menu.filter(item => b.preOrder[String(item.id || item.name)] > 0);
-    const orderTotal = orderItems.reduce((s, item) => s + (item.price || 0) * (b.preOrder[String(item.id || item.name)] || 0), 0);
+    const orderItems = b.menu.filter(item => b.preOrder[String(item.id||item.name)] > 0);
+    const orderTotal = orderItems.reduce((s, item) => s+(item.price||0)*(b.preOrder[String(item.id||item.name)]||0), 0);
     body.innerHTML = `
     ${renderStepBar(stepNum)}
     <div style="text-align:center;padding:16px 0 12px">
       <div style="font-size:32px;margin-bottom:10px">🎉</div>
       <div style="font-family:'Fraunces',Georgia,serif;font-size:24px;margin-bottom:6px">${esc(b.restaurant.name)}</div>
       <div style="color:var(--ink3);font-size:13.5px">${humanDate(b.date)} · ${b.time} · ${b.guests} ${t('guests_s')}</div>
-      <div style="color:var(--ink4);font-size:12.5px;margin-top:3px">${esc(b.zone?.name || 'Asosiy zona')}${b.table ? ' · #' + esc(b.table.table_number || b.table.number || '') : ''}</div>
+      <div style="color:var(--ink4);font-size:12.5px;margin-top:3px">${esc(b.zone?.name||'Asosiy zona')}${b.table?` · #${esc(b.table.table_number||b.table.number||'')}`:''}</div>
       ${hasLoc ? `<a href="https://maps.google.com/?q=${rd.latitude},${rd.longitude}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:11.5px;color:var(--accent);font-weight:700">📍 ${t('map_view')}</a>` : ''}
     </div>
     <div style="background:var(--bg3);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px">
@@ -1783,20 +2061,12 @@ function renderStep() {
         <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('date_l')}</div><div style="font-weight:800;font-size:14px">${humanDate(b.date)}</div></div>
         <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('time_l')}</div><div style="font-weight:800;font-size:14px">${b.time}</div></div>
         <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">${t('guests_l')}</div><div style="font-weight:800;font-size:14px">${b.guests} ${t('guests_s')}</div></div>
-        <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">Zona</div><div style="font-weight:800;font-size:14px">${esc(b.zone?.name || 'Asosiy')}</div></div>
+        <div><div style="font-size:9.5px;color:var(--ink3);font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px">Zona</div><div style="font-weight:800;font-size:14px">${esc(b.zone?.name||'Asosiy')}</div></div>
       </div>
     </div>
-    ${orderItems.length ? `
-    <div class="order-summary-card">
+    ${orderItems.length ? `<div class="order-summary-card">
       <div style="font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px">${t('pre_order')}</div>
-      ${orderItems.map(item => {
-        const qty = b.preOrder[String(item.id || item.name)] || 0;
-        return `<div class="os-item">
-          <span class="os-name">${esc(item.name)}</span>
-          <span class="os-qty">x${qty}</span>
-          <span class="os-price">${fmt(item.price * qty)} so'm</span>
-        </div>`;
-      }).join('')}
+      ${orderItems.map(item => { const qty=b.preOrder[String(item.id||item.name)]||0; return `<div class="os-item"><span class="os-name">${esc(item.name)}</span><span class="os-qty">x${qty}</span><span class="os-price">${fmt(item.price*qty)} so'm</span></div>`; }).join('')}
       <div class="os-total"><span>${t('order_total')}</span><span style="color:var(--accent)">${fmt(orderTotal)} so'm</span></div>
     </div>` : ''}`;
     foot.innerHTML = `<div style="display:flex;gap:9px">
@@ -1805,16 +2075,24 @@ function renderStep() {
     </div>`;
   }
 }
+window.renderStep = renderStep;
+window.autoSuggestTable = autoSuggestTable;
 
 window.selectZone = function(key) {
-  if (key === '__v') S.booking.zone = { id: null, name: 'Asosiy zal', __virtual: true };
-  else { const z = S.booking.zones.find(x => String(x.id) === key); if (z) S.booking.zone = { ...z, __virtual: false }; else return; }
-  S.booking.table = null; renderStep();
+  if (key === '__v') S.booking.zone = { id:null, name:'Asosiy zal', capacity:S.booking.restaurant?.capacity||50, __virtual:true };
+  else { const z = S.booking.zones.find(x => String(x.id) === key); if (z) S.booking.zone = { ...z, __virtual:false }; else return; }
+  S.booking.table = null;
+  renderStep();
   tg?.HapticFeedback?.selectionChanged?.();
 };
 window.selectTable = function(id) {
-  if (id === null) S.booking.table = null;
-  else { const tb = S.booking.tables.find(x => String(x.id) === id); if (tb) S.booking.table = (S.booking.table && String(S.booking.table.id) === id) ? null : tb; }
+  if (id === null) { S.booking.table = null; }
+  else {
+    const tb = S.booking.tables.find(x => String(x.id) === id);
+    if (!tb) return;
+    if (S.booking.time && isTableConflict(tb.id)) { toast(t('table_conflict'), 'warn'); return; }
+    S.booking.table = (S.booking.table && String(S.booking.table.id) === id) ? null : tb;
+  }
   renderStep();
   tg?.HapticFeedback?.selectionChanged?.();
 };
@@ -1829,7 +2107,7 @@ window.goAfterTime = function() {
 };
 window.copyCard = function(num) {
   const clean = num.replace(/[^0-9]/g, '');
-  navigator.clipboard?.writeText(clean).then(() => toast(t('copy_ok'), 'success')).catch(() => toast(t('copy_ok'), 'success'));
+  navigator.clipboard?.writeText(clean).then(()=>toast(t('copy_ok'),'success')).catch(()=>toast(t('copy_ok'),'success'));
   tg?.HapticFeedback?.impactOccurred('light');
 };
 window.uploadScreenshot = async function(input) {
@@ -1837,10 +2115,21 @@ window.uploadScreenshot = async function(input) {
   const dz = input.closest('.dz-mini'); if (dz) dz.innerHTML = '<div class="spin"></div>';
   try {
     const fd = new FormData(); fd.append('file', file);
-    const r = await api('/uploads/image', { method: 'POST', body: fd });
-    S.booking.screenshotUrl = r.url; toast(t('upload_ok'), 'success'); renderStep();
-  } catch(e) { toast(e.message, 'error'); renderStep(); }
+    const r = await api('/uploads/image', { method:'POST', body:fd });
+    S.booking.screenshotUrl = r.url; toast(t('upload_ok'),'success'); renderStep();
+  } catch(e) { toast(e.message,'error'); renderStep(); }
 };
+
+// Zone gallery from booking list
+window.openZoneGalleryFromList = function(idx) {
+  const zone = S.booking.zones[idx] || (S.booking.zones.length ? S.booking.zones[idx] : null);
+  if (!zone) return;
+  openZoneGallery(zone);
+};
+window.openZoneGalleryFromBooking = function() {
+  if (S.booking.zone) openZoneGallery(S.booking.zone);
+};
+window.openTableGallery = openTableGallery;
 
 async function loadAvailability() {
   document.getElementById('sheet-body').innerHTML = '<div style="padding:48px 0;text-align:center"><div class="spin"></div></div>';
@@ -1851,22 +2140,23 @@ async function loadAvailability() {
   renderStep();
 }
 window.loadAvailability = loadAvailability;
+window.loadTableBookings = loadTableBookings;
 
 async function submitBooking() {
   const b = S.booking, btn = document.getElementById('submit-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span>'; }
   try {
-    await api('/reservations', { method: 'POST', body: JSON.stringify({
+    await api('/reservations', { method:'POST', body:JSON.stringify({
       restaurant_id: b.restaurant.id,
       zone_id: b.zone && !b.zone.__virtual ? b.zone.id : null,
       table_id: b.table?.id || null,
       date: b.date, time: b.time, guests: b.guests,
       pre_order: Object.keys(b.preOrder).length ? b.preOrder : undefined
     })});
-    toast(t('bk_ok'), 'success'); closeSheet(); loadBookings(); switchTab('bookings');
+    toast(t('bk_ok'),'success'); closeSheet(); loadBookings(); switchTab('bookings');
   } catch(e) {
-    toast(e.message || 'Xatolik', 'error');
-    if (btn) { btn.disabled = false; btn.innerHTML = `${t('confirm_btn')} · ${b.time}`; }
+    toast(e.message||'Xatolik','error');
+    if (btn) { btn.disabled=false; btn.innerHTML=`${t('confirm_btn')} · ${b.time}`; }
   }
 }
 window.submitBooking = submitBooking;
@@ -1874,9 +2164,9 @@ window.submitBooking = submitBooking;
 async function submitWithDeposit() {
   const b = S.booking;
   const btn = document.querySelector('.accent-btn');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spin"></span>'; }
   try {
-    const res = await api('/reservations', { method: 'POST', body: JSON.stringify({
+    const res = await api('/reservations', { method:'POST', body:JSON.stringify({
       restaurant_id: b.restaurant.id,
       zone_id: b.zone && !b.zone.__virtual ? b.zone.id : null,
       table_id: b.table?.id || null,
@@ -1884,52 +2174,50 @@ async function submitWithDeposit() {
     })});
     const bookingId = res?.id || res?.reservation?.id;
     if (bookingId) {
-      await api(`/bookings/${bookingId}/deposit/submit`, { method: 'POST', body: JSON.stringify({
-        payment_reference: b.paymentRef || null,
-        screenshot_url: b.screenshotUrl || null,
-        amount: b.depositAmount
-      })}).catch(() => {});
+      await api(`/bookings/${bookingId}/deposit/submit`, { method:'POST', body:JSON.stringify({ payment_reference:b.paymentRef||null, screenshot_url:b.screenshotUrl||null, amount:b.depositAmount }) }).catch(()=>{});
     }
-    toast(t('bk_ok_dep'), 'success'); closeSheet(); loadBookings(); switchTab('bookings');
+    toast(t('bk_ok_dep'),'success'); closeSheet(); loadBookings(); switchTab('bookings');
   } catch(e) {
-    toast(e.message || 'Xatolik', 'error');
-    if (btn) { btn.disabled = false; btn.innerHTML = `💳 ${t('deposit_paid')}`; }
+    toast(e.message||'Xatolik','error');
+    if (btn) { btn.disabled=false; btn.innerHTML=`💳 ${t('deposit_paid')}`; }
   }
 }
 
-/* ── SEARCH ── */
+/* ════════════════════════
+   SEARCH
+════════════════════════ */
 let _st;
 document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(_st); _st = setTimeout(() => { S.q = e.target.value.trim(); applyFilters(); }, 250);
 });
 
 function requestGeo() {
-  if (!navigator.geolocation) { S.coords = { lat: 41.2995, lng: 69.2401 }; return; }
+  if (!navigator.geolocation) { S.coords = {lat:41.2995,lng:69.2401}; return; }
   navigator.geolocation.getCurrentPosition(
-    p => { S.coords = { lat: p.coords.latitude, lng: p.coords.longitude }; loadRestaurants(); },
-    () => { S.coords = { lat: 41.2995, lng: 69.2401 }; },
+    p => { S.coords = {lat:p.coords.latitude,lng:p.coords.longitude}; loadRestaurants(); },
+    () => { S.coords = {lat:41.2995,lng:69.2401}; },
     { timeout: 5000 }
   );
 }
 
+/* ════════════════════════
+   INIT
+════════════════════════ */
 async function init() {
   applyTheme();
-  if (tg?.onEvent) tg.onEvent('themeChanged', () => { if (S.theme === 'auto') applyTheme(); });
+  if (tg?.onEvent) tg.onEvent('themeChanged', () => { if (S.theme==='auto') applyTheme(); });
   const savedLang = localStorage.getItem('ot_lang');
   if (savedLang) S.lang = savedLang;
   else if (tg?.initDataUnsafe?.user?.language_code) {
     const lc = tg.initDataUnsafe.user.language_code;
-    S.lang = lc.startsWith('ru') ? 'ru' : lc.startsWith('en') ? 'en' : 'uz';
+    S.lang = lc.startsWith('ru')?'ru':lc.startsWith('en')?'en':'uz';
   }
   applyLang(); renderChips();
   await auth();
-  document.getElementById('home-user-name').textContent = S.user?.first_name || (S.lang==='uz'?'mehmon':S.lang==='ru'?'гость':'guest');
+  document.getElementById('home-user-name').textContent = S.user?.first_name || 'mehmon';
   requestGeo();
   await loadRestaurants();
-  // Pre-load bookings for review eligibility check
   loadBookings();
-  const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; obs.unobserve(e.target); } }), { threshold: .08 });
-  document.querySelectorAll('.section').forEach(el => { el.style.opacity='0'; el.style.transform='translateY(14px)'; el.style.transition='opacity .65s ease, transform .65s ease'; obs.observe(el); });
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
